@@ -1,0 +1,198 @@
+/* LoadingScreen.css */
+
+.loading-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient glows */
+.loading-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 109, 240, 0.12) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* Film strip decoration */
+.loading-filmstrip {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-12);
+  animation: fadeIn 0.5s ease both;
+}
+
+.loading-film-frame {
+  width: 112px;
+  height: 156px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.loading-film-frame::before,
+.loading-film-frame::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--color-bg);
+  border-radius: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.loading-film-frame::before { top: 5px; }
+.loading-film-frame::after  { bottom: 5px; }
+
+.loading-film-frame.active {
+  border-color: var(--color-accent);
+  background: linear-gradient(135deg, rgba(0,232,122,0.12), rgba(124,109,240,0.12));
+}
+
+/* hide the film-strip sprocket holes once a poster fills the frame */
+.loading-film-frame.active::before,
+.loading-film-frame.active::after {
+  display: none;
+}
+
+/* Movie title inside a filled frame (fallback when no poster) */
+.loading-film-title {
+  position: absolute;
+  inset: 12px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* Found movie poster filling the frame */
+.loading-film-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Main content */
+.loading-content {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.loading-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.02em;
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+
+.loading-subtitle {
+  font-size: 1.15rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-8);
+  font-weight: 500;
+  animation: fadeUp 0.5s 0.2s ease both;
+}
+
+/* Progress bar */
+.loading-progress-wrap {
+  margin-bottom: var(--space-6);
+  animation: fadeUp 0.5s 0.3s ease both;
+}
+
+.loading-progress-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.loading-progress-bar-fill {
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: var(--radius-full);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.loading-progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(0,232,122,0.8);
+}
+
+.loading-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-4);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.loading-progress-count {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-accent);
+  font-size: 1.15rem;
+}
+
+/* Friendly wait message */
+.loading-note {
+  margin-top: var(--space-8);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--color-text-faint);
+  animation: fadeUp 0.5s 0.4s ease both;
+}
+
+/* No API key notice */
+.loading-nokey {
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-6);
+  background: rgba(245, 166, 35, 0.1);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-accent-3);
+  text-align: center;
+  animation: fadeIn 0.5s 0.5s ease both;
+}

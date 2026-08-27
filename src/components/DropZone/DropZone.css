@@ -1,0 +1,262 @@
+/* DropZone.css */
+
+.dropzone-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-8);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Header */
+.dropzone-header {
+  text-align: center;
+  margin-bottom: var(--space-10);
+  max-width: 900px;
+}
+
+.dropzone-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-badge);
+}
+
+.dropzone-logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.dropzone-logo-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  text-transform: uppercase;
+}
+
+/* Main Headline (Larger size with solid Letterboxd 3-color brand styling) */
+.dropzone-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.4rem, 7.5vw, 5.5rem);
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-4);
+}
+
+.dropzone-title .letterboxd-brand {
+  display: inline-block;
+}
+
+.dropzone-title .lb-orange {
+  color: #ff8000;
+}
+
+.dropzone-title .lb-green {
+  color: #00e054;
+}
+
+.dropzone-title .lb-blue {
+  color: #40bcf4;
+}
+
+.dropzone-title .unwrapped-highlight {
+  color: #ffffff;
+}
+
+.dropzone-subtitle {
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* Drop Area */
+.dropzone-area {
+  width: 100%;
+  max-width: 720px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-12) var(--space-10);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: var(--color-surface);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzone-area:hover,
+.dropzone-area:focus-within {
+  border-color: var(--color-accent);
+  background: var(--color-surface-raised);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+}
+
+.dropzone-area.dragging {
+  border-color: var(--color-accent);
+  background: var(--color-surface-raised);
+  transform: scale(1.02) translateY(-4px);
+}
+
+.dropzone-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Centered Upload Icon */
+.dropzone-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+.dropzone-icon svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.dropzone-area-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+  text-align: center;
+}
+
+.dropzone-area-sub {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+  font-weight: 500;
+  text-align: center;
+}
+
+.dropzone-or {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-5);
+  text-align: center;
+}
+
+/* Rigid Button */
+.dropzone-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-accent);
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  border-radius: var(--radius-button);
+  transition: all var(--transition-base);
+  pointer-events: none;
+  margin: 0 auto;
+}
+
+.dropzone-error-msg {
+  margin-top: var(--space-5);
+  padding: var(--space-4) var(--space-6);
+  background: rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent-warm);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Guide Steps */
+.dropzone-guide {
+  margin-top: var(--space-10);
+  max-width: 720px;
+  width: 100%;
+}
+
+.dropzone-guide-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+.dropzone-guide-steps {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.dropzone-guide-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-badge);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.dropzone-guide-step-num {
+  width: 24px;
+  height: 24px;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+/* Privacy */
+.dropzone-privacy {
+  margin-top: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-faint);
+}

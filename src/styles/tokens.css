@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap');
+
+:root {
+  /* Surface Colors */
+  --color-bg: #090912;
+  --color-surface: #11111d;
+  --color-surface-raised: #181828;
+  --color-surface-active: #202034;
+  
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-hover: rgba(255, 255, 255, 0.22);
+  --color-border-emerald: rgba(0, 232, 122, 0.35);
+
+  /* Solid Accents */
+  --color-accent: #00e87a;
+  --color-accent-bg: rgba(0, 232, 122, 0.1);
+  --color-accent-2: #7c6df0;
+  --color-accent-2-bg: rgba(124, 109, 240, 0.1);
+  --color-accent-3: #f5a623;
+  --color-accent-3-bg: rgba(245, 166, 35, 0.1);
+  --color-accent-warm: #ff6b6b;
+  --color-accent-4: #45b6ff;
+  --color-accent-4-bg: rgba(69, 182, 255, 0.1);
+  --color-muted-blue: #3c4a70;
+
+  /* Text */
+  --color-text: #ffffff;
+  --color-text-muted: #9e9ea8;
+  --color-text-faint: #606078;
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Rigid Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-button: 8px;
+  --radius-badge: 6px;
+  --radius-card: 18px;
+  --radius-full: 999px;
+
+  /* Shadows */
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.5);
+
+  /* Gradients (used sparingly, per design guidelines) */
+  --gradient-accent: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}

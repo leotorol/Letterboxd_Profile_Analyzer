@@ -1,0 +1,254 @@
+/* QuickFacts.css */
+
+.qf-section {
+  min-height: 100vh;
+  padding: var(--space-12) var(--space-10) var(--space-16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Header */
+.qf-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+  max-width: 900px;
+}
+
+.qf-category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-badge);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-4);
+}
+
+.qf-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.qf-username {
+  color: var(--color-accent);
+}
+
+.qf-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Bento Grid Architecture */
+.qf-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* Generic Bento Card Base */
+.bento-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* Card Header & Icon */
+.bento-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.bento-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bento-icon {
+  font-size: 1.6rem;
+  width: 44px;
+  height: 44px;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+}
+
+.bento-label {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+/* Bento Card Spans */
+.bento-span-2 {
+  grid-column: span 2;
+}
+
+.bento-span-3 {
+  grid-column: span 3;
+}
+
+/* Bento Hero Numbers */
+.bento-number {
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 5vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-text);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2);
+}
+
+.bento-number-unit {
+  font-size: 0.55em;
+  color: var(--color-text-muted);
+  margin-left: 4px;
+}
+
+.bento-number-sub-minutes {
+  font-size: 0.4em;
+  color: var(--color-text-muted);
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+.bento-subtext {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* Specialized Widget 1: Watched Meter */
+.bento-meter-wrap {
+  margin-top: var(--space-6);
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  border: none;
+}
+
+.bento-meter-bar {
+  height: 8px;
+  background: var(--color-muted-blue);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.bento-meter-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+
+.bento-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* Specialized Widget 2: Star Rating Gauge */
+.rating-stars-gauge {
+  display: flex;
+  gap: 6px;
+  margin: var(--space-4) 0;
+}
+
+.star-box {
+  flex: 1;
+  height: 8px;
+  background: var(--color-surface-raised);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.star-box-fill {
+  height: 100%;
+  background: var(--color-accent-3);
+  border-radius: 3px;
+}
+
+/* Specialized Widget 3: Watchlist Dual Split */
+.watchlist-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-4);
+}
+
+.watchlist-stat-box {
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+.watchlist-stat-box:first-child {
+  border-right: 1px solid var(--color-border);
+  padding-right: var(--space-8);
+}
+
+.watchlist-stat-box:last-child {
+  padding-left: var(--space-8);
+}
+
+/* Enrichment Report Banner */
+.qf-enrichment-banner {
+  width: 100%;
+  max-width: 1400px;
+  padding: var(--space-4) var(--space-6);
+  background: rgba(255, 165, 0, 0.08);
+  border: 1px solid rgba(255, 165, 0, 0.25);
+  border-radius: var(--radius-card);
+  margin-bottom: var(--space-8);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-accent-warm);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .qf-bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-span-2,
+  .bento-span-3 {
+    grid-column: span 1;
+  }
+  .watchlist-split {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}

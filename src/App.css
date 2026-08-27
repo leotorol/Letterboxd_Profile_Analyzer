@@ -1,0 +1,31 @@
+/* App.css — shared app-level styles */
+
+/* Upload a different file — always pinned at the very bottom of the page */
+.qf-reset-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.qf-reset-btn {
+  margin-top: var(--space-12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.qf-reset-btn:hover {
+  border-color: var(--color-accent-warm);
+  color: var(--color-accent-warm);
+  background: var(--color-surface-raised);
+  transform: translateY(-2px);
+}

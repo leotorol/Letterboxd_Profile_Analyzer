@@ -1,0 +1,307 @@
+/* Heatmap.css */
+
+.ry-heat {
+  --cell-min: 15px;
+  --cell-h: 30px;
+  --gap: 4px;
+  --month-row-h: 1rem;
+  position: relative;
+  width: 100%;
+}
+
+/* Horizontal overflow for small screens; centered + full width when it fits */
+.ry-heat-scroll {
+  overflow-x: auto;
+  width: 100%;
+  padding: var(--space-1) 0 var(--space-2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-muted-blue) transparent;
+}
+
+.ry-heat-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+/* Weekday gutter — row-gap MUST match the grid's gap or labels drift */
+.ry-heat-weekdays {
+  display: grid;
+  grid-template-rows: repeat(7, var(--cell-h));
+  grid-auto-flow: column;
+  row-gap: var(--gap);
+  align-items: center;
+  width: 46px;
+  flex-shrink: 0;
+  /* drop the labels down past the month row so each one lines up with its day row */
+  padding-top: calc(var(--month-row-h) + var(--space-2));
+}
+
+.ry-heat-weekday-label {
+  grid-column: 1;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ry-heat-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Month labels */
+.ry-heat-months {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(var(--cell-min), 1fr));
+  column-gap: var(--gap);
+  margin-bottom: var(--space-2);
+  height: var(--month-row-h);
+  overflow: visible;
+}
+
+.ry-heat-month-label {
+  grid-row: 1;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  line-height: var(--month-row-h);
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* The grid of days: rectangular cells stretching to fill the whole card */
+.ry-heat-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(var(--cell-min), 1fr));
+  grid-auto-rows: var(--cell-h);
+  gap: var(--gap);
+  width: 100%;
+}
+
+/* Day cells */
+.ry-heat-cell {
+  min-width: var(--cell-min);
+  height: var(--cell-h);
+  border-radius: 5px;
+  background: var(--color-surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.ry-heat-cell.lv1 { background: rgba(0, 232, 122, 0.28); border-color: transparent; }
+.ry-heat-cell.lv2 { background: rgba(0, 232, 122, 0.5); border-color: transparent; }
+.ry-heat-cell.lv3 { background: rgba(0, 232, 122, 0.72); border-color: transparent; }
+.ry-heat-cell.lv4 { background: var(--color-accent); border-color: transparent; }
+
+/* Empty/future days get a faint ghost so the full-year grid reads as one block */
+.ry-heat-cell.blank {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Only real data cells react to the pointer */
+.ry-heat-grid .ry-heat-cell:not(.blank):hover {
+  transform: scale(1.15);
+  border-color: var(--color-border-hover);
+  z-index: 2;
+  position: relative;
+}
+
+/* Legend */
+.ry-heat-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.ry-heat-legend .ry-heat-cell {
+  pointer-events: none;
+  height: 16px;
+  min-width: 16px;
+}
+
+.ry-heat-legend-text {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Hover micro-tooltip (simple count popover) */
+.ry-heat-mini-tip {
+  position: absolute;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translate(-50%, -110%);
+}
+
+.ry-heat-mini-count {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  line-height: 1;
+}
+
+.ry-heat-mini-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* Pinned film-list tooltip */
+.ry-heat-tooltip {
+  position: absolute;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  min-width: 300px;
+  max-width: 380px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
+
+.ry-heat-tooltip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ry-heat-tooltip-total {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.ry-heat-tooltip-count {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  line-height: 1;
+}
+
+.ry-heat-tooltip-count-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ry-heat-tooltip-date {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.ry-heat-tooltip-films {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 460px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-muted-blue) transparent;
+}
+
+.ry-heat-film {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ry-heat-film-poster {
+  width: 72px;
+  height: 108px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.ry-heat-film-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ry-heat-film-poster-missing {
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(135deg, var(--color-surface-active) 0%, var(--color-surface) 100%);
+}
+
+.ry-heat-film-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ry-heat-film-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ry-heat-film-year {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.ry-heat-tooltip-more {
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--color-border);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .ry-heat {
+    --cell-h: 22px;
+    --cell-min: 11px;
+  }
+  .ry-heat-weekdays {
+    width: 34px;
+  }
+}

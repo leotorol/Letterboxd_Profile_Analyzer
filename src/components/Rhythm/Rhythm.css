@@ -1,0 +1,822 @@
+/* Rhythm.css */
+
+.ry-section {
+  min-height: 100vh;
+  padding: var(--space-12) var(--space-10) var(--space-16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Header (matches the incumbent section header) */
+.ry-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+  max-width: 900px;
+}
+
+.ry-category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-badge);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-4);
+}
+
+.ry-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.ry-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Empty state */
+.ry-empty {
+  max-width: 520px;
+  width: 100%;
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.ry-empty svg {
+  color: var(--color-accent);
+}
+
+.ry-empty code {
+  color: var(--color-accent);
+}
+
+/* Bento grid */
+.ry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* Card base */
+.ry-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: relative;
+  overflow: hidden;
+}
+
+/* the heatmap card lets its tooltip float above everything else */
+.ry-card:has(.ry-heat) {
+  overflow: visible;
+}
+
+.ry-span-2 {
+  grid-column: span 2;
+}
+
+.ry-span-3 {
+  grid-column: span 3;
+}
+
+/* Card head */
+.ry-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ry-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ry-card-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+}
+
+.ry-card-label {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.ry-card-note {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+/* helper line nudging users to click a heatmap day */
+.ry-click-hint {
+  margin-top: -4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+  letter-spacing: 0.01em;
+}
+
+/* Hero numbers */
+.ry-hero-numbers {
+  display: flex;
+  gap: var(--space-10);
+  flex-wrap: wrap;
+}
+
+.ry-hero-number {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 4vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-text);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ry-hero-number-muted {
+  color: var(--color-text-faint);
+}
+
+.ry-hero-unit {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-left: var(--space-2);
+}
+
+.ry-hero-subtext {
+  margin-top: var(--space-2);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* Year navigator */
+.ry-year-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  align-self: center;
+}
+
+.ry-year-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
+}
+
+.ry-year-btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-surface-active);
+}
+
+.ry-year-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ry-year-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.ry-year-value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-text);
+  min-width: 76px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Streak blocks */
+.ry-streak-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ry-streak-number {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 3.5vw, 3rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+}
+
+.ry-streak-unit {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ry-streak-subtext {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* disclaimer that the current streak is not the record */
+.ry-streak-note {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-top: var(--space-2);
+}
+
+.ry-streak-note strong {
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+/* Horizontal poster strip filling the empty space of the Streaks card */
+.ry-streak-films {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex: 1;
+  min-height: 0;
+  margin: calc(var(--space-2) * -1) calc(var(--space-8) * -1);
+  padding: var(--space-3) var(--space-8);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-muted-blue) transparent;
+}
+
+.ry-streak-film {
+  /* each poster takes exactly a quarter of the strip, minus the gaps, so
+     four of them always sit snug with no scroll on any screen width */
+  flex: 0 0 calc((100% - 3 * var(--space-3)) / 4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ry-streak-film-poster {
+  width: 100%;
+  height: 156px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.ry-streak-film-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ry-streak-film-poster-missing {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--color-surface-active) 0%, var(--color-surface) 100%);
+}
+
+.ry-streak-film-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pair of side-by-side mini stats that anchor to the bottom of the card so
+   the card doesn't feel half-empty next to a taller neighbour */
+.ry-mini-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: auto;
+}
+
+.ry-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.ry-mini-number {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ry-mini-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+/* single tile filling the whole row width */
+.ry-mini-solo {
+  width: 100%;
+}
+
+.ry-divider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* When you watch: weekday bars */
+.ry-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ry-bar-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 34px;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ry-bar-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.ry-bar-track {
+  height: 10px;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.ry-bar-fill {
+  height: 100%;
+  background: var(--color-accent-3);
+  opacity: 0.35;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition-base);
+}
+
+.ry-bar-fill.is-peak {
+  opacity: 1;
+}
+
+.ry-bar-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Month seasonality banner: grows so it always fills the card, no dead space
+   below the bars when this card is shorter than its neighbour */
+.ry-month-banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-height: 0;
+  justify-content: flex-end;
+}
+
+.ry-month-banner-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ry-month-banner-value {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--color-accent-4);
+  line-height: 1;
+}
+
+.ry-month-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
+  flex: 1;
+  min-height: 44px;
+  margin-top: var(--space-1);
+}
+
+.ry-month-bar {
+  position: relative;
+  flex: 1;
+  background: var(--color-accent-4);
+  opacity: 0.35;
+  border-radius: 3px 3px 0 0;
+  min-height: 3px;
+  transition: opacity var(--transition-base);
+}
+
+.ry-month-bar.is-peak {
+  opacity: 1;
+}
+
+.ry-month-bar:hover {
+  opacity: 1;
+}
+
+/* dark micro-tooltip that floats above the hovered month bar */
+.ry-month-tip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.ry-month-tip-count {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--color-accent-4);
+  line-height: 1;
+}
+
+.ry-month-tip-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* Pace over time: SVG trend chart */
+.ry-evo {
+  position: relative;
+  width: 100%;
+}
+
+.ry-evo-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+}
+
+.ry-evo-grid {
+  stroke: #1f1f33;
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.ry-evo-area {
+  fill: var(--color-accent-4);
+  opacity: 0.16;
+}
+
+.ry-evo-line {
+  fill: none;
+  stroke: var(--color-accent-4);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ry-evo-peak {
+  fill: var(--color-accent-4);
+  stroke: var(--color-bg);
+  stroke-width: 2;
+}
+
+.ry-evo-tick {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.ry-evo-year {
+  fill: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+.ry-evo-guide {
+  stroke: var(--color-border-hover);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.ry-evo-dot {
+  fill: var(--color-accent-4);
+  stroke: var(--color-bg);
+  stroke-width: 2;
+}
+
+.ry-evo-tooltip {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -60%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.ry-evo-tooltip-count {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--color-accent-4);
+  line-height: 1;
+}
+
+.ry-evo-tooltip-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* Idle projection / comfort states */
+.ry-projection-idle,
+.ry-comfort-idle {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* Pace evolution: compact yearly sparkline inside the projection card */
+.ry-proj-evolution {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ry-proj-evo-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.ry-proj-evo-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.ry-proj-evo-sub {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ry-proj-evo-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ry-proj-evo-area {
+  fill: var(--color-accent-2);
+  opacity: 0.16;
+}
+
+.ry-proj-evo-line {
+  fill: none;
+  stroke: var(--color-accent-2);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ry-proj-evo-year {
+  fill: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+.ry-proj-takeaway {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.ry-proj-takeaway strong {
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+/* Comfort movies: centered stripe of big-poster cards that fill the card width */
+.ry-comfort-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-5);
+  align-items: flex-start;
+}
+
+.ry-comfort-item {
+  flex: 1 1 0;
+  min-width: 150px;
+  max-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ry-comfort-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.ry-comfort-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ry-comfort-poster-missing {
+  width: 100%;
+  height: 100%;
+  background: var(--color-surface-active);
+}
+
+.ry-comfort-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ry-comfort-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.ry-comfort-rank {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ry-comfort-count {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-accent-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.ry-comfort-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.ry-comfort-year {
+  margin-left: var(--space-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.ry-comfort-last {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.ry-comfort-foot {
+  margin-top: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* Responsive: collapse to single column */
+@media (max-width: 1024px) {
+  .ry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ry-span-2,
+  .ry-span-3 {
+    grid-column: span 1;
+  }
+
+  .ry-card-note {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .ry-hero-numbers {
+    gap: var(--space-6);
+  }
+
+  .ry-comfort-item {
+    min-width: 128px;
+    max-width: 180px;
+  }
+
+  .ry-card {
+    padding: var(--space-6);
+  }
+}
