@@ -113,7 +113,3 @@ letterboxd stats/
 ## Data privacy
 
 Your Letterboxd export is parsed and enriched entirely in the browser. Raw movie metadata (title + year) is sent to TMDB to fetch extra details, but no personal account data is transmitted or stored anywhere. Enrichment results are cached in your browser's `localStorage` only.
-
-## Design guidelines
-
-See [`DESIGN_GUIDELINES.md`](./DESIGN_GUIDELINES.md) and [`CODE_QUALITY_GUIDELINES.md`](./CODE_QUALITY_GUIDELINES.md) for the visual direction and engineering conventions this project follows.

@@ -524,12 +524,14 @@
 .ry-evo {
   position: relative;
   width: 100%;
+  height: 340px;
+  margin-top: auto;
 }
 
 .ry-evo-svg {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   cursor: crosshair;
 }
 

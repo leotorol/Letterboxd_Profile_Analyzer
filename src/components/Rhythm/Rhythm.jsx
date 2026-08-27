@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useData } from '../../context/DataContext';
 import { useRhythmStats, buildYearGrid } from '../../hooks/useRhythmStats';
 import { useCountUp } from '../../hooks/useCountUp';
@@ -124,11 +124,27 @@ function patternNote(item, kind) {
  */
 function TrendChart({ series }) {
   const [hover, setHover] = useState(-1);
+  const containerRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 720, height: 250 });
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width > 0 && height > 0) {
+          setDimensions({ width: Math.round(width), height: Math.round(height) });
+        }
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const chart = useMemo(() => {
-    const W = 720;
-    const H = 250;
-    const padL = 10;
+    const W = dimensions.width;
+    const H = dimensions.height;
+    const padL = 40;
     const padR = 10;
     const padT = 20;
     const padB = 30;
@@ -174,7 +190,7 @@ function TrendChart({ series }) {
 
   if (series.length === 0) return null;
 
-  const { W, H, padL, padT, baseY, n, x, y, linePath, areaPath, gridLines, ticks } = chart;
+  const { W, H, padL, padR, padT, baseY, n, x, y, linePath, areaPath, gridLines, ticks } = chart;
   const hovered = hover >= 0 && hover < n ? series[hover] : null;
 
   /**
@@ -189,15 +205,17 @@ function TrendChart({ series }) {
   function onMove(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientX - rect.left) / rect.width;
-    const idx = Math.round(ratio * (n - 1));
+    const plotRatio = (ratio * W - padL) / (W - padL - padR);
+    const idx = Math.round(plotRatio * (n - 1));
     setHover(Math.max(0, Math.min(n - 1, idx)));
   }
 
   return (
-    <div className="ry-evo">
+    <div className="ry-evo" ref={containerRef}>
       <svg
         className="ry-evo-svg"
         viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
         role="img"
         aria-label="Films watched per month over time"
         onMouseMove={onMove}
@@ -354,10 +372,11 @@ function PaceEvolution({ series = [] }) {
         <span className="ry-proj-evo-sub">films per year</span>
       </div>
       <svg
-        className="ry-proj-evo-svg"
+        className="ry-evo-svg"
         viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
         role="img"
-        aria-label="Films watched per year over your whole Letterboxd life"
+        aria-label="Films watched per year"
       >
         <path className="ry-proj-evo-area" d={area} />
         <path className="ry-proj-evo-line" d={line} />
@@ -436,7 +455,7 @@ export default function Rhythm() {
           )}
         </h2>
         <p className="ry-subtitle">
-          You've seen borring facts. Now let's start with the fun part: when, how often, and
+          You've seen boring facts. Now let's start with the fun part: when, how often, and
           patterns hiding inside your film watching routine.
         </p>
       </header>
