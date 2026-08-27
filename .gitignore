@@ -14,9 +14,8 @@ dist-ssr
 !.vscode/extensions.json
 .claude/
 .gemini/
-.cursor/
+.impeccable/
 .llm_skills/
-.idea
 .DS_Store
 Thumbs.db
 *.suo
@@ -29,8 +28,6 @@ Thumbs.db
 .env.local
 .env.*.local
 coverage/
-*.md
-README.md
 DESIGN_GUIDELINES.md
 CODE_QUALITY_GUIDELINES.md
 PRODUCT.md
