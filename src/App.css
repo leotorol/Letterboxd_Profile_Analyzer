@@ -4,6 +4,7 @@
 .qf-reset-wrap {
   display: flex;
   justify-content: center;
+  padding: 0 80px;
 }
 
 .qf-reset-btn {
@@ -28,4 +29,9 @@
   color: var(--color-accent-warm);
   background: var(--color-surface-raised);
   transform: translateY(-2px);
+}
+
+.qf-reset-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }

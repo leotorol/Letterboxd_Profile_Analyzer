@@ -44,7 +44,7 @@ export function useLetterboxdData() {
         TMDB_API_KEY,
         (processed, total, batch) => {
           if (Array.isArray(batch)) {
-            const posterBase = 'https://image.tmdb.org/t/p/w92';
+            const posterBase = 'https://image.tmdb.org/t/p/w185';
             const entries = batch.map(m => ({
               name: m.name,
               year: m.year,

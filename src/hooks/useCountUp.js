@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 /**
  * Custom hook to animate a numerical value from 0 to target using requestAnimationFrame.
  *
- * Employs ease-out-cubic easing for smooth deceleration.
+ * Employs ease-out-cubic easing for smooth deceleration. Respects prefers-reduced-motion.
  *
  * Args:
  *   target (number): Destination integer value to animate towards.
@@ -14,12 +14,18 @@ import { useState, useEffect, useRef } from 'react';
  *   number: Current animated integer value during frame updates.
  */
 export function useCountUp(target, duration = 1600, delay = 0) {
+  const prefersReducedMotion = typeof window !== 'undefined'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   const [value, setValue] = useState(0);
   const frameRef = useRef(null);
 
   useEffect(() => {
-    // don't run animation on zero or null targets
     if (target === 0 || target == null) return;
+
+    // if reduced motion is preferred, jump straight to the target
+    if (prefersReducedMotion) return;
+
     const startTime = performance.now() + delay;
 
     /**
@@ -46,7 +52,10 @@ export function useCountUp(target, duration = 1600, delay = 0) {
 
     frameRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameRef.current);
-  }, [target, duration, delay]);
+  }, [target, duration, delay, prefersReducedMotion]);
+
+  // when reduced motion is preferred, skip animation entirely
+  if (prefersReducedMotion) return target ?? 0;
 
   return value;
 }

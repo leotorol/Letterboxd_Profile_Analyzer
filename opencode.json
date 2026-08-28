@@ -1,0 +1,22 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"],
+      "enabled": true
+    }
+  },
+  "references": {
+    "ejemplos_lbx": {
+      "path": "C:/Users/usuario/Downloads/ejemplos zip lbx",
+      "description": "Carpeta con los zips de ejemplo de Letterboxd para probar la importacion"
+    }
+  },
+  "permission": {
+    "external_directory": {
+      "*": "ask",
+      "C:/Users/usuario/Downloads/ejemplos zip lbx/**": "allow"
+    }
+  }
+}

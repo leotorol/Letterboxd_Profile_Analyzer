@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useData } from './context/DataContext';
 import DropZone from './components/DropZone/DropZone';
 import LoadingScreen from './components/LoadingScreen/LoadingScreen';
@@ -22,6 +23,10 @@ const ArrowLeftIcon = () => (
 export default function App() {
   const { appState, setAppState, setRawData, setEnrichedData, setEnrichmentReport } = useData();
 
+  useEffect(() => {
+    if (appState === 'ready') window.scrollTo(0, 0);
+  }, [appState]);
+
   function handleReset() {
     setAppState('idle');
     setRawData(null);
@@ -32,7 +37,8 @@ export default function App() {
   // switch between upload, loading progress, and stats dashboard screens
   return (
     <ErrorBoundary>
-      <main>
+      <a href="#main-content" className="skip-nav">Skip to content</a>
+      <main id="main-content">
         {appState === 'idle'    && <DropZone />}
         {appState === 'loading' && <LoadingScreen />}
         {appState === 'ready'   && (

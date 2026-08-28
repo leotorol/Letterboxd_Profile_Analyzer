@@ -177,7 +177,7 @@ function TrendChart({ series }) {
     });
 
     return { W, H, padL, padR, padT, padB, baseY, max, n, x, y, linePath, areaPath, gridLines, ticks };
-  }, [series]);
+  }, [series, dimensions.width, dimensions.height]);
 
   const peak = useMemo(() => {
     if (series.length === 0) return null;
@@ -672,7 +672,9 @@ export default function Rhythm() {
               </p>
             )}
 
-            <PaceEvolution series={stats.evolution} />
+            <div style={{ marginTop: 'auto' }}>
+              <PaceEvolution series={stats.evolution} />
+            </div>
           </section>
 
           {/* 06 — Comfort movies */}
@@ -718,7 +720,7 @@ export default function Rhythm() {
               </div>
             ) : (
               <p className="ry-comfort-idle">
-                No rewatching detected — every film was a one-time thing. That's a
+                No rewatching detected, every film was a one-time thing. That's a
                 decisive (if stubborn) viewing style.
               </p>
             )}

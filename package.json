@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.102.5",
     "jszip": "^3.10.1",
     "papaparse": "^5.7.0",
     "react": "^19.2.8",

@@ -1,0 +1,16 @@
+- main [ref=e3]:
+  - generic [ref=e33]:
+    - generic "Recently found movies" [ref=e34]:
+      - generic "Good Will Hunting (1997)" [ref=e47]
+      - generic "Ocean Waves (1993)" [ref=e48]
+      - generic "Suzume (2022)" [ref=e49]
+      - generic "Your Name. (2016)" [ref=e50]
+      - generic "Memories of Murder (2003)" [ref=e51]
+    - generic [ref=e38]:
+      - heading "Analysing leotorol…" [level=1] [ref=e39]
+      - paragraph [ref=e40]: Enriching your movies with TMDB data
+      - progressbar [ref=e41]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: 100 of 356 movies enriched
+          - generic [ref=e45]: 28%
+      - paragraph [ref=e46]: This may take a while after you upload, remember it's a free project running on your own machine :):):)

@@ -1,37 +1,38 @@
 /* DropZone.css */
 
 .dropzone-wrapper {
-  min-height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-12) var(--space-8);
+  padding: var(--space-3) var(--space-6);
   position: relative;
   overflow: hidden;
   width: 100%;
+  gap: var(--space-3);
 }
 
 /* Header */
 .dropzone-header {
   text-align: center;
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-3);
   max-width: 900px;
 }
 
 .dropzone-logo {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-6);
-  padding: var(--space-2) var(--space-5);
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-badge);
 }
 
 .dropzone-logo-img {
-  height: 36px;
+  height: 28px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -39,7 +40,7 @@
 
 .dropzone-logo-text {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: var(--color-text);
@@ -49,12 +50,12 @@
 /* Main Headline (Larger size with solid Letterboxd 3-color brand styling) */
 .dropzone-title {
   font-family: var(--font-display);
-  font-size: clamp(3.4rem, 7.5vw, 5.5rem);
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
   font-weight: 900;
   color: var(--color-text);
   line-height: 1.05;
   letter-spacing: -0.03em;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-1);
 }
 
 .dropzone-title .letterboxd-brand {
@@ -62,15 +63,15 @@
 }
 
 .dropzone-title .lb-orange {
-  color: #ff8000;
+  color: var(--color-lb-orange);
 }
 
 .dropzone-title .lb-green {
-  color: #00e054;
+  color: var(--color-lb-green);
 }
 
 .dropzone-title .lb-blue {
-  color: #40bcf4;
+  color: var(--color-lb-blue);
 }
 
 .dropzone-title .unwrapped-highlight {
@@ -78,11 +79,11 @@
 }
 
 .dropzone-subtitle {
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: var(--color-text-muted);
   max-width: 640px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.4;
   font-weight: 500;
 }
 
@@ -92,7 +93,7 @@
   max-width: 720px;
   border: 2px dashed var(--color-border);
   border-radius: var(--radius-card);
-  padding: var(--space-12) var(--space-10);
+  padding: var(--space-5) var(--space-8);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-base);
@@ -108,14 +109,19 @@
 .dropzone-area:focus-within {
   border-color: var(--color-accent);
   background: var(--color-surface-raised);
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-card);
+}
+
+.dropzone-area:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
 }
 
 .dropzone-area.dragging {
   border-color: var(--color-accent);
   background: var(--color-surface-raised);
-  transform: scale(1.02) translateY(-4px);
+  transform: scale(1.01) translateY(-2px);
 }
 
 .dropzone-input {
@@ -133,7 +139,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-2);
 }
 
 .dropzone-icon svg {
@@ -143,28 +149,28 @@
 
 .dropzone-area-title {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: var(--color-text);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-1);
   text-align: center;
 }
 
 .dropzone-area-sub {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: var(--color-text-muted);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-2);
   font-weight: 500;
   text-align: center;
 }
 
 .dropzone-or {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-text-faint);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-2);
   text-align: center;
 }
 
@@ -174,12 +180,12 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-8);
+  padding: var(--space-3) var(--space-6);
   background: var(--color-accent);
   color: #000;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   border-radius: var(--radius-button);
   transition: all var(--transition-base);
   pointer-events: none;
@@ -187,37 +193,37 @@
 }
 
 .dropzone-error-msg {
-  margin-top: var(--space-5);
-  padding: var(--space-4) var(--space-6);
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: rgba(255, 107, 107, 0.12);
   border: 1px solid rgba(255, 107, 107, 0.4);
   border-radius: var(--radius-sm);
   color: var(--color-accent-warm);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-align: center;
 }
 
 /* Guide Steps */
 .dropzone-guide {
-  margin-top: var(--space-10);
+  margin-top: var(--space-3);
   max-width: 720px;
   width: 100%;
 }
 
 .dropzone-guide-title {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-text-faint);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
   text-align: center;
 }
 
 .dropzone-guide-steps {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-3);
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -225,25 +231,25 @@
 .dropzone-guide-step {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-badge);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text-muted);
 }
 
 .dropzone-guide-step-num {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   background: var(--color-surface-raised);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 800;
   color: var(--color-accent);
   flex-shrink: 0;
@@ -251,12 +257,12 @@
 
 /* Privacy */
 .dropzone-privacy {
-  margin-top: var(--space-8);
+  margin-top: var(--space-3);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: var(--color-text-faint);
 }

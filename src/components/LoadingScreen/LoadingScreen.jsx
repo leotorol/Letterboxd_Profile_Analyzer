@@ -32,7 +32,7 @@ export default function LoadingScreen() {
               title={movie ? `${movie.name}${movie.year ? ` (${movie.year})` : ''}` : ''}
             >
               {movie?.poster
-                ? <img className="loading-film-poster" src={movie.poster} alt="" loading="lazy" />
+                ? <img className="loading-film-poster" src={movie.poster} alt="" loading="eager" decoding="async" />
                 : movie && <div className="loading-film-title">{movie.name}</div>}
             </div>
           );

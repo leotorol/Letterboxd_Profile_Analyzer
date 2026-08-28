@@ -32,6 +32,11 @@
   gap: var(--space-4);
   margin-bottom: var(--space-12);
   animation: fadeIn 0.5s ease both;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: var(--space-2) 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) transparent;
 }
 
 .loading-film-frame {

@@ -3,9 +3,9 @@ import { useMemo } from 'react';
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DISPLAY_WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 // thumbnails in the heatmap tooltip: small enough to load fast, big enough to read
-const POSTER_BASE = 'https://image.tmdb.org/t/p/w92';
+const POSTER_BASE = 'https://image.tmdb.org/t/p/w185';
 // comfort movies are shown as big posters so we want a chunkier resolution
-const POSTER_BASE_LARGE = 'https://image.tmdb.org/t/p/w342';
+const POSTER_BASE_LARGE = 'https://image.tmdb.org/t/p/w500';
 
 // the pace window used for the forward projection
 const PACE_WINDOW_DAYS = 56;

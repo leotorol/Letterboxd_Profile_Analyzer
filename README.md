@@ -14,7 +14,7 @@ Everything runs **100% in your browser** — no data ever leaves your machine. I
 
 1. Unzips and parses your Letterboxd export locally (via JSZip + PapaParse).
 2. Enriches each movie with extra data (runtime, directors, genres, budget, posters, etc.) from the TMDB API.
-3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" radar, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, random fun stats, and a Pasapalabra-style trivia game.
+3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" radar, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, random fun stats, and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
 
 > Status: Sections 01 (Quick Facts) and 02 (Rhythm / heatmaps & comfort movies) are built and wired into the app. The remaining scroll sections are the next steps.
 
@@ -107,7 +107,7 @@ letterboxd stats/
 │   │   └── Rhythm/            # Section 02: heatmap, streaks, pace, comfort movies
 │   └── styles/
 │       ├── tokens.css         # Design tokens (colors, spacing, radii)
-│       └── global.css         # Global base styles
+│       └── global.css         # Global base styles + animated space background (stars + nebula)
 ```
 
 ## Data privacy
