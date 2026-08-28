@@ -1,5 +1,0 @@
-Muy buen sitio para ahcer guay la pagina 
-
-https://impeccable.style/tutorials/getting-started/
-
-he hecho ya el npx impeccable install
