@@ -1,0 +1,220 @@
+.cinematic-bg-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.orbital-film-strip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200vw;
+  height: 60px;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  opacity: 0.05;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 18px,
+      rgba(255, 255, 255, 0.4) 18px,
+      rgba(255, 255, 255, 0.4) 22px,
+      transparent 22px,
+      transparent 40px
+    );
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  animation: filmOrbit 90s linear infinite;
+}
+
+.orbital-film-strip::before,
+.orbital-film-strip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.5) 0px,
+      rgba(255, 255, 255, 0.5) 6px,
+      transparent 6px,
+      transparent 14px
+    );
+}
+
+.orbital-film-strip::before {
+  top: -10px;
+}
+
+.orbital-film-strip::after {
+  bottom: -10px;
+}
+
+@keyframes filmOrbit {
+  from { transform: translate(-50%, -50%) rotate(-15deg) translateX(0); }
+  to { transform: translate(-50%, -50%) rotate(-15deg) translateX(-200px); }
+}
+
+.projector-beam {
+  position: absolute;
+  top: 0;
+  right: 10%;
+  width: 300px;
+  height: 150vh;
+  background: linear-gradient(
+    170deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.02) 20%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.02) 80%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  opacity: 0.15;
+  animation: beamFlicker 6s ease-in-out infinite;
+}
+
+.beam-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 45%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 60%, rgba(255, 255, 255, 0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 75%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 85%, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+  animation: particlesFloat 20s linear infinite;
+}
+
+@keyframes beamFlicker {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.18; }
+}
+
+@keyframes particlesFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100px); }
+}
+
+.camera-constellation {
+  position: absolute;
+  top: 16%;
+  left: 5%;
+  width: 173px;
+  height: 173px;
+  transform: rotate(20deg);
+  opacity: 0.06;
+  overflow: visible;
+  animation: constellationFloat 50s ease-in-out infinite;
+}
+
+.constellation-line circle,
+.constellation-line rect,
+.constellation-line path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: constellationBlink 3s ease-in-out infinite;
+}
+
+.constellation-stars circle {
+  fill: rgba(255, 255, 255, 0.7);
+  animation: starTwinkle 2.5s ease-in-out infinite;
+}
+
+.constellation-stars circle:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+.constellation-stars circle:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes constellationBlink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes constellationFloat {
+  0%, 100% { transform: rotate(20deg) translate(0, 0); }
+  25% { transform: rotate(20deg) translate(8px, 5px); }
+  50% { transform: rotate(20deg) translate(3px, 10px); }
+  75% { transform: rotate(20deg) translate(-5px, 4px); }
+}
+
+.lbx-logo-constellation {
+  position: absolute;
+  bottom: 12%;
+  right: 6%;
+  width: 168px;
+  height: 168px;
+  transform: rotate(-12deg);
+  opacity: 0.15;
+  overflow: visible;
+  animation: lbxLogoFloat 55s ease-in-out infinite;
+}
+
+.lbx-circle-orange circle {
+  fill: none;
+  stroke: rgba(255, 140, 0, 0.7);
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: constellationBlink 3s ease-in-out infinite;
+}
+
+.lbx-circle-green circle {
+  fill: none;
+  stroke: rgba(0, 232, 122, 0.7);
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: constellationBlink 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.lbx-circle-blue circle {
+  fill: none;
+  stroke: rgba(68, 180, 255, 0.7);
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: constellationBlink 3s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+@keyframes lbxLogoFloat {
+  0%, 100% { transform: rotate(-12deg) translate(0, 0); }
+  25% { transform: rotate(-12deg) translate(6px, 4px); }
+  50% { transform: rotate(-12deg) translate(2px, 8px); }
+  75% { transform: rotate(-12deg) translate(-4px, 3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbital-film-strip,
+  .projector-beam,
+  .beam-particles,
+  .constellation-line circle,
+  .constellation-line rect,
+  .constellation-line path,
+  .constellation-stars circle,
+  .camera-constellation,
+  .lbx-logo-constellation {
+    animation: none !important;
+  }
+}

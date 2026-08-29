@@ -4,6 +4,7 @@ import DropZone from './components/DropZone/DropZone';
 import LoadingScreen from './components/LoadingScreen/LoadingScreen';
 import QuickFacts from './components/QuickFacts/QuickFacts';
 import Rhythm from './components/Rhythm/Rhythm';
+import CinematicBackground from './components/CinematicBackground/CinematicBackground';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
@@ -37,6 +38,7 @@ export default function App() {
   // switch between upload, loading progress, and stats dashboard screens
   return (
     <ErrorBoundary>
+      <CinematicBackground />
       <a href="#main-content" className="skip-nav">Skip to content</a>
       <main id="main-content">
         {appState === 'idle'    && <DropZone />}

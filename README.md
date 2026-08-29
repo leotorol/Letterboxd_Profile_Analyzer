@@ -82,7 +82,7 @@ The free TMDB API rate limit is generous but not unlimited, so the app batches r
 letterboxd stats/
 ├── index.html                 # Vite entry point
 ├── vite.config.js             # Vite + React plugin config
-├── package.json               # Scripts and dependencies
+── package.json               # Scripts and dependencies
 ├── .env                       # Local env vars (VITE_TMDB_API_KEY)
 ├── src/
 │   ├── main.jsx               # React root: mounts <App/> inside DataProvider
@@ -99,12 +99,15 @@ letterboxd stats/
 │   ├── services/
 │   │   ├── zipParser.js       # Unzips export and parses the CSVs
 │   │   └── tmdbApi.js         # TMDB search/enrichment with scored matching + localStorage cache
+│   ├── utils/
+│   │   └── dateFormat.js      # Date formatting utilities
 │   ├── components/
-│   │   ├── ErrorBoundary.jsx  # Catches render errors so the UI never breaks
-│   │   ├── DropZone/          # Drag-and-drop ZIP/CSV upload screen
-│   │   ├── LoadingScreen/     # Enrichment progress + live poster strip
-│   │   ├── QuickFacts/        # Section 01: quick facts hook (Bento dashboard)
-│   │   └── Rhythm/            # Section 02: heatmap, streaks, pace, comfort movies
+│   │   ├── CinematicBackground/  # Animated space background with stars, nebula, and camera constellation
+│   │   ├── DropZone/             # Drag-and-drop ZIP/CSV upload screen
+│   │   ├── ErrorBoundary.jsx     # Catches render errors so the UI never breaks
+│   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
+│   │   ├── QuickFacts/           # Section 01: quick facts hook (Bento dashboard)
+│   │   └── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
 │   └── styles/
 │       ├── tokens.css         # Design tokens (colors, spacing, radii)
 │       └── global.css         # Global base styles + animated space background (stars + nebula)
