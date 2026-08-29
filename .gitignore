@@ -20,6 +20,8 @@ dist-ssr
 Thumbs.db
 *.suo
 *.ntvs*
+.playwright-mcp
+*.png
 *.njsproj
 *.sln
 *.sw?
@@ -32,3 +34,5 @@ DESIGN_GUIDELINES.md
 CODE_QUALITY_GUIDELINES.md
 PRODUCT.md
 Esctructura pagina.md
+*.zip
+*.csv
