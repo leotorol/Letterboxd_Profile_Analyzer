@@ -192,6 +192,105 @@ function currentStreak(days, watchedSet) {
 }
 
 /**
+ * Finds the longest run of consecutive weeks with at least one watch.
+ *
+ * A week is considered active if any day within it had a watch. Weeks start
+ * on Sunday to match the heatmap grid.
+ *
+ * Args:
+ *   days (Array<string>): Sorted ISO date strings that had at least one watch.
+ *
+ * Returns:
+ *   Object: { length } of the longest week streak, plus the week start dates
+ *   (Sundays) that make it up.
+ */
+function findLongestWeekStreak(days) {
+  if (days.length === 0) return { length: 0, weekStarts: [] };
+  
+  const weekStarts = new Set();
+  for (const day of days) {
+    const d = parseLbDate(day);
+    if (!d) continue;
+    const weekStart = toISO(startOfWeekSunday(d));
+    weekStarts.add(weekStart);
+  }
+  
+  const sortedWeeks = [...weekStarts].sort();
+  if (sortedWeeks.length === 0) return { length: 0, weekStarts: [] };
+  
+  let bestLen = 1;
+  let bestEnd = 0;
+  let runLen = 1;
+  let runEnd = 0;
+  
+  for (let i = 1; i < sortedWeeks.length; i++) {
+    const prev = parseLbDate(sortedWeeks[i - 1]);
+    const curr = parseLbDate(sortedWeeks[i]);
+    const gap = diffDays(prev, curr);
+    
+    if (gap === 7) {
+      runLen++;
+      runEnd = i;
+    } else {
+      runLen = 1;
+      runEnd = i;
+    }
+    
+    if (runLen > bestLen) {
+      bestLen = runLen;
+      bestEnd = runEnd;
+    }
+  }
+  
+  const startIdx = bestEnd - bestLen + 1;
+  return { length: bestLen, weekStarts: sortedWeeks.slice(startIdx, bestEnd + 1) };
+}
+
+/**
+ * Counts consecutive active weeks ending at the most recent watched week.
+ *
+ * Args:
+ *   days (Array<string>): Sorted ISO date strings that had at least one watch.
+ *
+ * Returns:
+ *   number: Consecutive active weeks ending at the last watch.
+ */
+function currentWeekStreak(days) {
+  if (days.length === 0) return 0;
+  
+  const weekStarts = new Set();
+  for (const day of days) {
+    const d = parseLbDate(day);
+    if (!d) continue;
+    const weekStart = toISO(startOfWeekSunday(d));
+    weekStarts.add(weekStart);
+  }
+  
+  const sortedWeeks = [...weekStarts].sort();
+  if (sortedWeeks.length === 0) return 0;
+  
+  const today = new Date();
+  let cursor = startOfWeekSunday(today);
+  let cursorISO = toISO(cursor);
+  
+  if (!weekStarts.has(cursorISO)) {
+    cursor = addDays(cursor, -7);
+    cursorISO = toISO(cursor);
+  }
+  
+  if (!weekStarts.has(cursorISO)) return 0;
+  
+  let run = 0;
+  while (weekStarts.has(cursorISO)) {
+    run++;
+    cursor = addDays(cursor, -7);
+    cursorISO = toISO(cursor);
+  }
+  
+  return run;
+}
+
+/**
  * Scales a daily count into a discrete 0-4 intensity bucket.
  *
  * Buckets are relative to the max day so both a casual and a marathoning user
@@ -550,6 +649,8 @@ export function useRhythmStats(rawData, enrichedData = null) {
       streakFilms.push(...films.map(f => ({ ...f, iso })));
     }
 
+    const longestWeek = findLongestWeekStreak(activeDays);
+
     return {
       empty,
       byDate,
@@ -560,6 +661,8 @@ export function useRhythmStats(rawData, enrichedData = null) {
         longestGap: empty ? 0 : longestGap(activeDays),
         current: empty ? 0 : currentStreak(activeDays, watchedSet),
         activeDays: activeDays.length,
+        longestWeek: empty ? 0 : longestWeek.length,
+        currentWeek: empty ? 0 : currentWeekStreak(activeDays),
       },
       streakFilms,
       patterns,

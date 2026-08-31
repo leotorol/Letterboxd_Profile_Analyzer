@@ -430,8 +430,8 @@ export default function Rhythm() {
   const animTrailing = useCountUp(yearFilms, 1400, 200);
   const animDays = useCountUp(yearDays, 1400, 300);
   const animStreak = useCountUp(stats.streaks.longestActive, 1400, 200);
-  const animCurrent = useCountUp(stats.streaks.current, 1400, 300);
   const animYearEnd = useCountUp(stats.projection.filmsByYearEnd, 1400, 200);
+  const animStreakWeek = useCountUp(stats.streaks.longestWeek, 1400, 250);
 
   const weekdayMax = stats.patterns ? Math.max(1, ...stats.patterns.weekdayRank.map((w) => w.count)) : 1;
   const monthMax = stats.patterns ? Math.max(1, ...stats.patterns.monthRank.map((m) => m.count)) : 1;
@@ -565,21 +565,14 @@ export default function Rhythm() {
               </div>
             )}
 
-            {stats.streaks.current > 0 && stats.streaks.current < stats.streaks.longestActive && (
-              <p className="ry-streak-note">
-                Don't mix that up with what's going on right now: your current run is{' '}
-                <strong className="tabular-nums">{stats.streaks.current}</strong> days, not the record.
-              </p>
-            )}
-
             <div className="ry-mini-pair">
-              <div className="ry-mini">
-                <span className="ry-mini-number tabular-nums">{animCurrent}</span>
-                <span className="ry-mini-label">right now</span>
-              </div>
               <div className="ry-mini">
                 <span className="ry-mini-number tabular-nums">{stats.streaks.longestGap.toLocaleString()}</span>
                 <span className="ry-mini-label">days was your longest dry spell</span>
+              </div>
+              <div className="ry-mini">
+                <span className="ry-mini-number tabular-nums">{animStreakWeek}<span className="ry-mini-unit">w</span></span>
+                <span className="ry-mini-label">longest streak logging at least one film per week</span>
               </div>
             </div>
           </section>

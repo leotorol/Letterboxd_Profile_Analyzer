@@ -339,11 +339,11 @@
   text-overflow: ellipsis;
 }
 
-/* Pair of side-by-side mini stats that anchor to the bottom of the card so
+/* Row of side-by-side mini stats that anchor to the bottom of the card so
    the card doesn't feel half-empty next to a taller neighbour */
 .ry-mini-pair {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.3fr;
   gap: var(--space-4);
   margin-top: auto;
 }
@@ -374,6 +374,14 @@
   font-weight: 600;
   color: var(--color-text-muted);
   line-height: 1.35;
+}
+
+.ry-mini-unit {
+  font-size: 0.65em;
+  font-weight: 700;
+  color: var(--color-text-faint);
+  margin-left: 0.15em;
+  vertical-align: baseline;
 }
 
 /* single tile filling the whole row width */
@@ -821,5 +829,9 @@
 
   .ry-card {
     padding: var(--space-6);
+  }
+
+  .ry-mini-pair {
+    grid-template-columns: 1fr;
   }
 }

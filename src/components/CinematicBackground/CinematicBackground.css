@@ -114,24 +114,31 @@
   width: 173px;
   height: 173px;
   transform: rotate(20deg);
-  opacity: 0.06;
+  opacity: 0.15;
   overflow: visible;
   animation: constellationFloat 50s ease-in-out infinite;
+}
+
+.camera-constellation .constellation-line circle,
+.camera-constellation .constellation-line rect,
+.camera-constellation .constellation-line path {
+  stroke: rgba(255, 255, 255, 0.3);
+  animation: constellationBlink 6s ease-in-out infinite;
 }
 
 .constellation-line circle,
 .constellation-line rect,
 .constellation-line path {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.6);
-  stroke-width: 2.6;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
   animation: constellationBlink 3s ease-in-out infinite;
 }
 
 .constellation-stars circle {
-  fill: rgba(255, 255, 255, 0.7);
+  fill: rgba(255, 255, 255, 0.9);
   animation: starTwinkle 2.5s ease-in-out infinite;
 }
 
