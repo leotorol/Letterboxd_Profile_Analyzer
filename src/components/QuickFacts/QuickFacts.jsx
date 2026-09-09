@@ -207,7 +207,7 @@ export default function QuickFacts() {
       <div className="qf-bento-grid">
 
         {/* Bento 1: Movies Watched Hero */}
-        <div className="bento-card bento-span-2">
+        <div className="bento-card qf-col-8">
           <div>
             <div className="bento-header">
               <div className="bento-title-group">
@@ -243,7 +243,7 @@ export default function QuickFacts() {
         </div>
 
         {/* Bento 2: Average Rating */}
-        <div className="bento-card">
+        <div className="bento-card qf-col-4">
           <div className="bento-header">
             <div className="bento-title-group">
               <div className="bento-icon" style={{ color: 'var(--color-accent-3)' }}>
@@ -275,7 +275,7 @@ export default function QuickFacts() {
         </div>
 
         {/* Bento 3: Watch Time Breakdown */}
-        <div className="bento-card bento-span-2">
+        <div className="bento-card qf-col-8">
           <div>
             <div className="bento-header">
               <div className="bento-title-group">
@@ -300,7 +300,7 @@ export default function QuickFacts() {
         </div>
 
         {/* Bento 4: Unique Directors */}
-        <div className="bento-card">
+        <div className="bento-card qf-col-4">
           <div className="bento-header">
             <div className="bento-title-group">
               <div className="bento-icon">
@@ -322,7 +322,7 @@ export default function QuickFacts() {
         </div>
 
         {/* Bento 5: Watchlist Dual Split Card */}
-        <div className="bento-card bento-span-3">
+        <div className="bento-card qf-col-12">
           <div className="bento-header">
             <div className="bento-title-group">
               <div className="bento-icon">

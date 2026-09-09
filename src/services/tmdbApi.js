@@ -551,13 +551,15 @@ async function findBestMatch(movie, apiKey) {
  *   apiKey (string): TMDB API v3 key.
  *
  * Returns:
- *   Promise<Object>: Enriched movie object with runtime, directors and genres.
+ *   Promise<Object>: Enriched movie object with runtime, directors (and their
+ *   genders), genres and country data.
  */
 async function fetchMovieDetails(movie, apiKey) {
   const baseResult = {
     ...movie,
     runtime: null,
     directors: [],
+    directorGenders: [],
     genres: [],
     tmdbId: null,
     mediaType: null,
@@ -586,9 +588,13 @@ async function fetchMovieDetails(movie, apiKey) {
       };
     }
 
-    const directors = (detail.credits?.crew || [])
+    // capture the director names AND their tmdb gender code (1 female, 2 male,
+    // 0 unknown) so the reveal section can talk about who's actually behind the lens
+    const directorData = (detail.credits?.crew || [])
       .filter(c => c.job === 'Director')
-      .map(c => c.name);
+      .map(c => ({ name: c.name, gender: c.gender ?? 0 }));
+    const directors = directorData.map(d => d.name);
+    const directorGenders = directorData.map(d => d.gender);
 
     const genres = (detail.genres || []).map(g => g.name);
 
@@ -614,6 +620,7 @@ async function fetchMovieDetails(movie, apiKey) {
       mediaType,
       runtime,
       directors,
+      directorGenders,
       genres,
       popularity: detail.popularity || null,
       voteAverage: detail.vote_average || null,
@@ -657,6 +664,7 @@ export async function enrichMovies(movies, apiKey, onProgress) {
       ...m,
       runtime: null,
       directors: [],
+      directorGenders: [],
       genres: [],
       tmdbId: null,
       mediaType: null,
