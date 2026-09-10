@@ -16,7 +16,7 @@ Everything runs **100% in your browser** — no data ever leaves your machine. I
 2. Enriches each movie with extra data (runtime, directors, genres, budget, posters, etc.) from the TMDB API.
 3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" radar, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, random fun stats, and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
 
-> Status: Sections 01 (Quick Facts) and 02 (Rhythm / heatmaps & comfort movies) are built and wired into the app. The remaining scroll sections are the next steps.
+> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies) and 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map) are built and wired into the app. The remaining scroll sections are the next steps.
 
 The free TMDB API rate limit is generous but not unlimited, so the app batches requests, caches results in `localStorage`, and shows a live progress screen while it enriches your films. The same export is cached to speed up future loads.
 
@@ -27,6 +27,7 @@ The free TMDB API rate limit is generous but not unlimited, so the app batches r
 - **JSZip** — reading the ZIP export
 - **PapaParse** — parsing the CSVs
 - **TMDB API** — movie metadata enrichment
+- **topojson-client** + **world-atlas** — country geometry for the world map
 - **@tanstack/react-query** — data fetching (available for future use)
 - **Oxlint** — linting
 
@@ -93,6 +94,7 @@ letterboxd stats/
 │   ├── context/
 │   │   └── DataContext.jsx    # Global app state + parsed/enriched data store
 │   ├── hooks/
+│   │   ├── useCinephileStats.js # Derives all stats for the Cinephile Profile section
 │   │   ├── useCountUp.js      # Animated number counter hook
 │   │   ├── useLetterboxdData.js # Orchestrates ZIP parse → TMDB enrichment
 │   │   └── useRhythmStats.js  # Derives all temporal stats for the Rhythm section
@@ -107,7 +109,8 @@ letterboxd stats/
 │   │   ├── ErrorBoundary.jsx     # Catches render errors so the UI never breaks
 │   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
 │   │   ├── QuickFacts/           # Section 01: quick facts hook (Bento dashboard)
-│   │   └── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
+│   │   ├── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
+│   │   └── CinephileProfile/     # Section 03: spectrum, genres, taste, diversity, world map
 │   └── styles/
 │       ├── tokens.css         # Design tokens (colors, spacing, radii)
 │       └── global.css         # Global base styles + animated space background (stars + nebula)

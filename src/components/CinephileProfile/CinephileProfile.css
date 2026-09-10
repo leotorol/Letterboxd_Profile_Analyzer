@@ -60,6 +60,11 @@
   max-width: 1400px;
 }
 
+/* keep fr tracks from flooring at the intrinsic width of posters / svgs */
+.cp-grid > * {
+  min-width: 0;
+}
+
 .cp-col-12 {
   grid-column: span 12;
 }
@@ -68,16 +73,8 @@
   grid-column: span 8;
 }
 
-.cp-col-7 {
-  grid-column: span 7;
-}
-
 .cp-col-6 {
   grid-column: span 6;
-}
-
-.cp-col-5 {
-  grid-column: span 5;
 }
 
 .cp-col-4 {
@@ -142,13 +139,6 @@
   font-weight: 500;
   color: var(--color-text-muted);
   text-align: right;
-}
-
-.cp-lead-text {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  line-height: 1.55;
 }
 
 .cp-chart-empty {
@@ -265,28 +255,14 @@
   color: var(--color-accent-2);
 }
 
-.cp-tip-value {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 900;
-  color: var(--color-accent);
-  line-height: 1.1;
-}
-
-.cp-tip-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-/* Takeaway banner */
+/* Takeaway banner: solid accent dot instead of the lazy colored border-left tell */
 .cp-takeaway {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
   background: var(--color-surface-raised);
-  border-left: 3px solid var(--accent, var(--color-accent-4));
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 500;
@@ -294,16 +270,16 @@
   line-height: 1.5;
 }
 
-.cp-foot {
-  margin-top: var(--space-3);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
+.cp-takeaway-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--accent, var(--color-accent));
+  flex-shrink: 0;
+  margin-top: 5px;
 }
 
-/* Genre Fingerprint Card — radial donut */
+/* Genre Fingerprint Card: radial donut */
 .cp-gfp-wrap {
   display: flex;
   flex-direction: column;
@@ -357,9 +333,20 @@
   align-items: center;
   gap: var(--space-2);
   padding: 4px 6px;
+  border: none;
+  width: 100%;
+  text-align: left;
+  background: none;
+  font: inherit;
+  color: inherit;
   border-radius: var(--radius-sm);
   transition: background 120ms ease;
-  cursor: default;
+  cursor: pointer;
+}
+
+.cp-gfp-legend-row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
 }
 
 .cp-gfp-legend-row.is-active {
@@ -541,17 +528,18 @@
 .cp-spectrum-pole {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--color-text-muted);
   white-space: nowrap;
   min-width: 85px;
 }
 
 .cp-spectrum-pole-left {
   text-align: right;
+  color: var(--color-dna-alt);
 }
 
 .cp-spectrum-pole-right {
   text-align: left;
+  color: var(--color-dna-pos);
 }
 
 .cp-spectrum-track {
@@ -564,12 +552,37 @@
   overflow: visible;
 }
 
-.cp-spectrum-fill {
-  height: 100%;
-  background: var(--color-accent);
-  opacity: 0.4;
+/* Dual-fill track: scaleX so the width animation never touches layout */
+.cp-spectrum-dual {
+  display: block;
+  position: absolute;
+  inset: 0;
   border-radius: 5px;
-  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.cp-spectrum-fill-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background: var(--color-dna-alt);
+  opacity: 0.65;
+  transform-origin: left center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cp-spectrum-fill-right {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background: var(--color-dna-pos);
+  opacity: 0.65;
+  transform-origin: right center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cp-spectrum-marker {
@@ -584,6 +597,18 @@
   transition: left 600ms cubic-bezier(0.4, 0, 0.2, 1), transform 150ms ease, background-color 150ms ease;
   box-shadow: 0 0 12px rgba(0, 232, 122, 0.6);
   cursor: help;
+}
+
+/* fat invisible hit area so the 15px marker is actually tappable */
+.cp-spectrum-marker::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+
+.cp-spectrum-marker:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .cp-spectrum-marker.is-active {
@@ -610,7 +635,7 @@
   font-weight: 500;
   color: var(--color-text);
   line-height: 1.4;
-  animation: fadeIn 150ms ease;
+  animation: cpDnaFadeIn 150ms ease forwards;
 }
 
 .cp-dna-tip::after {
@@ -624,15 +649,15 @@
   border-color: var(--color-border) transparent transparent transparent;
 }
 
-@keyframes fadeIn {
+@keyframes cpDnaFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateX(-50%) translateY(-4px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 }
 
@@ -650,6 +675,12 @@
   padding-bottom: 60px;
   overflow: visible;
   width: 100%;
+}
+
+.cp-dotplot-columns:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .cp-dotplot-col {
@@ -686,16 +717,34 @@
   width: 9px;
   height: 9px;
   flex-shrink: 0;
+  border: none;
+  padding: 0;
+  background: none;
   border-radius: 50%;
   transition: transform 120ms ease, box-shadow 120ms ease;
-  cursor: crosshair;
+  cursor: pointer;
   transform: translateX(-50%);
+}
+
+/* invisible hit pad so a 9px dot is a 25px tap target, fingers only, coarse pointers keep freewheeling mouse sweeps
+   sin esto los pads solapados de dots hermanos roban el pointerenter y el barrido se vuelve pegajoso */
+@media (pointer: coarse) {
+  .cp-dotplot-dot::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
 }
 
 .cp-dotplot-dot:hover {
   transform: translateX(-50%) scale(2.2);
   z-index: 30;
   box-shadow: 0 0 10px rgba(0, 232, 122, 0.9);
+}
+
+.cp-dotplot-dot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .cp-dotplot-overflow {
@@ -776,12 +825,21 @@
   gap: var(--space-4);
   padding: var(--space-3) var(--space-5);
   background: var(--color-surface-raised);
-  border-left: 3px solid var(--verdict-color, var(--color-accent));
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 0.92rem;
   font-weight: 700;
   color: var(--color-text);
   line-height: 1.4;
+}
+
+.cp-verdict-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--verdict-color, var(--color-accent));
+  flex-shrink: 0;
+  order: -1;
 }
 
 .cp-taste-delta {
@@ -835,14 +893,16 @@
 
 .cp-scatter-dot {
   opacity: 0.5;
-  transition: r 120ms ease, opacity 120ms ease;
-  cursor: crosshair;
+  transition: opacity 120ms ease;
+  pointer-events: none;
 }
 
-.cp-scatter-dot.is-hover {
-  opacity: 1;
+/* hover ring: one cheap overlay circle instead of restyling every dot */
+.cp-scatter-ring {
+  fill: none;
   stroke: #ffffff;
   stroke-width: 1.5;
+  pointer-events: none;
 }
 
 .cp-tick-avg-line {
@@ -860,18 +920,19 @@
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
+  padding: var(--space-1);
 }
 
 .cp-arc-svg {
   display: block;
-  width: 90px;
-  height: 90px;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+  width: 100px;
+  height: 100px;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4));
 }
 
 .cp-arc-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
+  stroke: rgba(255, 255, 255, 0.06);
   stroke-width: 8;
 }
 
@@ -884,9 +945,10 @@
 
 .cp-arc-pct {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 900;
-  fill: var(--color-text);
+  fill: #ffffff;
+  letter-spacing: -0.02em;
 }
 
 .cp-arc-sub {
@@ -901,129 +963,178 @@
   font-weight: 700;
   color: var(--color-text-muted);
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 /* Upgraded Behind the Lens Diversity Card */
 .cp-diversity-enhanced {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
   height: 100%;
 }
 
 .cp-diversity-gauges {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-around;
   gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .cp-director-spotlight {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface-raised);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
+}
+
+.cp-director-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-2);
 }
 
 .cp-director-title {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--color-accent-2);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.cp-director-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.cp-director-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.cp-director-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  width: 100%;
-}
-
-.cp-director-bar {
-  height: 4px;
-  background: var(--color-surface);
-  border-radius: 2px;
-  overflow: hidden;
-  width: 100%;
-}
-
-.cp-director-fill {
-  height: 100%;
-  background: var(--color-accent-2);
-  border-radius: 2px;
-}
-
-.cp-director-name {
   font-family: var(--font-display);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 800;
   color: var(--color-text);
-}
-
-.cp-director-stats {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.cp-diversity-countries {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-border);
-}
-
-.cp-diversity-countries-title {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--color-text-faint);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
-.cp-country-chips {
+.cp-director-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.cp-barchart-container {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  flex-direction: column;
+  width: 100%;
+  padding-top: var(--space-2);
 }
 
-.cp-country-chip {
-  display: inline-flex;
+.cp-barchart-grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 157px;
+  right: 65px;
+  pointer-events: none;
+}
+
+.cp-barchart-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #1f1f33;
+}
+
+.cp-barchart-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.cp-barchart-row {
+  display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-badge);
+  gap: var(--space-3);
+  width: 100%;
 }
 
-.cp-country-code {
-  font-size: 0.78rem;
-  font-weight: 700;
+.cp-barchart-label-col {
+  width: 145px;
+  flex-shrink: 0;
+  text-align: right;
+  overflow: hidden;
+}
+
+.cp-barchart-name {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.cp-barchart-bar-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.cp-barchart-track {
+  width: 100%;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cp-barchart-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  transform-origin: left center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cp-barchart-value-col {
+  width: 58px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.cp-barchart-count {
   color: var(--color-text);
 }
 
-.cp-country-count {
-  font-size: 0.72rem;
-  font-weight: 800;
+.cp-barchart-rating {
+  font-size: 0.7rem;
   color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* screen-reader-only list: keyboard fallback for countries on the map */
+.cp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* World map */
@@ -1032,7 +1143,7 @@
   width: 100%;
   border-radius: var(--radius-md);
   overflow: visible;
-  background: #0d0d1a;
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
 }
 
@@ -1055,8 +1166,9 @@
 }
 
 .cp-map-country.has-films:hover {
-  opacity: 0.85;
-  stroke: rgba(255, 255, 255, 0.35);
+  opacity: 0.9;
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 1;
 }
 
 .cp-map-tip {
@@ -1064,20 +1176,17 @@
   top: 0;
   left: 0;
   z-index: 50;
-  /* Position is driven by transform3d from JS – GPU composited, no layout thrash */
+  /* GPU-composited positioning, no left/top, pure transform */
   will-change: transform;
-  transition: opacity 120ms ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   padding: var(--space-2) var(--space-4);
-  background: rgba(13, 13, 26, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 232, 122, 0.25);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 232, 122, 0.08);
+  box-shadow: var(--shadow-card);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -1091,9 +1200,10 @@
 .cp-map-tip-pct {
   font-size: 0.68rem;
   font-weight: 700;
-  color: rgba(0, 232, 122, 0.6);
+  color: var(--color-text-faint);
   padding: 1px 5px;
-  background: rgba(0, 232, 122, 0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 3px;
 }
 
@@ -1206,9 +1316,7 @@
 
   .cp-col-12,
   .cp-col-8,
-  .cp-col-7,
   .cp-col-6,
-  .cp-col-5,
   .cp-col-4 {
     grid-column: span 2;
   }
@@ -1225,9 +1333,7 @@
 
   .cp-col-12,
   .cp-col-8,
-  .cp-col-7,
   .cp-col-6,
-  .cp-col-5,
   .cp-col-4 {
     grid-column: span 1;
   }
@@ -1238,6 +1344,18 @@
 
   .cp-diversity-gauges {
     justify-content: center;
+  }
+
+  /* dots get a real horizontal scroll on phones instead of squished overlapping columns */
+  .cp-dotplot-columns {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+
+  .cp-dotplot-col {
+    flex: 0 0 46px;
+    min-width: 46px;
   }
 
   .cp-poster-accent-strip {

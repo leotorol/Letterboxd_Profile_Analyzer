@@ -2,48 +2,8 @@ import { useMemo } from 'react';
 
 // how many dots max we render per genre column in the dotplot
 const GENRE_DOTPLOT_MAX_DOTS = 80;
-// filter out anything longer than this – it's an anime series or tv marathon, not a film
+// filter out anything longer than this, it's an anime series or tv marathon, not a film
 const MAX_FILM_RUNTIME_MIN = 300;
-// runtime reference points for the "short film <-> epic" axis
-const RUNTIME_LOW = 85;
-const RUNTIME_HIGH = 185;
-// rating reference points for the "lenient <-> critical" axis
-const RATING_LOW = 2;
-const RATING_HIGH = 4.5;
-
-/**
- * Maps a TMDB ISO 3166-1 country code to a coarse continent bucket.
- *
- * Args:
- *   code (string): Two letter ISO country code, eg 'US'.
- *
- * Returns:
- *   string: Continent group, or 'Other' when the country is unknown.
- */
-function continentOf(code) {
-  const map = {
-    US: 'North America', CA: 'North America', MX: 'North America',
-    AR: 'South America', BR: 'South America', CL: 'South America', CO: 'South America',
-    PE: 'South America', VE: 'South America', UY: 'South America', PY: 'South America',
-    BO: 'South America', EC: 'South America',
-    GB: 'Europe', FR: 'Europe', DE: 'Europe', IT: 'Europe', ES: 'Europe', PT: 'Europe',
-    NL: 'Europe', BE: 'Europe', CH: 'Europe', AT: 'Europe', IE: 'Europe', PL: 'Europe',
-    SE: 'Europe', NO: 'Europe', DK: 'Europe', FI: 'Europe', GR: 'Europe', CZ: 'Europe',
-    HU: 'Europe', RO: 'Europe', RU: 'Europe', UA: 'Europe', TR: 'Europe', IS: 'Europe',
-    LU: 'Europe', SK: 'Europe', HR: 'Europe', RS: 'Europe', BG: 'Europe', EE: 'Europe',
-    LV: 'Europe', LT: 'Europe', SI: 'Europe', AL: 'Europe', MK: 'Europe', BA: 'Europe',
-    CY: 'Europe', MT: 'Europe',
-    IN: 'Asia', JP: 'Asia', KR: 'Asia', CN: 'Asia', HK: 'Asia', TW: 'Asia', SG: 'Asia',
-    MY: 'Asia', TH: 'Asia', ID: 'Asia', PH: 'Asia', VN: 'Asia', PK: 'Asia', BD: 'Asia',
-    LK: 'Asia', NP: 'Asia', AE: 'Asia', SA: 'Asia', IL: 'Asia', IR: 'Asia', IQ: 'Asia',
-    LB: 'Asia', JO: 'Asia', QA: 'Asia', KW: 'Asia', KZ: 'Asia', UZ: 'Asia', GE: 'Asia',
-    NG: 'Africa', ZA: 'Africa', DZ: 'Africa', MA: 'Africa', TN: 'Africa', EG: 'Africa',
-    KE: 'Africa', ET: 'Africa', GH: 'Africa', SN: 'Africa', CI: 'Africa', UG: 'Africa',
-    TZ: 'Africa', ZW: 'Africa',
-    AU: 'Oceania', NZ: 'Oceania', FJ: 'Oceania',
-  };
-  return map[code] || 'Other';
-}
 
 /**
  * Averages an array of numbers.
@@ -73,21 +33,6 @@ function median(values) {
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-/**
- * Clamps a number between a lower and upper bound.
- *
- * Args:
- *   value (number): Input value.
- *   low (number): Lower bound.
- *   high (number): Upper bound.
- *
- * Returns:
- *   number: Clamped value.
- */
-function clamp(value, low, high) {
-  return Math.max(low, Math.min(high, value));
 }
 
 /**
@@ -168,9 +113,10 @@ function buildSpectrum(rows) {
   const withLang = rows.filter((m) => m.originalLanguage);
   const years = rows.filter((m) => m.year).map((m) => m.year);
 
-  const medianVotes = median(withVotes.map((m) => m.voteCount));
-  const mainstreamCount = medianVotes != null && withVotes.length
-    ? withVotes.filter((m) => m.voteCount >= medianVotes).length
+  // threshold on the mean, not the median: a median split is always ~50% by definition
+  const avgVotes = withVotes.length ? mean(withVotes.map((m) => m.voteCount)) : null;
+  const mainstreamCount = avgVotes != null
+    ? withVotes.filter((m) => m.voteCount >= avgVotes).length
     : 0;
   const mainstream = withVotes.length ? mainstreamCount / withVotes.length : null;
 
@@ -213,7 +159,7 @@ function buildSpectrum(rows) {
       mainstream,
       mainstream != null ? `${Math.round(mainstream * 100)}% mainstream` : null,
       withVotes.length
-        ? `Out of ${withVotes.length.toLocaleString()} films, ${mainstreamCount.toLocaleString()} (${Math.round(mainstream * 100)}%) are above average TMDB popularity.`
+        ? `Out of ${withVotes.length.toLocaleString()} films, ${mainstreamCount.toLocaleString()} (${Math.round(mainstream * 100)}%) have more than your average TMDB vote count.`
         : 'Not enough TMDB vote data.'
     ),
     makeAxis(
@@ -260,7 +206,7 @@ function buildSpectrum(rows) {
  *   rows (Array<Object>): Full enriched movies array.
  *
  * Returns:
- *   Object: Sorted genre list, maxCount, total genre occurrences, entropy, rarest genre.
+ *   Object: Sorted genre list, maxCount, total genre occurrences and the top genre.
  */
 function buildGenreDistribution(rows) {
   const byGenre = new Map();
@@ -295,19 +241,37 @@ function buildGenreDistribution(rows) {
   const list = [...byGenre.values()].sort((a, b) => b.count - a.count);
   const total = list.reduce((sum, entry) => sum + entry.count, 0);
   const maxCount = list.length ? list[0].count : 0;
-  const validForRarest = list.filter(e => e.genre !== 'TV Movie' && e.genre !== 'Documentary');
-  const rarestGenre = validForRarest.length ? validForRarest[validForRarest.length - 1] : null;
 
   return {
     list,
     total,
     maxCount,
-    entropy: genreEntropy(rows),
     topGenre: list[0] || null,
-    rarestGenre,
     distinctCount: list.length,
     maxDots: GENRE_DOTPLOT_MAX_DOTS,
   };
+}
+
+/**
+ * Splits genres into the highest and lowest average rated genre.
+ *
+ * Args:
+ *   list (Array<Object>): Genre rows, each carrying a `films` array.
+ *
+ * Returns:
+ *   Object: `{ top, bottom }` genre rows enriched with `avg` and `ratedCount`,
+ *     or nulls when nothing has been rated.
+ */
+function buildGenreReward(list) {
+  const withAvg = list
+    .map((row) => {
+      const rated = row.films.filter((f) => f.rating != null);
+      const avg = rated.length ? rated.reduce((s, f) => s + f.rating, 0) / rated.length : null;
+      return { ...row, avg, ratedCount: rated.length };
+    })
+    .filter((r) => r.avg != null)
+    .sort((a, b) => b.avg - a.avg);
+  return { top: withAvg[0] || null, bottom: withAvg[withAvg.length - 1] || null };
 }
 
 /**
@@ -321,7 +285,7 @@ function buildGenreDistribution(rows) {
  *   rows (Array<Object>): Full enriched movies array.
  *
  * Returns:
- *   Object: series, direction ('up'|'down'|'steady'), delta, earlyAvg, lateAvg.
+ *   Object: series, direction ('up'|'down'|'steady') and delta.
  */
 function buildTasteEvolution(rows) {
   // check date, watchedDate, or fallback to year so no logs get lost
@@ -365,7 +329,7 @@ function buildTasteEvolution(rows) {
     else direction = 'steady';
   }
 
-  return { series, direction, delta, earlyAvg, lateAvg, total: rated.length };
+  return { series, direction, delta, total: rated.length };
 }
 
 /**
@@ -380,7 +344,7 @@ function buildTasteEvolution(rows) {
  *   axis (string): Either 'runtime' or 'era'.
  *
  * Returns:
- *   Object: points, Pearson r, count, xMin, xMax, avgX.
+ *   Object: points, Pearson r, count, xMin and xMax.
  */
 function buildCorrelation(rows, axis) {
   const points = [];
@@ -404,16 +368,14 @@ function buildCorrelation(rows, axis) {
   }
 
   if (!points.length) {
-    return { points: [], r: 0, count: 0, xMin: 0, xMax: 0, avgX: 0 };
+    return { points: [], r: 0, count: 0, xMin: 0, xMax: 0 };
   }
 
   let xMin = Infinity;
   let xMax = -Infinity;
-  let xSum = 0;
   for (const point of points) {
     if (point.x < xMin) xMin = point.x;
     if (point.x > xMax) xMax = point.x;
-    xSum += point.x;
   }
 
   return {
@@ -422,7 +384,6 @@ function buildCorrelation(rows, axis) {
     count: points.length,
     xMin,
     xMax,
-    avgX: xSum / points.length,
   };
 }
 
@@ -433,15 +394,11 @@ function buildCorrelation(rows, axis) {
  *   rows (Array<Object>): Full enriched movies array.
  *
  * Returns:
- *   Object: Diversity metrics, top countries, top director, and continent distribution.
+ *   Object: Female directed share, director loyalty share and the top directors.
  */
 function buildDiversity(rows) {
   let femaleInfo = 0;
   let femaleFilms = 0;
-  let intlInfo = 0;
-  let intlFilms = 0;
-  const countryCounts = new Map();
-  const continentCounts = new Map();
   const directorStats = new Map();
 
   for (const movie of rows) {
@@ -464,28 +421,7 @@ function buildDiversity(rows) {
         dEntry.ratedCount++;
       }
     }
-
-    const language = movie.originalLanguage;
-    const countries = movie.productionCountries || [];
-    for (const code of countries) {
-      countryCounts.set(code, (countryCounts.get(code) || 0) + 1);
-      const continent = continentOf(code);
-      continentCounts.set(continent, (continentCounts.get(continent) || 0) + 1);
-    }
-
-    if (language || countries.length) {
-      intlInfo++;
-      const isInternational = language
-        ? language !== 'en'
-        : !countries.includes('US') && !countries.includes('GB');
-      if (isInternational) intlFilms++;
-    }
   }
-
-  const topCountries = [...countryCounts.entries()]
-    .map(([code, count]) => ({ code, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 8);
 
   const topDirectors = [...directorStats.values()]
     .map((d) => ({
@@ -493,21 +429,28 @@ function buildDiversity(rows) {
       avgRating: d.ratedCount ? d.ratingSum / d.ratedCount : null,
     }))
     .sort((a, b) => b.count - a.count || (b.avgRating || 0) - (a.avgRating || 0))
-    .slice(0, 3);
+    .slice(0, 5);
 
-  const continents = [...continentCounts.entries()]
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
+  let repeatFilms = 0;
+  let totalWithDirectors = 0;
+  for (const movie of rows) {
+    const directors = movie.directors || [];
+    if (directors.length > 0) {
+      totalWithDirectors++;
+      if (directors.some((name) => (directorStats.get(name)?.count || 0) >= 2)) {
+        repeatFilms++;
+      }
+    }
+  }
+
+  const directorLoyaltyShare = totalWithDirectors ? repeatFilms / totalWithDirectors : null;
 
   return {
     femaleShare: femaleInfo ? femaleFilms / femaleInfo : null,
     femaleInfo,
-    internationalShare: intlInfo ? intlFilms / intlInfo : null,
-    intlInfo,
-    topCountries,
-    continents,
+    directorLoyaltyShare,
+    totalWithDirectors,
     topDirectors,
-    topCountry: topCountries[0] || null,
   };
 }
 
@@ -515,7 +458,7 @@ function buildDiversity(rows) {
  * Builds per-country film counts for the world map visualisation.
  *
  * Uses the productionCountries ISO 3166-1 codes already on every TMDB-enriched
- * film. No extra API call needed – this is all from the existing enrichment.
+ * film. No extra API call needed, this is all from the existing enrichment.
  *
  * Args:
  *   rows (Array<Object>): Full enriched movies array.
@@ -547,22 +490,22 @@ function buildWorldMap(rows) {
  * the component only worries about layout and micro interactions.
  *
  * Args:
- *   rawData (Object|null): The parsed Letterboxd rawData from context.
  *   enrichedData (Array<Object>|null): Enriched rows from TMDB.
  *
  * Returns:
  *   Object: A full bundle of cinephile stats.
  */
-export function useCinephileStats(rawData, enrichedData = null) {
+export function useCinephileStats(enrichedData = null) {
   return useMemo(() => {
     const rows = enrichedData || [];
     const watchedCount = rows.length;
 
-    const emptyGenre = { list: [], total: 0, maxCount: 0, entropy: 0, topGenre: null, rarestGenre: null, distinctCount: 0, maxDots: GENRE_DOTPLOT_MAX_DOTS };
-    const emptyCorr = { points: [], r: 0, count: 0, xMin: 0, xMax: 0, avgX: 0 };
-    const emptyTaste = { series: [], direction: 'steady', delta: 0, earlyAvg: null, lateAvg: null, total: 0 };
-    const emptyDiversity = { femaleShare: null, femaleInfo: 0, internationalShare: null, intlInfo: 0, topCountries: [], continents: [], topDirectors: [], topCountry: null };
+    const emptyGenre = { list: [], total: 0, maxCount: 0, topGenre: null, distinctCount: 0, maxDots: GENRE_DOTPLOT_MAX_DOTS };
+    const emptyCorr = { points: [], r: 0, count: 0, xMin: 0, xMax: 0 };
+    const emptyTaste = { series: [], direction: 'steady', delta: 0, total: 0 };
+    const emptyDiversity = { femaleShare: null, femaleInfo: 0, directorLoyaltyShare: null, totalWithDirectors: 0, topDirectors: [] };
     const emptyMap = { byCountry: new Map(), maxCount: 0, totalCountries: 0 };
+    const emptyReward = { top: null, bottom: null };
 
     if (watchedCount === 0) {
       return {
@@ -574,15 +517,19 @@ export function useCinephileStats(rawData, enrichedData = null) {
         duration: emptyCorr,
         era: emptyCorr,
         diversity: emptyDiversity,
+        genreReward: emptyReward,
         worldMap: emptyMap,
       };
     }
+
+    const genre = buildGenreDistribution(rows);
 
     return {
       hasData: true,
       watchedCount,
       spectrum: buildSpectrum(rows),
-      genre: buildGenreDistribution(rows),
+      genre,
+      genreReward: buildGenreReward(genre.list),
       taste: buildTasteEvolution(rows),
       duration: buildCorrelation(rows, 'runtime'),
       era: buildCorrelation(rows, 'era'),

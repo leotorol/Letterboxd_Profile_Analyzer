@@ -217,12 +217,12 @@ button:active {
   50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
 }
 
-/* Reduced motion: disable all animations for users who prefer it */
+/* Reduced motion: kill decorative loops, but keep state-change feedback as a fast fade instead of the classic 0.01ms instant jump */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 80ms !important;
     scroll-behavior: auto !important;
   }
 }
