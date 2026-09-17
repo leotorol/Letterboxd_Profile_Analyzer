@@ -4,6 +4,24 @@ const CACHE_VERSION = 'v3';
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 300;
 
+// the placeholder people leave in .env, treat it as "no key" like an empty one
+const PLACEHOLDER_KEY = 'your_tmdb_api_key_here';
+
+export const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '';
+
+/**
+ * Tells whether a usable TMDB API key is configured.
+ *
+ * Args:
+ *   apiKey (string, optional): Key to check. Defaults to the env key.
+ *
+ * Returns:
+ *   boolean: True when the key is present and not the placeholder.
+ */
+export function hasTmdbKey(apiKey = TMDB_API_KEY) {
+  return Boolean(apiKey) && apiKey !== PLACEHOLDER_KEY;
+}
+
 // fuzzy ratio needed to accept a title, 0.6 was letting some nasty almost-titles through
 const FUZZY_ACCEPT = 0.85;
 // letterboxd and tmdb sometimes disagree by a year (festival premiere vs wide release shit)
@@ -27,7 +45,7 @@ const enrichmentReport = {
  * Returns:
  *   void
  */
-export function resetEnrichmentReport() {
+function resetEnrichmentReport() {
   enrichmentReport.total = 0;
   enrichmentReport.matched = 0;
   enrichmentReport.failed = [];
@@ -658,7 +676,7 @@ async function fetchMovieDetails(movie, apiKey) {
  *   Promise<Array<Object>>: Enriched movie objects array.
  */
 export async function enrichMovies(movies, apiKey, onProgress) {
-  if (!apiKey || apiKey === 'your_tmdb_api_key_here') {
+  if (!hasTmdbKey(apiKey)) {
     onProgress?.(movies.length, movies.length);
     return movies.map(m => ({
       ...m,

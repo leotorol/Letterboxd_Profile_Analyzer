@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { formatIsoDate } from '../../utils/dateFormat';
+import { tipPosition } from '../../utils/positionTip';
 import './Heatmap.css';
 
 /**
@@ -41,13 +42,7 @@ export default function Heatmap({ heatmap, byDateMovies = new Map() }) {
    *   Object: Clamped { x, y } coordinates.
    */
   function cellPosition(node) {
-    const wrap = wrapRef.current;
-    if (!wrap) return { x: 0, y: 0 };
-    const wrapRect = wrap.getBoundingClientRect();
-    const rect = node.getBoundingClientRect();
-    const x = rect.left - wrapRect.left + rect.width / 2;
-    const y = rect.top - wrapRect.top;
-    return { x: Math.max(90, Math.min(wrapRect.width - 90, x)), y };
+    return tipPosition(wrapRef.current, node);
   }
 
   /**

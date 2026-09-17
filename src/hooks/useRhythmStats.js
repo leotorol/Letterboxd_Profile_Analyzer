@@ -1,11 +1,8 @@
 import { useMemo } from 'react';
+import { MONTH_LABELS } from '../utils/dateFormat';
+import { TMDB_POSTER_LARGE, TMDB_POSTER_SMALL } from '../utils/tmdbImages';
 
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DISPLAY_WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-// thumbnails in the heatmap tooltip: small enough to load fast, big enough to read
-const POSTER_BASE = 'https://image.tmdb.org/t/p/w185';
-// comfort movies are shown as big posters so we want a chunkier resolution
-const POSTER_BASE_LARGE = 'https://image.tmdb.org/t/p/w500';
 
 // the pace window used for the forward projection
 const PACE_WINDOW_DAYS = 56;
@@ -111,25 +108,28 @@ function countByDate(rows) {
 }
 
 /**
- * Finds the longest run of consecutive days present in a sorted date list.
+ * Finds the longest run of entries spaced exactly stepDays apart.
+ *
+ * Both the daily streak and the weekly streak are the same scan, they just
+ * walk a different step, so the loop lives here once.
  *
  * Args:
- *   days (Array<string>): Sorted ISO date strings that had at least one watch.
+ *   items (Array<string>): Sorted ISO date strings, all active.
+ *   stepDays (number): Gap between neighbouring entries in a valid run.
  *
  * Returns:
- *   Object: { length } of the longest run, plus the ISO dates that make it up
- *   so the UI can pull the posters watched during it.
+ *   Object: { length } of the longest run plus the entries that make it up.
  */
-function findLongestStreak(days) {
-  if (days.length === 0) return { length: 0, dates: [] };
+function findLongestRun(items, stepDays) {
+  if (items.length === 0) return { length: 0, items: [] };
   let bestLen = 1;
   let bestEnd = 0;
   let runLen = 1;
   let runEnd = 0;
-  for (let i = 1; i < days.length; i++) {
+  for (let i = 1; i < items.length; i++) {
     // parseLbDate keeps everything local so DST/UTC drift doesn't eat a day
-    const gap = diffDays(parseLbDate(days[i - 1]), parseLbDate(days[i]));
-    if (gap === 1) {
+    const gap = diffDays(parseLbDate(items[i - 1]), parseLbDate(items[i]));
+    if (gap === stepDays) {
       runLen++;
       runEnd = i;
     } else {
@@ -142,7 +142,22 @@ function findLongestStreak(days) {
     }
   }
   const startIdx = bestEnd - bestLen + 1;
-  return { length: bestLen, dates: days.slice(startIdx, bestEnd + 1) };
+  return { length: bestLen, items: items.slice(startIdx, bestEnd + 1) };
+}
+
+/**
+ * Finds the longest run of consecutive days present in a sorted date list.
+ *
+ * Args:
+ *   days (Array<string>): Sorted ISO date strings that had at least one watch.
+ *
+ * Returns:
+ *   Object: { length } of the longest run, plus the ISO dates that make it up
+ *   so the UI can pull the posters watched during it.
+ */
+function findLongestStreak(days) {
+  const { length, items } = findLongestRun(days, 1);
+  return { length, dates: items };
 }
 
 /**
@@ -165,30 +180,22 @@ function longestGap(days) {
 }
 
 /**
- * Counts consecutive active days ending at the most recent watched day.
+ * Collects the Sunday that starts every active week, sorted ascending.
  *
  * Args:
  *   days (Array<string>): Sorted ISO date strings that had at least one watch.
- *   watchedSet (Set<string>): Quick lookup of active days.
  *
  * Returns:
- *   number: Consecutive active days ending at the last watch.
+ *   Array<string>: Sorted ISO week start dates.
  */
-function currentStreak(days, watchedSet) {
-  if (days.length === 0) return 0;
-  // count the run that's still alive: start today, but let a not-watched-yet
-  // today fall back to yesterday so the streak isn't killed before bedtime
-  const today = new Date();
-  let cursor = today;
-  if (!watchedSet.has(toISO(cursor))) cursor = addDays(cursor, -1);
-  if (!watchedSet.has(toISO(cursor))) return 0;
-
-  let run = 0;
-  while (watchedSet.has(toISO(cursor))) {
-    run++;
-    cursor = addDays(cursor, -1);
+function collectWeekStarts(days) {
+  const weekStarts = new Set();
+  for (const day of days) {
+    const d = parseLbDate(day);
+    if (!d) continue;
+    weekStarts.add(toISO(startOfWeekSunday(d)));
   }
-  return run;
+  return [...weekStarts].sort();
 }
 
 /**
@@ -205,89 +212,8 @@ function currentStreak(days, watchedSet) {
  *   (Sundays) that make it up.
  */
 function findLongestWeekStreak(days) {
-  if (days.length === 0) return { length: 0, weekStarts: [] };
-  
-  const weekStarts = new Set();
-  for (const day of days) {
-    const d = parseLbDate(day);
-    if (!d) continue;
-    const weekStart = toISO(startOfWeekSunday(d));
-    weekStarts.add(weekStart);
-  }
-  
-  const sortedWeeks = [...weekStarts].sort();
-  if (sortedWeeks.length === 0) return { length: 0, weekStarts: [] };
-  
-  let bestLen = 1;
-  let bestEnd = 0;
-  let runLen = 1;
-  let runEnd = 0;
-  
-  for (let i = 1; i < sortedWeeks.length; i++) {
-    const prev = parseLbDate(sortedWeeks[i - 1]);
-    const curr = parseLbDate(sortedWeeks[i]);
-    const gap = diffDays(prev, curr);
-    
-    if (gap === 7) {
-      runLen++;
-      runEnd = i;
-    } else {
-      runLen = 1;
-      runEnd = i;
-    }
-    
-    if (runLen > bestLen) {
-      bestLen = runLen;
-      bestEnd = runEnd;
-    }
-  }
-  
-  const startIdx = bestEnd - bestLen + 1;
-  return { length: bestLen, weekStarts: sortedWeeks.slice(startIdx, bestEnd + 1) };
-}
-
-/**
- * Counts consecutive active weeks ending at the most recent watched week.
- *
- * Args:
- *   days (Array<string>): Sorted ISO date strings that had at least one watch.
- *
- * Returns:
- *   number: Consecutive active weeks ending at the last watch.
- */
-function currentWeekStreak(days) {
-  if (days.length === 0) return 0;
-  
-  const weekStarts = new Set();
-  for (const day of days) {
-    const d = parseLbDate(day);
-    if (!d) continue;
-    const weekStart = toISO(startOfWeekSunday(d));
-    weekStarts.add(weekStart);
-  }
-  
-  const sortedWeeks = [...weekStarts].sort();
-  if (sortedWeeks.length === 0) return 0;
-  
-  const today = new Date();
-  let cursor = startOfWeekSunday(today);
-  let cursorISO = toISO(cursor);
-  
-  if (!weekStarts.has(cursorISO)) {
-    cursor = addDays(cursor, -7);
-    cursorISO = toISO(cursor);
-  }
-  
-  if (!weekStarts.has(cursorISO)) return 0;
-  
-  let run = 0;
-  while (weekStarts.has(cursorISO)) {
-    run++;
-    cursor = addDays(cursor, -7);
-    cursorISO = toISO(cursor);
-  }
-  
-  return run;
+  const { length, items } = findLongestRun(collectWeekStarts(days), 7);
+  return { length, weekStarts: items };
 }
 
 /**
@@ -493,7 +419,7 @@ function buildByDateMovies(rows, enriched) {
 
     let posterPath = null;
     if (enriched?.[i]) {
-      posterPath = enriched[i].posterPath ? POSTER_BASE + enriched[i].posterPath : null;
+      posterPath = enriched[i].posterPath ? TMDB_POSTER_SMALL + enriched[i].posterPath : null;
     }
 
     let list = map.get(iso);
@@ -539,7 +465,7 @@ function buildRewatches(watchedRows, diaryRows = [], enriched = null) {
   watchedRows.forEach((row, i) => {
     const key = `${row.name}::${row.year}`;
     if (enriched?.[i]?.posterPath && !posterByKey.has(key)) {
-      posterByKey.set(key, POSTER_BASE_LARGE + enriched[i].posterPath);
+      posterByKey.set(key, TMDB_POSTER_LARGE + enriched[i].posterPath);
     }
   });
 
@@ -619,7 +545,6 @@ export function useRhythmStats(rawData, enrichedData = null) {
     const byDate = countByDate(rows);
     const byDateMovies = buildByDateMovies(rows, enrichedData);
     const activeDays = [...byDate.keys()].sort();
-    const watchedSet = new Set(activeDays);
 
     const empty = activeDays.length === 0;
 
@@ -659,10 +584,7 @@ export function useRhythmStats(rawData, enrichedData = null) {
       streaks: {
         longestActive: empty ? 0 : longest.length,
         longestGap: empty ? 0 : longestGap(activeDays),
-        current: empty ? 0 : currentStreak(activeDays, watchedSet),
-        activeDays: activeDays.length,
         longestWeek: empty ? 0 : longestWeek.length,
-        currentWeek: empty ? 0 : currentWeekStreak(activeDays),
       },
       streakFilms,
       patterns,

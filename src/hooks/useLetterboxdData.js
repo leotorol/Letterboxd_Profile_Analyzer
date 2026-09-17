@@ -1,8 +1,7 @@
 import { useData } from '../context/DataContext';
 import { parseLetterboxdZip } from '../services/zipParser';
-import { enrichMovies, getEnrichmentReport } from '../services/tmdbApi';
-
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '';
+import { enrichMovies, getEnrichmentReport, TMDB_API_KEY } from '../services/tmdbApi';
+import { TMDB_POSTER_SMALL } from '../utils/tmdbImages';
 
 /**
  * Hook to orchestrate ZIP upload parsing, TMDB enrichment, and state progression.
@@ -44,11 +43,10 @@ export function useLetterboxdData() {
         TMDB_API_KEY,
         (processed, total, batch) => {
           if (Array.isArray(batch)) {
-            const posterBase = 'https://image.tmdb.org/t/p/w185';
             const entries = batch.map(m => ({
               name: m.name,
               year: m.year,
-              poster: m.posterPath ? posterBase + m.posterPath : null,
+              poster: m.posterPath ? TMDB_POSTER_SMALL + m.posterPath : null,
             }));
             recentMovies = [...recentMovies, ...entries].slice(-7);
           }

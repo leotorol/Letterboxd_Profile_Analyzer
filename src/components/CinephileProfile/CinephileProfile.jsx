@@ -2,9 +2,11 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { feature } from 'topojson-client';
 import { useData } from '../../context/DataContext';
 import { useCinephileStats } from '../../hooks/useCinephileStats';
+import { polarToCartesian } from '../../utils/geometry';
+import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
+import { tipPosition } from '../../utils/positionTip';
+import { ClockIcon, TrendIcon } from '../icons/Icons';
 import './CinephileProfile.css';
-
-const TMDB_POSTER_SMALL = 'https://image.tmdb.org/t/p/w185';
 
 // ISO 3166-1 alpha-2 to full country name map, used by the world map tooltip
 const COUNTRY_NAMES = {
@@ -95,32 +97,6 @@ const GenreIcon = () => (
     <rect x="10" y="6" width="4" height="11" rx="1" />
     <rect x="17" y="9" width="4" height="8" rx="1" />
     <line x1="3" y1="21" x2="21" y2="21" />
-  </svg>
-);
-
-/**
- * Trend line section icon.
- *
- * Returns:
- *   JSX.Element: Inline SVG icon.
- */
-const TrendIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-    <polyline points="17 6 23 6 23 12" />
-  </svg>
-);
-
-/**
- * Clock section icon.
- *
- * Returns:
- *   JSX.Element: Inline SVG icon.
- */
-const ClockIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
   </svg>
 );
 
@@ -350,16 +326,11 @@ function GenreDiversityCard({ genre }) {
   const isSingle = segments.length === 1;
   const GAP_DEG = isSingle ? 0 : 2;
 
-  function polarToXY(cx, cy, r, angleDeg) {
-    const rad = ((angleDeg - 90) * Math.PI) / 180;
-    return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
-  }
-
   function arcPath(startDeg, endDeg, rOuter, rInner) {
-    const s1 = polarToXY(CX, CY, rOuter, startDeg);
-    const e1 = polarToXY(CX, CY, rOuter, endDeg);
-    const s2 = polarToXY(CX, CY, rInner, endDeg);
-    const e2 = polarToXY(CX, CY, rInner, startDeg);
+    const s1 = polarToCartesian(CX, CY, rOuter, startDeg - 90);
+    const e1 = polarToCartesian(CX, CY, rOuter, endDeg - 90);
+    const s2 = polarToCartesian(CX, CY, rInner, endDeg - 90);
+    const e2 = polarToCartesian(CX, CY, rInner, startDeg - 90);
     const large = endDeg - startDeg > 180 ? 1 : 0;
     return [
       `M ${s1[0].toFixed(2)} ${s1[1].toFixed(2)}`,
@@ -510,21 +481,8 @@ function GenreDotplot({ genre }) {
   const maxCount = visibleGenres[0]?.count || 1;
   const MAX_DOTS_PER_COL = genre.maxDots;
 
-  function positionFrom(node) {
-    const wrap = containerRef.current;
-    if (!wrap) return { x: 0, y: 0 };
-    const wrapRect = wrap.getBoundingClientRect();
-    const rect = node.getBoundingClientRect();
-    const x = rect.left - wrapRect.left + rect.width / 2;
-    const y = rect.top - wrapRect.top;
-    return {
-      x: Math.max(120, Math.min(wrapRect.width - 120, x)),
-      y,
-    };
-  }
-
   const makeTip = (film, genreName, node) => ({
-    type: 'film', film, genre: genreName, ...positionFrom(node),
+    type: 'film', film, genre: genreName, ...tipPosition(containerRef.current, node, 120),
   });
   // tap the same dot twice and the pinned tip dies
   const activate = (film, genreName, node) => (

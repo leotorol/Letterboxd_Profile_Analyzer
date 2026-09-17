@@ -2,36 +2,14 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { useData } from '../../context/DataContext';
 import { useRhythmStats, buildYearGrid } from '../../hooks/useRhythmStats';
 import { useCountUp } from '../../hooks/useCountUp';
-import { formatIsoDate } from '../../utils/dateFormat';
+import { formatIsoDate, FULL_DAYS, FULL_MONTHS } from '../../utils/dateFormat';
+import { CalendarIcon, ClockIcon, TrendIcon } from '../icons/Icons';
 import Heatmap from './Heatmap';
 import './Rhythm.css';
-
-const CalendarIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-    <line x1="16" y1="2" x2="16" y2="6" />
-    <line x1="8" y1="2" x2="8" y2="6" />
-    <line x1="3" y1="10" x2="21" y2="10" />
-  </svg>
-);
 
 const FlameIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-  </svg>
-);
-
-const ClockIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
-  </svg>
-);
-
-const TrendIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-    <polyline points="17 6 23 6 23 12" />
   </svg>
 );
 
@@ -77,18 +55,6 @@ function formatWeeks(weeks) {
   const years = weeks / 52;
   return `≈ ${years >= 10 ? Math.round(years) : years.toFixed(1)} years`;
 }
-
-/* 3-letter day labels used in the weekday bars -> full names for the copy */
-const FULL_DAYS = {
-  Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday',
-  Fri: 'Friday', Sat: 'Saturday', Sun: 'Sunday',
-};
-
-/* 3-letter month labels -> full names for the busiest-month banner */
-const FULL_MONTHS = {
-  Jan: 'January', Feb: 'February', Mar: 'March', Apr: 'April', May: 'May', Jun: 'June',
-  Jul: 'July', Aug: 'August', Sep: 'September', Oct: 'October', Nov: 'November', Dec: 'December',
-};
 
 /**
  * Gets the day/month label text and short-form note for a ranked bar group.

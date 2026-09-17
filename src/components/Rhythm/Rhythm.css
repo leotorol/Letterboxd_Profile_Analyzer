@@ -270,20 +270,6 @@
   color: var(--color-text-muted);
 }
 
-/* disclaimer that the current streak is not the record */
-.ry-streak-note {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  margin-top: var(--space-2);
-}
-
-.ry-streak-note strong {
-  color: var(--color-text);
-  font-weight: 800;
-}
-
 /* Horizontal poster strip filling the empty space of the Streaks card */
 .ry-streak-films {
   display: flex;
@@ -660,12 +646,6 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-.ry-proj-evo-svg {
-  display: block;
-  width: 100%;
-  height: auto;
 }
 
 .ry-proj-evo-area {

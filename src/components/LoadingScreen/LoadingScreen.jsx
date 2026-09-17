@@ -1,8 +1,8 @@
 import { useData } from '../../context/DataContext';
+import { hasTmdbKey } from '../../services/tmdbApi';
 import './LoadingScreen.css';
 
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '';
-const HAS_API_KEY = TMDB_API_KEY && TMDB_API_KEY !== 'your_tmdb_api_key_here';
+const HAS_API_KEY = hasTmdbKey();
 
 /**
  * LoadingScreen component displaying TMDB enrichment progress bar and an

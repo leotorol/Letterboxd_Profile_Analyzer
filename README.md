@@ -14,9 +14,9 @@ Everything runs **100% in your browser** — no data ever leaves your machine. I
 
 1. Unzips and parses your Letterboxd export locally (via JSZip + PapaParse).
 2. Enriches each movie with extra data (runtime, directors, genres, budget, posters, etc.) from the TMDB API.
-3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" radar, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, random fun stats, and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
+3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" spectrum, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, random fun stats, and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
 
-> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies) and 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map) are built and wired into the app. The remaining scroll sections are the next steps.
+> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies), 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map) and 04 (Ratings / consensus, contrarian level & decades) are built and wired into the app. The remaining scroll sections are the next steps.
 
 The free TMDB API rate limit is generous but not unlimited, so the app batches requests, caches results in `localStorage`, and shows a live progress screen while it enriches your films. The same export is cached to speed up future loads.
 
@@ -28,7 +28,6 @@ The free TMDB API rate limit is generous but not unlimited, so the app batches r
 - **PapaParse** — parsing the CSVs
 - **TMDB API** — movie metadata enrichment
 - **topojson-client** + **world-atlas** — country geometry for the world map
-- **@tanstack/react-query** — data fetching (available for future use)
 - **Oxlint** — linting
 
 ## Prerequisites
@@ -64,7 +63,7 @@ The free TMDB API rate limit is generous but not unlimited, so the app batches r
 ## How to use it
 
 1. Go to Letterboxd → **Settings → Export Data** and download your ZIP.
-2. Open the app and drag-and-drop the ZIP file (or a single CSV) onto the upload zone.
+2. Open the app and drag-and-drop the ZIP file (or pick it with the file selector) onto the upload zone.
 3. Wait while your movies are enriched (you'll see live posters fill the progress strip).
 4. Scroll through your stats!
 
@@ -83,37 +82,40 @@ The free TMDB API rate limit is generous but not unlimited, so the app batches r
 letterboxd stats/
 ├── index.html                 # Vite entry point
 ├── vite.config.js             # Vite + React plugin config
-── package.json               # Scripts and dependencies
+├── package.json               # Scripts and dependencies
 ├── .env                       # Local env vars (VITE_TMDB_API_KEY)
 ├── src/
 │   ├── main.jsx               # React root: mounts <App/> inside DataProvider
 │   ├── App.jsx                # Top-level state router (upload / loading / stats)
 │   ├── App.css
-│   ├── index.css
-│   ├── assets/                # Static images (hero, logos)
 │   ├── context/
 │   │   └── DataContext.jsx    # Global app state + parsed/enriched data store
 │   ├── hooks/
 │   │   ├── useCinephileStats.js # Derives all stats for the Cinephile Profile section
 │   │   ├── useCountUp.js      # Animated number counter hook
 │   │   ├── useLetterboxdData.js # Orchestrates ZIP parse → TMDB enrichment
+│   │   ├── useRatingStats.js  # Derives all stats for the Ratings section
 │   │   └── useRhythmStats.js  # Derives all temporal stats for the Rhythm section
 │   ├── services/
 │   │   ├── zipParser.js       # Unzips export and parses the CSVs
-│   │   └── tmdbApi.js         # TMDB search/enrichment with scored matching + localStorage cache
+│   │   └── tmdbApi.js         # TMDB search/enrichment, scored matching + cache
 │   ├── utils/
-│   │   └── dateFormat.js      # Date formatting utilities
+│   │   ├── dateFormat.js      # Date formatting + shared month/day labels
+│   │   ├── positionTip.js     # Shared hover tooltip positioning for charts
+│   │   └── tmdbImages.js      # TMDB poster URL constants
 │   ├── components/
-│   │   ├── CinematicBackground/  # Animated space background with stars, nebula, and camera constellation
-│   │   ├── DropZone/             # Drag-and-drop ZIP/CSV upload screen
+│   │   ├── CinematicBackground/  # Animated space background with stars and nebula
+│   │   ├── CinephileProfile/     # Section 03: spectrum, genres, taste, diversity, world map
+│   │   ├── DropZone/             # Drag-and-drop ZIP upload screen
 │   │   ├── ErrorBoundary.jsx     # Catches render errors so the UI never breaks
+│   │   ├── icons/                # Shared inline SVG icons
 │   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
-│   │   ├── QuickFacts/           # Section 01: quick facts hook (Bento dashboard)
-│   │   ├── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
-│   │   └── CinephileProfile/     # Section 03: spectrum, genres, taste, diversity, world map
+│   │   ├── QuickFacts/           # Section 01: quick facts (Bento dashboard)
+│   │   ├── Ratings/              # Section 04: consensus, contrarian level, decades
+│   │   └── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
 │   └── styles/
 │       ├── tokens.css         # Design tokens (colors, spacing, radii)
-│       └── global.css         # Global base styles + animated space background (stars + nebula)
+│       └── global.css         # Global base styles + animated space background
 ```
 
 ## Data privacy

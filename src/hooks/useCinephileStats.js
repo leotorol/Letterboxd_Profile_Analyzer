@@ -498,19 +498,17 @@ function buildWorldMap(rows) {
 export function useCinephileStats(enrichedData = null) {
   return useMemo(() => {
     const rows = enrichedData || [];
-    const watchedCount = rows.length;
 
     const emptyGenre = { list: [], total: 0, maxCount: 0, topGenre: null, distinctCount: 0, maxDots: GENRE_DOTPLOT_MAX_DOTS };
     const emptyCorr = { points: [], r: 0, count: 0, xMin: 0, xMax: 0 };
     const emptyTaste = { series: [], direction: 'steady', delta: 0, total: 0 };
     const emptyDiversity = { femaleShare: null, femaleInfo: 0, directorLoyaltyShare: null, totalWithDirectors: 0, topDirectors: [] };
-    const emptyMap = { byCountry: new Map(), maxCount: 0, totalCountries: 0 };
+    const emptyMap = { byCountry: new Map(), maxCount: 0, totalCountries: 0, totalWatched: 0 };
     const emptyReward = { top: null, bottom: null };
 
-    if (watchedCount === 0) {
+    if (rows.length === 0) {
       return {
         hasData: false,
-        watchedCount: 0,
         spectrum: [],
         genre: emptyGenre,
         taste: emptyTaste,
@@ -526,7 +524,6 @@ export function useCinephileStats(enrichedData = null) {
 
     return {
       hasData: true,
-      watchedCount,
       spectrum: buildSpectrum(rows),
       genre,
       genreReward: buildGenreReward(genre.list),

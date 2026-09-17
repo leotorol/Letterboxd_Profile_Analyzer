@@ -5,6 +5,7 @@ import LoadingScreen from './components/LoadingScreen/LoadingScreen';
 import QuickFacts from './components/QuickFacts/QuickFacts';
 import Rhythm from './components/Rhythm/Rhythm';
 import CinephileProfile from './components/CinephileProfile/CinephileProfile';
+import Ratings from './components/Ratings/Ratings';
 import CinematicBackground from './components/CinematicBackground/CinematicBackground';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
@@ -49,6 +50,7 @@ export default function App() {
             <QuickFacts />
             <Rhythm />
             <CinephileProfile />
+            <Ratings />
             {/* Always rendered at the very bottom of the page, horizontally centered */}
             <div className="qf-reset-wrap">
               <button className="qf-reset-btn" onClick={handleReset} aria-label="Upload a different ZIP file">

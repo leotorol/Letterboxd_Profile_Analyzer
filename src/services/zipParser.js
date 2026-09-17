@@ -124,9 +124,16 @@ export async function parseLetterboxdZip(file) {
     if (!findFile(zip, 'ratings.csv')) missingFiles.push('ratings.csv');
     if (!findFile(zip, 'watched.csv')) missingFiles.push('watched.csv');
 
-    // throw custom clear error detailing what went wrong
+    if (missingFiles.length > 0) {
+      // throw custom clear error detailing what went wrong
+      throw new Error(
+        `Missing required Letterboxd data files (${missingFiles.join(', ')}). Make sure you uploaded the official ZIP exported from your Letterboxd account settings.`
+      );
+    }
+
+    // files are there but empty, so there's literally nothing to analyse
     throw new Error(
-      `Missing required Letterboxd data files (${missingFiles.join(', ')}). Make sure you uploaded the official ZIP exported from your Letterboxd account settings.`
+      'Your Letterboxd export has no watched or rated films. Log a few movies first and export again.'
     );
   }
 
@@ -164,15 +171,6 @@ export async function parseLetterboxdZip(file) {
     };
   });
 
-  const normalisedRatings = ratings.map(r => ({
-    date: r['Date'],
-    name: r['Name'],
-    year: r['Year'] ? parseInt(r['Year'], 10) : null,
-    uri: r['Letterboxd URI'],
-    rating: r['Rating'] ? parseFloat(r['Rating']) : null,
-    normalizedTitle: normalizeTitle(r['Name']),
-  }));
-
   const normalisedWatchlist = watchlist.map(w => ({
     date: w['Date'],
     name: w['Name'],
@@ -188,25 +186,16 @@ export async function parseLetterboxdZip(file) {
     date: d['Watched Date'] || d['Date'] || null,
     name: d['Name'],
     year: d['Year'] ? parseInt(d['Year'], 10) : null,
-    uri: d['Letterboxd URI'],
-    rating: d['Rating'] ? parseFloat(d['Rating']) : null,
-    rewatch: d['Rewatch'] === true || d['Rewatch'] === 'true' || d['Rewatch'] === 'Yes',
-    tags: d['Tags'] || '',
   }));
 
   const profileData = profile[0] || {};
 
   return {
-    ratings: normalisedRatings,
     watched: normalisedWatched,
     watchlist: normalisedWatchlist,
     diary: normalisedDiary,
     profile: {
       username: profileData['Username'] || '',
-      givenName: profileData['Given Name'] || '',
-      dateJoined: profileData['Date Joined'] || '',
-      bio: profileData['Bio'] || '',
-      favoriteFilms: profileData['Favorite Films'] || '',
     },
   };
 }

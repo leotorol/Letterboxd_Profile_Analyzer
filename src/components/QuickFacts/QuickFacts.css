@@ -63,9 +63,6 @@
 
 .qf-col-12 { grid-column: span 12; }
 .qf-col-8 { grid-column: span 8; }
-.qf-col-7 { grid-column: span 7; }
-.qf-col-6 { grid-column: span 6; }
-.qf-col-5 { grid-column: span 5; }
 .qf-col-4 { grid-column: span 4; }
 
 /* Generic Bento Card Base */
@@ -245,7 +242,7 @@
   .qf-bento-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .qf-col-12, .qf-col-8, .qf-col-7, .qf-col-6, .qf-col-5, .qf-col-4 {
+  .qf-col-12, .qf-col-8, .qf-col-4 {
     grid-column: span 2;
   }
 }
@@ -254,7 +251,7 @@
   .qf-bento-grid {
     grid-template-columns: 1fr;
   }
-  .qf-col-12, .qf-col-8, .qf-col-7, .qf-col-6, .qf-col-5, .qf-col-4 {
+  .qf-col-12, .qf-col-8, .qf-col-4 {
     grid-column: span 1;
   }
   .watchlist-split {
