@@ -304,4 +304,25 @@
   .ry-heat-weekdays {
     width: 34px;
   }
+
+  /* Keep the pinned film list inside the phone viewport and shorter than the screen */
+  .ry-heat-tooltip {
+    min-width: 0;
+    width: min(80vw, 260px);
+    max-width: none;
+    padding: var(--space-3);
+  }
+
+  .ry-heat-tooltip-films {
+    max-height: 46vh;
+  }
+
+  .ry-heat-film-poster {
+    width: 56px;
+    height: 84px;
+  }
+
+  .ry-heat-film-name {
+    font-size: 0.95rem;
+  }
 }

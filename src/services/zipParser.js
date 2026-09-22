@@ -107,12 +107,13 @@ export async function parseLetterboxdZip(file) {
   }
 
   // grab all the damn CSVs in parallel
-  const [ratings, watched, watchlist, profile, diary] = await Promise.all([
+  const [ratings, watched, watchlist, profile, diary, reviews] = await Promise.all([
     extractCSV('ratings.csv'),
     extractCSV('watched.csv'),
     extractCSV('watchlist.csv'),
     extractCSV('profile.csv'),
     extractCSV('diary.csv'),
+    extractCSV('reviews.csv'),
   ]);
 
   // validate that this is actually a Letterboxd export zip
@@ -188,12 +189,27 @@ export async function parseLetterboxdZip(file) {
     year: d['Year'] ? parseInt(d['Year'], 10) : null,
   }));
 
+  // reviews.csv is one row per written review. The Review field can be empty
+  // for spoiler only or rating only entries, so those get dropped: there is
+  // nothing to analyse in an empty review. Only the fields the reviews section
+  // actually reads are kept, the rest is dead weight.
+  const normalisedReviews = reviews
+    .map((r) => ({
+      date: r['Date'] || r['Watched Date'] || null,
+      name: r['Name'],
+      year: r['Year'] ? parseInt(r['Year'], 10) : null,
+      rating: r['Rating'] ? parseFloat(r['Rating']) : null,
+      review: (r['Review'] || '').trim(),
+    }))
+    .filter((r) => r.review.length > 0);
+
   const profileData = profile[0] || {};
 
   return {
     watched: normalisedWatched,
     watchlist: normalisedWatchlist,
     diary: normalisedDiary,
+    reviews: normalisedReviews,
     profile: {
       username: profileData['Username'] || '',
     },

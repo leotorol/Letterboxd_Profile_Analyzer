@@ -15,19 +15,13 @@
   max-width: 900px;
 }
 
-.cp-category-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-badge);
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--color-accent);
+.cp-section-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-text-faint);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   margin-bottom: var(--space-4);
 }
 
@@ -39,10 +33,6 @@
   margin-bottom: var(--space-3);
   line-height: 1.1;
   letter-spacing: -0.02em;
-}
-
-.cp-username {
-  color: var(--color-accent);
 }
 
 .cp-subtitle {
@@ -96,7 +86,7 @@
 }
 
 /* tooltips need to pop out of the card boundary */
-.cp-card:has(.cp-tip),
+.cp-card:has(.poster-tip),
 .cp-card:has(.cp-map-tip) {
   overflow: visible;
 }
@@ -178,81 +168,6 @@
   font-size: 10px;
   font-weight: 600;
   font-family: var(--font-body);
-}
-
-/* Shared dark tooltip */
-.cp-tip {
-  position: absolute;
-  z-index: 50;
-  transform: translate(-50%, -110%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-card);
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-.cp-poster-tip {
-  padding: 8px;
-}
-
-.cp-tip-film-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  max-width: 280px;
-}
-
-.cp-tip-poster {
-  width: 72px;
-  height: 108px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-  flex-shrink: 0;
-  border: 1px solid var(--color-border);
-}
-
-.cp-tip-film-info {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  text-align: left;
-}
-
-.cp-tip-title {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--color-text);
-  line-height: 1.25;
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.cp-tip-sub {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.cp-tip-rating {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: var(--color-accent);
-}
-
-.cp-tip-stack-tag {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--color-accent-2);
 }
 
 /* Takeaway banner: solid accent dot instead of the lazy colored border-left tell */
@@ -1141,34 +1056,99 @@
 .cp-map-wrap {
   position: relative;
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 280px;
   border-radius: var(--radius-md);
   overflow: visible;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
 }
 
+.cp-map-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  /* let the page scroll until you actually zoom the map in */
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+
+.cp-map-viewport.is-zoomed {
+  touch-action: none;
+}
+
+.cp-map-viewport.is-dragging {
+  cursor: grabbing;
+}
+
 .cp-map-svg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
-  border-radius: var(--radius-md);
+  height: 100%;
 }
 
 .cp-map-country {
   stroke: rgba(255, 255, 255, 0.06);
   stroke-width: 0.5;
-  cursor: default;
+  cursor: grab;
   transition: opacity 120ms ease;
 }
 
 .cp-map-country.has-films {
-  cursor: crosshair;
+  cursor: pointer;
 }
 
 .cp-map-country.has-films:hover {
   opacity: 0.9;
   stroke: rgba(255, 255, 255, 0.5);
   stroke-width: 1;
+}
+
+.cp-map-controls {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cp-map-ctrl {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.cp-map-ctrl:hover {
+  background: var(--color-surface-active);
+  color: var(--color-text);
+}
+
+.cp-map-ctrl:active {
+  transform: scale(0.96);
+}
+
+.cp-map-ctrl:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.cp-map-ctrl:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .cp-map-tip {

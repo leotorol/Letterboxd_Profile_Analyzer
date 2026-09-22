@@ -171,7 +171,7 @@ export default function QuickFacts() {
     <div className="qf-section">
       {/* Header */}
       <header className="qf-header">
-        <div className="qf-category-tag">
+        <div className="qf-section-label">
           Section 01 / Quick Facts
         </div>
         <h2 className="qf-title">

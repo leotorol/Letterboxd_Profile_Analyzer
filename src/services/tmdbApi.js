@@ -1,8 +1,11 @@
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const CACHE_KEY_PREFIX = 'lbxd_tmdb_cache_';
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 300;
+// how many top billed cast members we keep per film, enough for the "most
+// watched actor" ranking without blowing up localStorage with every extra
+const CAST_LIMIT = 8;
 
 // the placeholder people leave in .env, treat it as "no key" like an empty one
 const PLACEHOLDER_KEY = 'your_tmdb_api_key_here';
@@ -578,6 +581,9 @@ async function fetchMovieDetails(movie, apiKey) {
     runtime: null,
     directors: [],
     directorGenders: [],
+    directorProfiles: {},
+    cast: [],
+    productionCompanies: [],
     genres: [],
     tmdbId: null,
     mediaType: null,
@@ -610,9 +616,26 @@ async function fetchMovieDetails(movie, apiKey) {
     // 0 unknown) so the reveal section can talk about who's actually behind the lens
     const directorData = (detail.credits?.crew || [])
       .filter(c => c.job === 'Director')
-      .map(c => ({ name: c.name, gender: c.gender ?? 0 }));
+      .map(c => ({ name: c.name, gender: c.gender ?? 0, profilePath: c.profile_path || null }));
     const directors = directorData.map(d => d.name);
     const directorGenders = directorData.map(d => d.gender);
+    // name to headshot lookup, keeps the duo card from reindexing the crew
+    const directorProfiles = Object.fromEntries(
+      directorData.map(d => [d.name, d.profilePath])
+    );
+
+    // top billed cast only, so the most-watched ranking has real faces to show
+    const cast = (detail.credits?.cast || [])
+      .slice(0, CAST_LIMIT)
+      .map(c => ({
+        name: c.name,
+        gender: c.gender ?? 0,
+        profilePath: c.profile_path || null,
+      }));
+
+    // studios and their logos, the money section groups by these
+    const productionCompanies = (detail.production_companies || [])
+      .map(c => ({ name: c.name, logoPath: c.logo_path || null }));
 
     const genres = (detail.genres || []).map(g => g.name);
 
@@ -639,6 +662,9 @@ async function fetchMovieDetails(movie, apiKey) {
       runtime,
       directors,
       directorGenders,
+      directorProfiles,
+      cast,
+      productionCompanies,
       genres,
       popularity: detail.popularity || null,
       voteAverage: detail.vote_average || null,
@@ -683,6 +709,9 @@ export async function enrichMovies(movies, apiKey, onProgress) {
       runtime: null,
       directors: [],
       directorGenders: [],
+      directorProfiles: {},
+      cast: [],
+      productionCompanies: [],
       genres: [],
       tmdbId: null,
       mediaType: null,

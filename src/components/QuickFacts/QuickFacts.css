@@ -16,19 +16,13 @@
   max-width: 900px;
 }
 
-.qf-category-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-badge);
+.qf-section-label {
+  font-family: var(--font-display);
   font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-accent);
+  font-weight: 800;
+  color: var(--color-text-faint);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   margin-bottom: var(--space-4);
 }
 

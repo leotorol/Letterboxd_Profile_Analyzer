@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
+import { dedupeFilms } from '../utils/films';
 
 /**
- * Contrarian persona bands, shared with section 04 so nobody retypes the
- * thresholds. Score is 0 to 100 where 0 is perfect agreement and 100 is max
- * disagreement. Each band carries its upper bound, the persona name and a
- * short blurb. Infinity caps the last one.
+ * Contrarian persona bands, shared with the Ratings component so nobody
+ * retypes the thresholds. Score is 0 to 100 where 0 is perfect agreement and
+ * 100 is max disagreement. Each band carries its upper bound, the persona
+ * name and a short blurb. Infinity caps the last one.
  */
 export const CONTRARIAN_BANDS = [
   { max: 15, label: 'Sheep', blurb: 'You and the crowd are basically the same person.' },
@@ -35,38 +36,6 @@ const EMPTY_CONTRARIAN = {
  */
 function tmdbTo5(tmdbAvg) {
   return tmdbAvg / 2;
-}
-
-/**
- * Drops duplicate logs of the same film.
- *
- * Letterboxd happily piles the same film up dozens of times (rewatches,
- * reimports, accidental double logs) and repeated posters look like shit on
- * the walls, plus they double count every average. Keyed on the normalised
- * title plus year, since that is what actually identifies a film, and we keep
- * the first entry we see. Confirmed against a real export with 29 copies of
- * Inception in it, so this is not a theoretical worry.
- *
- * Args:
- *   rows (Array<Object>): Enriched movies.
- *
- * Returns:
- *   Array<Object>: Rows with a single entry per film.
- */
-function dedupeFilms(rows) {
-  const seen = new Set();
-  const unique = [];
-
-  for (const movie of rows) {
-    if (!movie) continue;
-    const name = String(movie.name || '').trim().toLowerCase();
-    const key = `${name}::${movie.year ?? ''}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    unique.push(movie);
-  }
-
-  return unique;
 }
 
 /**

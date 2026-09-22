@@ -1,0 +1,889 @@
+/* Reviews.css Section 06: Análisis de tus propias reseñas */
+
+.rv-section {
+  min-height: 100vh;
+  padding: var(--space-12) 80px var(--space-16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.rv-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+  max-width: 900px;
+}
+
+.rv-section-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: var(--space-4);
+}
+
+.rv-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.rv-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Bento grid, 12 columns matching the other sections */
+.rv-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1400px;
+}
+
+.rv-grid > * {
+  min-width: 0;
+}
+
+.rv-col-12 { grid-column: span 12; }
+.rv-col-7  { grid-column: span 7;  }
+.rv-col-5  { grid-column: span 5;  }
+
+/* Card base */
+.rv-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* let the cloud tooltip escape the card instead of getting clipped */
+.rv-card:has(.rv-cloud-tip) {
+  overflow: visible;
+}
+
+.rv-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.rv-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.rv-card-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+}
+
+.rv-card-label {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.rv-card-note {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.rv-empty {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 70ch;
+}
+
+/* Visually hidden helper for the screen reader word list */
+.rv-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   WORD CLOUD: spiral packed words sized by frequency
+   ============================================================ */
+
+.rv-cloud {
+  position: relative;
+  width: 100%;
+  height: clamp(280px, 34vh, 380px);
+}
+
+.rv-cloud-word {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  animation: rvWordIn 480ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--word-delay, 0ms);
+}
+
+/* when one word is picked, the rest step back so the choice is obvious */
+.rv-cloud:has(.rv-cloud-word.is-active) .rv-cloud-word:not(.is-active) {
+  opacity: 0.4;
+}
+
+.rv-cloud-word.is-active {
+  transform: scale(1.08);
+}
+
+.rv-cloud:focus-visible {
+  outline: 2px solid var(--color-lb-blue);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.rv-cloud-tip {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, calc(-100% - 8px));
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 10px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  max-width: 240px;
+}
+
+.rv-cloud-tip-count {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+
+.rv-cloud-tip-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rv-cloud-foot {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.rv-cloud-foot-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-faint);
+}
+
+.rv-cloud-foot-word {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--color-lb-blue);
+  line-height: 1;
+}
+
+.rv-cloud-foot-count {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+@keyframes rvWordIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   REVIEW LENGTH BARS: average words per year
+   ============================================================ */
+
+.rv-bars {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.rv-bars-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.rv-bars-grid {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1;
+}
+
+.rv-bars-axis {
+  fill: var(--color-text-faint);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.rv-bars-hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.rv-bars-bar {
+  fill: rgba(64, 188, 244, 0.5);
+  transition: fill var(--transition-fast);
+}
+
+.rv-bars-group.is-active .rv-bars-bar {
+  fill: var(--color-lb-blue);
+}
+
+.rv-bars-group:focus-visible {
+  outline: none;
+}
+
+.rv-bars-group:focus-visible .rv-bars-bar {
+  stroke: var(--color-text);
+  stroke-width: 1.5;
+}
+
+.rv-bars-value {
+  fill: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rv-bars-year {
+  fill: var(--color-text-faint);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rv-bars-count {
+  fill: var(--color-text-faint);
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+/* the line joining the yearly averages is what shows the direction */
+.rv-bars-trend {
+  fill: none;
+  stroke: var(--color-lb-orange);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.rv-bars-trend-dot {
+  fill: var(--color-lb-orange);
+  stroke: var(--color-surface);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.rv-bars-tip {
+  position: absolute;
+  top: 0;
+  left: clamp(88px, var(--tip-x), calc(100% - 88px));
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 11px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+}
+
+.rv-bars-tip-year {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--color-lb-blue);
+  line-height: 1.1;
+}
+
+.rv-bars-tip-row {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.rv-bars-tip-val {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.rv-bars-tip-range {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.rv-bars-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.rv-bars-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rv-bars-legend-bar {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(64, 188, 244, 0.6);
+}
+
+.rv-bars-legend-line {
+  width: 16px;
+  height: 0;
+  border-top: 2px solid var(--color-lb-orange);
+}
+
+.rv-verdict {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.rv-verdict-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verdict-color, var(--color-lb-blue));
+  flex-shrink: 0;
+}
+
+.rv-verdict-delta {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+/* ============================================================
+   FINGERPRINT: numeric portrait of the writer
+   ============================================================ */
+
+.rv-fingerprint {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+  justify-content: space-between;
+}
+
+/* rows stretch to fill the card so no single dead block opens up above the note */
+.rv-fingerprint-rows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rv-fingerprint-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 11px 0;
+}
+
+.rv-fingerprint-row + .rv-fingerprint-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.rv-fingerprint-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rv-fingerprint-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.rv-fingerprint-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rv-fingerprint-value {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--color-text);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rv-fingerprint-note {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-faint);
+  line-height: 1.55;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+   FEATURED: hero review plus ranked picker
+   ============================================================ */
+
+/* The poster owns the left column, so the review text can never run underneath
+   it. Inside the right column the picker floats, so an expanded review flows
+   under the picker and out to the full card width. */
+.rv-featured {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.rv-feature-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* flow-root contains the floating picker while the text wraps around it */
+.rv-feature-main {
+  display: flow-root;
+  min-width: 0;
+}
+
+.rv-feature-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rv-feature-body {
+  min-width: 0;
+}
+
+/* flow-root makes the head a BFC, so it sits beside the floats instead of
+   running underneath them, while the text below wraps around both */
+.rv-feature-head {
+  display: flow-root;
+  margin-bottom: var(--space-3);
+}
+
+.rv-feature-head-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.rv-feature-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.rv-feature-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.rv-feature-year {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-faint);
+}
+
+.rv-feature-metrics {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  white-space: nowrap;
+}
+
+.rv-feature-rating {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.rv-feature-words {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-lb-blue);
+}
+
+.rv-feature-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.rv-feature-text.is-clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rv-feature-more {
+  display: inline-block;
+  margin-top: var(--space-3);
+  padding: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-lb-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rv-feature-more:hover {
+  color: var(--color-lb-green);
+}
+
+.rv-feature-list {
+  float: right;
+  width: 340px;
+  margin: 0 0 var(--space-4) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-left: 1px solid var(--color-border);
+  padding-left: var(--space-6);
+}
+
+.rv-feature-list-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-2);
+}
+
+.rv-rank-row {
+  display: grid;
+  grid-template-columns: 16px 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  color: inherit;
+}
+
+.rv-rank-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rv-rank-row.is-active {
+  background: rgba(64, 188, 244, 0.12);
+}
+
+.rv-rank-num {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--color-text-faint);
+  text-align: center;
+}
+
+.rv-rank-row.is-active .rv-rank-num {
+  color: var(--color-lb-blue);
+}
+
+.rv-rank-poster {
+  width: 32px;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+
+.rv-rank-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rv-rank-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rv-rank-name {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rv-rank-meta {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.rv-rank-words {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--color-text-muted);
+}
+
+.rv-rank-row.is-active .rv-rank-words {
+  color: var(--color-lb-blue);
+}
+
+/* Shared missing poster fallback */
+.rv-poster-missing {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--color-text-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-cloud-word {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .rv-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .rv-col-12,
+  .rv-col-7,
+  .rv-col-5 {
+    grid-column: span 2;
+  }
+}
+
+/* too narrow for the side column, so stack poster, review, then the picker */
+@media (max-width: 1080px) {
+  .rv-featured {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rv-feature-poster {
+    width: 180px;
+  }
+
+  .rv-feature-main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rv-feature-body {
+    order: 1;
+  }
+
+  .rv-feature-list {
+    float: none;
+    order: 2;
+    width: auto;
+    margin: var(--space-5) 0 0;
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-5);
+  }
+}
+
+@media (max-width: 768px) {
+  .rv-section {
+    padding: var(--space-10) 24px var(--space-12);
+  }
+
+  .rv-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rv-col-12,
+  .rv-col-7,
+  .rv-col-5 {
+    grid-column: span 1;
+  }
+
+  .rv-card-note {
+    display: none;
+  }
+
+  .rv-cloud {
+    height: clamp(300px, 52vh, 380px);
+  }
+}
+
+@media (max-width: 640px) {
+  .rv-section {
+    padding: var(--space-8) var(--space-6) var(--space-10);
+  }
+
+  .rv-card {
+    padding: var(--space-6);
+  }
+
+  .rv-feature-hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .rv-feature-poster {
+    max-width: 150px;
+  }
+
+  .rv-bars-axis {
+    font-size: 17px;
+  }
+
+  .rv-bars-year {
+    font-size: 17px;
+  }
+
+  .rv-bars-count {
+    font-size: 13px;
+  }
+
+  .rv-bars-value {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .rv-bars-axis {
+    font-size: 21px;
+  }
+
+  .rv-bars-year {
+    font-size: 21px;
+  }
+
+  .rv-bars-count {
+    font-size: 15px;
+  }
+
+  .rv-bars-value {
+    font-size: 21px;
+  }
+}

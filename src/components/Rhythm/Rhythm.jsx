@@ -372,7 +372,6 @@ export default function Rhythm() {
   const { rawData, enrichedData } = useData();
   const stats = useRhythmStats(rawData, enrichedData);
 
-  const username = rawData?.profile?.username;
   const currentYear = new Date().getFullYear();
   const latestYear = stats.years[stats.years.length - 1] || currentYear;
 
@@ -410,15 +409,9 @@ export default function Rhythm() {
   return (
     <div className="ry-section">
       <header className="ry-header">
-        <div className="ry-category-tag">Section 02 / Rhythm</div>
+        <div className="ry-section-label">Section 02 / Rhythm</div>
         <h2 className="ry-title">
-          {username ? (
-            <>
-              You've got a rhythm, let's take a look at it.
-            </>
-          ) : (
-            "Your watching has a rhythm."
-          )}
+          You've got a <span className="lb-hl-orange">rhythm</span>, let's take a look at it.
         </h2>
         <p className="ry-subtitle">
           You've seen boring facts. Now let's start with the fun part: when, how often, and

@@ -1,0 +1,947 @@
+/* Cast.css Section 05: Cast & Money */
+
+.cs-section {
+  min-height: 100vh;
+  padding: var(--space-12) 80px var(--space-16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.cs-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+  max-width: 900px;
+}
+
+.cs-section-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: var(--space-4);
+}
+
+.cs-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.cs-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Bento grid, 12 columns matching the other sections */
+.cs-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1400px;
+}
+
+.cs-grid > * {
+  min-width: 0;
+}
+
+.cs-col-7 { grid-column: span 7; }
+.cs-col-6 { grid-column: span 6; }
+.cs-col-5 { grid-column: span 5; }
+
+/* Card base */
+.cs-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* let the quadrant tooltip escape the card instead of getting clipped */
+.cs-card:has(.poster-tip) {
+  overflow: visible;
+}
+
+.cs-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cs-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cs-card-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+}
+
+.cs-card-label {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.cs-card-note {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.cs-empty {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Shared circular headshot */
+.cs-portrait {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cs-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cs-portrait-initials {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-text-faint);
+  letter-spacing: 0.02em;
+}
+
+.cs-portrait-hero {
+  width: 108px;
+  height: 108px;
+  border-color: rgba(0, 232, 122, 0.4);
+  animation: csHeroIn 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cs-portrait-hero .cs-portrait-initials {
+  font-size: 2rem;
+}
+
+.cs-portrait-row {
+  width: 40px;
+  height: 40px;
+}
+
+.cs-portrait-row .cs-portrait-initials {
+  font-size: 0.8rem;
+}
+
+.cs-portrait-duo {
+  width: 120px;
+  height: 120px;
+  border-color: rgba(124, 109, 240, 0.4);
+}
+
+.cs-portrait-duo .cs-portrait-initials {
+  font-size: 1.8rem;
+}
+
+/* ============================================================
+   CAST BOARD: headliner plus ranked unit chart
+   ============================================================ */
+
+.cs-cast {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cs-cast-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.cs-cast-hero-portrait {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cs-cast-rank-badge {
+  position: absolute;
+  bottom: -4px;
+  left: -4px;
+  padding: 3px 7px;
+  border-radius: var(--radius-badge);
+  background: var(--color-accent);
+  color: #042315;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.cs-cast-hero-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cs-cast-hero-role {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-faint);
+}
+
+.cs-cast-hero-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.cs-cast-hero-metrics {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.cs-cast-hero-count {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  line-height: 1;
+}
+
+.cs-cast-hero-count-lbl {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.cs-cast-hero-rating {
+  margin-left: var(--space-3);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-accent-3);
+}
+
+.cs-cast-hero-line {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  max-width: 46ch;
+  margin: 0;
+}
+
+.cs-cast-strip {
+  display: flex;
+  gap: 8px;
+}
+
+/* poster thumbs share one frame, the strip and the duo grid only differ in layout */
+.cs-cast-strip-item,
+.cs-duo-film {
+  aspect-ratio: 2 / 3;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+
+.cs-cast-strip-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-cast-strip-item img,
+.cs-duo-film img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cs-cast-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-cast-row {
+  display: grid;
+  grid-template-columns: 22px 40px 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 9px 0;
+}
+
+.cs-cast-row + .cs-cast-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.cs-cast-row-rank {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: var(--color-text-faint);
+  text-align: center;
+}
+
+.cs-cast-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cs-cast-row-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-cast-units {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.cs-cast-unit {
+  width: 7px;
+  height: 7px;
+  border-radius: 1.5px;
+  background: rgba(0, 232, 122, 0.55);
+  /* the section's one authored moment: the roll call cascades in */
+  animation: csUnitIn 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--unit-delay, 0ms);
+}
+
+@keyframes csUnitIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes csHeroIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cs-cast-row-metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 30px;
+}
+
+.cs-cast-row-count {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.cs-cast-row-avg {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-accent-3);
+}
+
+/* ============================================================
+   DUO: favourite director and actor pair
+   ============================================================ */
+
+.cs-duo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+  justify-content: space-between;
+}
+
+.cs-duo-intro {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.cs-duo-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.cs-duo-pair {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.cs-duo-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-duo-name {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cs-duo-role {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-faint);
+}
+
+.cs-duo-link {
+  align-self: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-2);
+  flex-shrink: 0;
+}
+
+.cs-duo-count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.cs-duo-count-num {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--color-accent-2);
+  line-height: 1;
+}
+
+.cs-duo-count-lbl {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.cs-duo-films {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+}
+
+/* ============================================================
+   STUDIOS: lollipop chart
+   ============================================================ */
+
+.cs-studios {
+  --cs-studio-meta: 162px;
+  --cs-studio-value: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* rows sit above an absolute grid so the guide lines span every row */
+.cs-studios-rows {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cs-studios-grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--cs-studio-meta) + var(--space-3));
+  right: calc(var(--cs-studio-value) + var(--space-3));
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.cs-studios-grid span {
+  width: 0;
+  border-left: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.cs-studio-row {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: var(--cs-studio-meta) 1fr var(--cs-studio-value);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cs-studio-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.cs-studio-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-studio-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.cs-studio-track {
+  position: relative;
+  height: 16px;
+}
+
+.cs-studio-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-50%);
+}
+
+.cs-studio-stem {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  border-radius: var(--radius-full);
+  transform: translateY(-50%);
+  opacity: 0.85;
+}
+
+.cs-studio-dot {
+  position: absolute;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+  transform: translate(-50%, -50%);
+}
+
+.cs-studio-rating {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.cs-studio-scale {
+  display: flex;
+  justify-content: space-between;
+  padding-left: calc(var(--cs-studio-meta) + var(--space-3));
+  padding-right: calc(var(--cs-studio-value) + var(--space-3));
+  margin-top: 2px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+   MONEY: budget vs box office quadrant
+   ============================================================ */
+
+.cs-money {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* plot grid: rotated y title, the SVG, then the x title under the plot column */
+.cs-quad-plot {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "yaxis plot"
+    ". xaxis";
+  gap: 4px 8px;
+  align-items: center;
+}
+
+.cs-quad-axis-title {
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-faint);
+}
+
+.cs-quad-axis-title-y {
+  grid-area: yaxis;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  justify-self: center;
+}
+
+.cs-quad-axis-title-x {
+  grid-area: xaxis;
+  text-align: center;
+}
+
+.cs-quad-svg {
+  grid-area: plot;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cs-quad-svg:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cs-quad-grid {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1;
+}
+
+.cs-quad-axis {
+  fill: var(--color-text-faint);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.cs-quad-breakeven {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+}
+
+/* invisible enlarged target so the tiny dots are easy to hover */
+.cs-quad-hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.cs-quad-dot {
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 0.6;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.cs-quad-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.cs-quad-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cs-quad-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.cs-quad-legend-swatch.is-loved {
+  background: rgba(0, 232, 122, 1);
+}
+
+.cs-quad-legend-swatch.is-meh {
+  background: rgba(0, 232, 122, 0.4);
+}
+
+.cs-quad-legend-line {
+  width: 18px;
+  height: 0;
+  border-top: 1.5px dashed rgba(255, 255, 255, 0.4);
+}
+
+.cs-money-foot {
+  display: flex;
+  align-items: stretch;
+}
+
+.cs-money-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 var(--space-4);
+}
+
+.cs-money-stat:first-child {
+  padding-left: 0;
+}
+
+.cs-money-stat + .cs-money-stat {
+  border-left: 1px solid var(--color-border);
+}
+
+.cs-money-stat-val {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+
+.cs-money-stat-lbl {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Shared takeaway line */
+.cs-takeaway {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.cs-takeaway-muted {
+  font-weight: 500;
+  color: var(--color-text-faint);
+}
+
+.cs-takeaway-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent, var(--color-accent));
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-cast-unit,
+  .cs-portrait-hero {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .cs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cs-col-7,
+  .cs-col-6,
+  .cs-col-5 {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .cs-section {
+    padding: var(--space-10) 24px var(--space-12);
+  }
+
+  .cs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-col-7,
+  .cs-col-6,
+  .cs-col-5 {
+    grid-column: span 1;
+  }
+
+  .cs-card-note {
+    display: none;
+  }
+
+  .cs-studios {
+    --cs-studio-meta: 124px;
+    --cs-studio-value: 34px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cs-section {
+    padding: var(--space-8) var(--space-6) var(--space-10);
+  }
+
+  .cs-card {
+    padding: var(--space-6);
+  }
+
+  .cs-cast-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .cs-cast-hero-line {
+    max-width: none;
+  }
+
+  .cs-cast-strip {
+    gap: 6px;
+  }
+
+  .cs-money-stat {
+    padding: 0 var(--space-3);
+  }
+
+  .cs-money-stat-val {
+    font-size: 1.15rem;
+  }
+
+  /* the quadrant viewBox scales down hard, so labels grow to stay legible */
+  .cs-quad-axis {
+    font-size: 15px;
+  }
+
+  /* studios go two rows on narrow screens so the name is never gutted */
+  .cs-studio-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "meta rating"
+      "track track";
+    row-gap: 7px;
+  }
+
+  .cs-studio-meta {
+    grid-area: meta;
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .cs-studio-track {
+    grid-area: track;
+  }
+
+  .cs-studio-rating {
+    grid-area: rating;
+  }
+
+  .cs-studio-scale,
+  .cs-studios-grid {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .cs-quad-axis {
+    font-size: 19px;
+  }
+}

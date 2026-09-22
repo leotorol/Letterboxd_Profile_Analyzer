@@ -184,6 +184,19 @@ p {
   font-feature-settings: "tnum";
 }
 
+/* Coloured keyword accents for section titles, using the Letterboxd palette */
+.lb-hl-blue {
+  color: var(--color-lb-blue);
+}
+
+.lb-hl-green {
+  color: var(--color-lb-green);
+}
+
+.lb-hl-orange {
+  color: var(--color-lb-orange);
+}
+
 button {
   font-family: var(--font-body);
   cursor: pointer;

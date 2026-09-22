@@ -1,68 +1,11 @@
 import { useMemo } from 'react';
+import { mean, median, pearson } from '../utils/stats';
+import { dedupeFilms } from '../utils/films';
 
 // how many dots max we render per genre column in the dotplot
 const GENRE_DOTPLOT_MAX_DOTS = 80;
 // filter out anything longer than this, it's an anime series or tv marathon, not a film
 const MAX_FILM_RUNTIME_MIN = 300;
-
-/**
- * Averages an array of numbers.
- *
- * Args:
- *   values (number[]): Numbers to average.
- *
- * Returns:
- *   number: Arithmetic mean, or 0 for an empty array.
- */
-function mean(values) {
-  if (!values.length) return 0;
-  return values.reduce((a, b) => a + b, 0) / values.length;
-}
-
-/**
- * Finds the median of an array of numbers.
- *
- * Args:
- *   values (number[]): Numbers to inspect.
- *
- * Returns:
- *   number|null: Median value, or null for an empty array.
- */
-function median(values) {
-  if (!values.length) return null;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-/**
- * Pearson product-moment correlation coefficient between two number arrays.
- *
- * Args:
- *   xs (number[]): First series.
- *   ys (number[]): Second series.
- *
- * Returns:
- *   number: Correlation in the range -1 to 1.
- */
-function pearson(xs, ys) {
-  const n = xs.length;
-  if (n < 2) return 0;
-  const mx = mean(xs);
-  const my = mean(ys);
-  let num = 0;
-  let dx = 0;
-  let dy = 0;
-  for (let i = 0; i < n; i++) {
-    const a = xs[i] - mx;
-    const b = ys[i] - my;
-    num += a * b;
-    dx += a * a;
-    dy += b * b;
-  }
-  const den = Math.sqrt(dx * dy);
-  return den === 0 ? 0 : num / den;
-}
 
 /**
  * Computes a normalised (0..1) Shannon entropy of the genre distribution.
@@ -497,7 +440,7 @@ function buildWorldMap(rows) {
  */
 export function useCinephileStats(enrichedData = null) {
   return useMemo(() => {
-    const rows = enrichedData || [];
+    const rows = dedupeFilms(enrichedData || []);
 
     const emptyGenre = { list: [], total: 0, maxCount: 0, topGenre: null, distinctCount: 0, maxDots: GENRE_DOTPLOT_MAX_DOTS };
     const emptyCorr = { points: [], r: 0, count: 0, xMin: 0, xMax: 0 };

@@ -3,9 +3,11 @@ import { feature } from 'topojson-client';
 import { useData } from '../../context/DataContext';
 import { useCinephileStats } from '../../hooks/useCinephileStats';
 import { polarToCartesian } from '../../utils/geometry';
+import { ratingColor } from '../../utils/ratingColor';
 import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
 import { tipPosition } from '../../utils/positionTip';
 import { ClockIcon, TrendIcon } from '../icons/Icons';
+import PosterTip from '../PosterTip/PosterTip';
 import './CinephileProfile.css';
 
 // ISO 3166-1 alpha-2 to full country name map, used by the world map tooltip
@@ -115,6 +117,46 @@ const GlobeIcon = () => (
 );
 
 /**
+ * Zoom in icon for the world map controls.
+ *
+ * Returns:
+ *   JSX.Element: Inline SVG icon.
+ */
+const PlusIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+/**
+ * Zoom out icon for the world map controls.
+ *
+ * Returns:
+ *   JSX.Element: Inline SVG icon.
+ */
+const MinusIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+/**
+ * Reset map view icon: four corner brackets pulling inward.
+ *
+ * Returns:
+ *   JSX.Element: Inline SVG icon.
+ */
+const FitIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 9V4h5" />
+    <path d="M20 9V4h-5" />
+    <path d="M4 15v5h5" />
+    <path d="M20 15v5h-5" />
+  </svg>
+);
+
+/**
  * Camera lens section icon.
  *
  * Returns:
@@ -127,56 +169,6 @@ const LensIcon = () => (
     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
   </svg>
 );
-
-/**
- * Maps a 0..5 film rating to an emerald fill colour.
- *
- * Args:
- *   rating (number|null): Film rating.
- *
- * Returns:
- *   string: CSS colour string.
- */
-function ratingColor(rating) {
-  if (rating == null) return 'rgba(255, 255, 255, 0.18)';
-  return `rgba(0, 232, 122, ${(0.35 + (rating / 5) * 0.65).toFixed(2)})`;
-}
-
-/**
- * Floating dark tooltip with a film poster, title, meta line and rating.
- *
- * Shared by every chart that pops film details on hover, tap or keyboard focus.
- *
- * Args:
- *   film (Object): Normalised film with name, year, rating and posterPath.
- *   sub (string, optional): Middle meta line rendered under the title.
- *   stackCount (number, optional): How many films share this chart point.
- *   style (Object, optional): Absolute positioning CSS.
- *
- * Returns:
- *   JSX.Element: The poster tooltip.
- */
-function PosterTip({ film, sub, stackCount = 0, style }) {
-  return (
-    <div className="cp-tip cp-poster-tip" style={style}>
-      <div className="cp-tip-film-card">
-        {film.posterPath && (
-          <img src={TMDB_POSTER_SMALL + film.posterPath} alt="" className="cp-tip-poster" />
-        )}
-        <div className="cp-tip-film-info">
-          <span className="cp-tip-title">{film.name}</span>
-          {sub && <span className="cp-tip-sub">{sub}</span>}
-          <span className="cp-tip-rating">
-            {film.rating != null ? `★ ${film.rating.toFixed(1)} / 5` : 'unrated'}
-          </span>
-          {stackCount > 1 && (
-            <span className="cp-tip-stack-tag">+{stackCount - 1} more at this point</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /**
  * Four horizontal spectrum bars replacing the old radar polygon with hover explanations.
@@ -1163,6 +1155,8 @@ const MAP_W = 960;
 const MAP_H = 480;
 const LAT_MAX = 84;
 const LAT_MIN = -58;
+// furthest you can zoom the world map in
+const MAX_MAP_SCALE = 8;
 
 /**
  * Miller Cylindrical projection latitude transform.
@@ -1288,19 +1282,14 @@ function geometryToPath(geometry) {
  *   fillById (Map): Numeric country id to fill colour.
  *   onCountryEnter (Function): Pointer enter handler.
  *   onCountryLeave (Function): Pointer leave handler.
- *   onCountryPick (Function): Pointer down handler.
+ *   onCountryClick (Function): Click handler (fires only on a real tap, not a drag).
  *
  * Returns:
  *   JSX.Element: The map SVG.
  */
-const MapBody = memo(function MapBody({ paths, fillById, onCountryEnter, onCountryLeave, onCountryPick }) {
+const MapBody = memo(function MapBody({ paths, fillById, onCountryEnter, onCountryLeave, onCountryClick }) {
   return (
-    <svg
-      className="cp-map-svg"
-      viewBox={`0 0 ${MAP_W} ${MAP_H}`}
-      role="img"
-      aria-label="World map showing countries your films come from"
-    >
+    <>
       {paths.map((path) => {
         const alpha2 = MAP_NUMERIC_TO_ALPHA2[path.id];
         const fill = alpha2 ? fillById.get(path.id) || 'var(--color-map-idle)' : 'var(--color-map-idle)';
@@ -1313,19 +1302,39 @@ const MapBody = memo(function MapBody({ paths, fillById, onCountryEnter, onCount
             style={{ fill }}
             onPointerEnter={(e) => onCountryEnter(e, path.id)}
             onPointerLeave={(e) => onCountryLeave(e, path.id)}
-            onPointerDown={(e) => onCountryPick(e, path.id)}
+            onClick={(e) => onCountryClick(e, path.id)}
           />
         );
       })}
-    </svg>
+    </>
   );
 });
 
 /**
+ * Clamps a map view so the zoomed window never escapes the projected map bounds.
+ *
+ * Args:
+ *   view (Object): Candidate `{ scale, x, y }` view, x/y being the viewBox origin.
+ *
+ * Returns:
+ *   Object: The clamped `{ scale, x, y }`.
+ */
+function clampMapView(view) {
+  const vbW = MAP_W / view.scale;
+  const vbH = MAP_H / view.scale;
+  return {
+    scale: view.scale,
+    x: Math.min(MAP_W - vbW, Math.max(0, view.x)),
+    y: Math.min(MAP_H - vbH, Math.max(0, view.y)),
+  };
+}
+
+/**
  * Interactive world map whose countries light up by how many films you watched from them.
  *
- * Loads the world-atlas topology lazily, projects it and handles hover, tap and
- * keyboard interactions plus a screen-reader fallback list.
+ * Loads the world-atlas topology lazily, projects it and handles hover, tap,
+ * drag to pan and zoom (buttons, ctrl/command + wheel or double click). The map
+ * stretches to fill whatever height the bento card hands it.
  *
  * Args:
  *   worldMap (Object): World map bundle from the stats hook.
@@ -1337,7 +1346,18 @@ function WorldMapChart({ worldMap }) {
   const [geoData, setGeoData] = useState(null);
   const [hover, setHover] = useState(null);
   const [pinned, setPinned] = useState(null);
+  const [view, setView] = useState({ scale: 1, x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
   const containerRef = useRef(null);
+  const viewportRef = useRef(null);
+  const viewRef = useRef(view);
+  const dragRef = useRef(null);
+  const suppressClickRef = useRef(false);
+
+  // keep the latest view reachable from drag handlers without stale closures
+  useEffect(() => {
+    viewRef.current = view;
+  }, [view]);
 
   useEffect(() => {
     import('world-atlas/countries-110m.json').then((mod) => {
@@ -1379,7 +1399,108 @@ function WorldMapChart({ worldMap }) {
     return (alpha2 && COUNTRY_NAMES[alpha2]) || alpha2 || `Country ${id}`;
   };
 
+  /**
+   * Zooms the viewBox around a point measured from the viewport's top left.
+   *
+   * The zoom is done through the SVG viewBox, not a CSS transform, so the map
+   * stays vector crisp at any zoom level instead of being a scaled up raster.
+   *
+   * Args:
+   *   cx (number): Cursor x in viewport pixels.
+   *   cy (number): Cursor y in viewport pixels.
+   *   factor (number): Multiplicative zoom factor.
+   */
+  const zoomAt = useCallback((cx, cy, factor) => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const rect = vp.getBoundingClientRect();
+    setView((v) => {
+      const nextScale = Math.min(MAX_MAP_SCALE, Math.max(1, v.scale * factor));
+      // keep the point under the cursor pinned by remapping the viewBox origin
+      const ux = v.x + (cx / rect.width) * (MAP_W / v.scale);
+      const uy = v.y + (cy / rect.height) * (MAP_H / v.scale);
+      return clampMapView({
+        scale: nextScale,
+        x: ux - (cx / rect.width) * (MAP_W / nextScale),
+        y: uy - (cy / rect.height) * (MAP_H / nextScale),
+      });
+    });
+  }, []);
+
+  const zoomButton = (factor) => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const rect = vp.getBoundingClientRect();
+    zoomAt(rect.width / 2, rect.height / 2, factor);
+  };
+
+  const resetView = () => setView({ scale: 1, x: 0, y: 0 });
+
+  // wheel needs a non passive native listener or preventDefault gets ignored
+  useEffect(() => {
+    const vp = viewportRef.current;
+    if (!vp) return undefined;
+    const onWheel = (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      const rect = vp.getBoundingClientRect();
+      zoomAt(e.clientX - rect.left, e.clientY - rect.top, Math.exp(-e.deltaY * 0.0015));
+    };
+    vp.addEventListener('wheel', onWheel, { passive: false });
+    return () => vp.removeEventListener('wheel', onWheel);
+  }, [zoomAt, geoData]);
+
+  const handleDragStart = useCallback((e) => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const v = viewRef.current;
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startX0: v.x,
+      startY0: v.y,
+      moved: false,
+      pointerId: e.pointerId,
+    };
+    vp.setPointerCapture(e.pointerId);
+    setDragging(true);
+  }, []);
+
+  const handleDragMove = useCallback((e) => {
+    const drag = dragRef.current;
+    const vp = viewportRef.current;
+    if (!drag || !vp) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+    setView((v) => {
+      const rect = vp.getBoundingClientRect();
+      // screen pixels to viewBox units, so the map tracks the cursor 1:1
+      const dxUser = (dx / rect.width) * (MAP_W / v.scale);
+      const dyUser = (dy / rect.height) * (MAP_H / v.scale);
+      return clampMapView({ scale: v.scale, x: drag.startX0 - dxUser, y: drag.startY0 - dyUser });
+    });
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    const vp = viewportRef.current;
+    if (vp && vp.hasPointerCapture && vp.hasPointerCapture(drag.pointerId)) {
+      vp.releasePointerCapture(drag.pointerId);
+    }
+    if (drag.moved) {
+      // a drag just ended, eat the click the browser fires right after
+      suppressClickRef.current = true;
+      setTimeout(() => { suppressClickRef.current = false; }, 0);
+    }
+    dragRef.current = null;
+    setDragging(false);
+  }, []);
+
   const handleCountryEnter = useCallback((e, id) => {
+    if (dragRef.current) return;
     const count = worldMap.byCountry.get(MAP_NUMERIC_TO_ALPHA2[id]) || 0;
     if (!count || !containerRef.current) {
       setHover(null);
@@ -1399,7 +1520,8 @@ function WorldMapChart({ worldMap }) {
     setHover(null);
   }, []);
 
-  const handleCountryPick = useCallback((e, id) => {
+  const handleCountryClick = useCallback((e, id) => {
+    if (suppressClickRef.current) return;
     const alpha2 = MAP_NUMERIC_TO_ALPHA2[id];
     const count = worldMap.byCountry.get(alpha2) || 0;
     if (!count || !containerRef.current) return;
@@ -1417,7 +1539,17 @@ function WorldMapChart({ worldMap }) {
     });
   }, [worldMap]);
 
-  const handleWrapPointerDown = useCallback(() => setPinned(null), []);
+  const handleViewportClick = useCallback(() => {
+    if (suppressClickRef.current) return;
+    setPinned(null);
+  }, []);
+
+  const handleDoubleClick = useCallback((e) => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const rect = vp.getBoundingClientRect();
+    zoomAt(e.clientX - rect.left, e.clientY - rect.top, 1.6);
+  }, [zoomAt]);
 
   if (!geoData) {
     return <div className="cp-map-loading">Loading map...</div>;
@@ -1434,19 +1566,63 @@ function WorldMapChart({ worldMap }) {
   const tip = hover || pinned;
 
   return (
-    <div
-      className="cp-map-wrap"
-      ref={containerRef}
-      onPointerLeave={handleCountryLeave}
-      onPointerDown={handleWrapPointerDown}
-    >
-      <MapBody
-        paths={paths}
-        fillById={fillById}
-        onCountryEnter={handleCountryEnter}
-        onCountryLeave={handleCountryLeave}
-        onCountryPick={handleCountryPick}
-      />
+    <div className="cp-map-wrap" ref={containerRef} onPointerLeave={handleCountryLeave}>
+      <div
+        ref={viewportRef}
+        className={`cp-map-viewport${dragging ? ' is-dragging' : ''}${view.scale > 1 ? ' is-zoomed' : ''}`}
+        onPointerDown={handleDragStart}
+        onPointerMove={handleDragMove}
+        onPointerUp={handleDragEnd}
+        onPointerCancel={handleDragEnd}
+        onClick={handleViewportClick}
+        onDoubleClick={handleDoubleClick}
+      >
+        <svg
+          className="cp-map-svg"
+          viewBox={`${view.x} ${view.y} ${MAP_W / view.scale} ${MAP_H / view.scale}`}
+          preserveAspectRatio="none"
+          role="img"
+          aria-label="World map showing countries your films come from"
+        >
+          <MapBody
+            paths={paths}
+            fillById={fillById}
+            onCountryEnter={handleCountryEnter}
+            onCountryLeave={handleCountryLeave}
+            onCountryClick={handleCountryClick}
+          />
+        </svg>
+      </div>
+
+      <div className="cp-map-controls">
+        <button
+          type="button"
+          className="cp-map-ctrl"
+          onClick={() => zoomButton(1.6)}
+          disabled={view.scale >= MAX_MAP_SCALE}
+          aria-label="Zoom in"
+        >
+          <PlusIcon />
+        </button>
+        <button
+          type="button"
+          className="cp-map-ctrl"
+          onClick={() => zoomButton(1 / 1.6)}
+          disabled={view.scale <= 1}
+          aria-label="Zoom out"
+        >
+          <MinusIcon />
+        </button>
+        <button
+          type="button"
+          className="cp-map-ctrl"
+          onClick={resetView}
+          disabled={view.scale === 1 && view.x === 0 && view.y === 0}
+          aria-label="Reset map view"
+        >
+          <FitIcon />
+        </button>
+      </div>
 
       <WatchedCountryList worldMap={worldMap} />
 
@@ -1520,9 +1696,8 @@ function PosterAccent({ films, title }) {
  *   JSX.Element: The Cinephile Profile section.
  */
 export default function CinephileProfile() {
-  const { rawData, enrichedData } = useData();
+  const { enrichedData } = useData();
   const stats = useCinephileStats(enrichedData);
-  const username = rawData?.profile?.username;
 
   // poster accents: 7 top genres (1 row)
   const topGenreFilms = useMemo(() => {
@@ -1601,8 +1776,8 @@ export default function CinephileProfile() {
     return (
       <div className="cp-section">
         <header className="cp-header">
-          <div className="cp-category-tag">Section 03 / Cinephile Profile</div>
-          <h2 className="cp-title">Your cinematic DNA.</h2>
+          <div className="cp-section-label">Section 03 / Cinephile Profile</div>
+          <h2 className="cp-title">Your cinematic <span className="lb-hl-blue">DNA</span>.</h2>
           <p className="cp-subtitle">Add some watches so we can work out who you are as a viewer.</p>
         </header>
       </div>
@@ -1632,12 +1807,8 @@ export default function CinephileProfile() {
   return (
     <div className="cp-section">
       <header className="cp-header">
-        <div className="cp-category-tag">Section 03 / Cinephile Profile</div>
-        <h2 className="cp-title">
-          {username ? (
-            <>Your cinematic DNA, <span className="cp-username">@{username}</span>.</>
-          ) : 'Your cinematic DNA.'}
-        </h2>
+        <div className="cp-section-label">Section 03 / Cinephile Profile</div>
+        <h2 className="cp-title">Your cinematic <span className="lb-hl-blue">DNA</span>.</h2>
         <p className="cp-subtitle">
           Who you are as a viewer. What you lean into, what you avoid, and how your taste has shifted over the years.
         </p>
@@ -1793,7 +1964,7 @@ export default function CinephileProfile() {
               </div>
               <div className="cp-card-label">Where Your Films Come From</div>
             </div>
-            <div className="cp-card-note">hover, tap or keyboard a country to see how many films from there you have watched.</div>
+            <div className="cp-card-note">hover or tap a country for its film count. drag to pan, use the buttons or ctrl scroll to zoom.</div>
           </div>
           <WorldMapChart worldMap={stats.worldMap} />
         </section>

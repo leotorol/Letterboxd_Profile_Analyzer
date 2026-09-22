@@ -16,19 +16,13 @@
   max-width: 900px;
 }
 
-.ry-category-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-badge);
+.ry-section-label {
+  font-family: var(--font-display);
   font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-accent);
+  font-weight: 800;
+  color: var(--color-text-faint);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   margin-bottom: var(--space-4);
 }
 
@@ -83,6 +77,7 @@
 
 /* Card base */
 .ry-card {
+  min-width: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -795,20 +790,85 @@
   .ry-card-note {
     display: none;
   }
+
+  .ry-evo {
+    height: 300px;
+  }
 }
 
-@media (max-width: 640px) {
-  .ry-hero-numbers {
-    gap: var(--space-6);
+@media (max-width: 768px) {
+  .ry-section {
+    padding: var(--space-10) 24px var(--space-12);
+  }
+
+  .ry-evo {
+    height: 270px;
+  }
+
+  /* Let the poster strip scroll sideways instead of crushing four covers into a sliver */
+  .ry-streak-film {
+    flex: 0 0 104px;
+  }
+
+  .ry-streak-film-poster {
+    height: auto;
+    aspect-ratio: 2 / 3;
   }
 
   .ry-comfort-item {
-    min-width: 128px;
-    max-width: 180px;
+    min-width: 140px;
+    max-width: 210px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ry-section {
+    padding: var(--space-8) var(--space-6) var(--space-10);
   }
 
   .ry-card {
     padding: var(--space-6);
+  }
+
+  /* Card heads stack so the title never fights the year nav for width */
+  .ry-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ry-year-nav {
+    align-self: center;
+  }
+
+  .ry-year-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ry-year-value {
+    font-size: 1.6rem;
+    min-width: 58px;
+  }
+
+  .ry-hero-numbers {
+    gap: var(--space-6);
+  }
+
+  .ry-evo {
+    height: 220px;
+  }
+
+  /* Strip bleeds to the smaller card padding on phones */
+  .ry-streak-films {
+    margin-left: calc(var(--space-6) * -1);
+    margin-right: calc(var(--space-6) * -1);
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  .ry-comfort-item {
+    min-width: 120px;
+    max-width: 170px;
   }
 
   .ry-mini-pair {

@@ -1,19 +1,23 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useRatingStats, CONTRARIAN_BANDS, MIN_DECADE_FILMS } from '../../hooks/useRatingStats';
 import { polarToCartesian } from '../../utils/geometry';
 import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
-import { tipPosition } from '../../utils/positionTip';
 import { CalendarIcon } from '../icons/Icons';
 import './Ratings.css';
 
 // SVG icons
 
+/**
+ * Balance scale icon for the consensus card header.
+ *
+ * Returns:
+ *   JSX.Element: Inline SVG icon.
+ */
 const ScaleIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 3v18" />
     <path d="M5 6l7-3 7 3" />
-    <path d="M2 12l3-6h0" />
     <path d="M5 6l-3 6h6l-3-6" />
     <path d="M19 6l-3 6h6l-3-6" />
     <circle cx="5" cy="12" r="3" fill="none" />
@@ -21,6 +25,12 @@ const ScaleIcon = () => (
   </svg>
 );
 
+/**
+ * Rebel face icon for the contrarian level card header.
+ *
+ * Returns:
+ *   JSX.Element: Inline SVG icon.
+ */
 const RebelIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2" />
@@ -47,7 +57,7 @@ function ConsensusItem({ film, isPositive, index }) {
   const { delta } = film;
   const sign = delta > 0 ? '+' : '';
   const badgeClass = isPositive ? 'is-positive' : 'is-negative';
-  
+
   return (
     <div className={`rt-consensus-item ${index % 2 === 0 ? 'is-left-col' : ''}`}>
       <div className="rt-consensus-poster-wrap">
@@ -83,6 +93,36 @@ function ConsensusItem({ film, isPositive, index }) {
 }
 
 /**
+ * One labelled half of the consensus card: a heading plus its film grid.
+ *
+ * The gems and overhyped halves were the same markup twice, so they share this.
+ *
+ * Args:
+ *   label (string): Heading shown above the grid.
+ *   labelClass (string): Extra class that colours the heading.
+ *   films (Array<Object>): Consensus entries to render.
+ *   isPositive (boolean): True for hidden gems, false for overhyped picks.
+ *
+ * Returns:
+ *   JSX.Element: A labelled consensus half.
+ */
+function ConsensusHalf({ label, labelClass, films, isPositive }) {
+  const keyPrefix = isPositive ? 'gem' : 'hype';
+  return (
+    <div className="rt-consensus-half">
+      <div className={`rt-consensus-label ${labelClass}`}>
+        <span>★</span> {label}
+      </div>
+      <div className="rt-consensus-grid">
+        {films.map((film, i) => (
+          <ConsensusItem key={`${keyPrefix}-${i}-${film.name}-${film.year}`} film={film} isPositive={isPositive} index={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Full-width card showing the user's 4 hidden gems and 4 overhyped films,
  * split horizontally with a divider.
  *
@@ -104,30 +144,22 @@ function ConsensusCard({ consensus }) {
   return (
     <div className="rt-consensus-wrap">
       {/* Hidden gems: user rates ABOVE consensus */}
-      <div className="rt-consensus-half">
-        <div className="rt-consensus-label rt-consensus-label-gems">
-          <span>★</span> Hidden gems underrated by the world
-        </div>
-        <div className="rt-consensus-grid">
-          {consensus.gems.map((film, i) => (
-            <ConsensusItem key={`gem-${i}-${film.name}-${film.year}`} film={film} isPositive={true} index={i} />
-          ))}
-        </div>
-      </div>
+      <ConsensusHalf
+        label="Hidden gems underrated by the world"
+        labelClass="rt-consensus-label-gems"
+        films={consensus.gems}
+        isPositive={true}
+      />
 
       <div className="rt-consensus-divider" />
 
       {/* Overhyped: user rates BELOW consensus */}
-      <div className="rt-consensus-half">
-        <div className="rt-consensus-label rt-consensus-label-hype">
-          <span>★</span> Overhyped don't get the hype
-        </div>
-        <div className="rt-consensus-grid">
-          {consensus.overhyped.map((film, i) => (
-            <ConsensusItem key={`hype-${i}-${film.name}-${film.year}`} film={film} isPositive={false} index={i} />
-          ))}
-        </div>
-      </div>
+      <ConsensusHalf
+        label="Overhyped don't get the hype"
+        labelClass="rt-consensus-label-hype"
+        films={consensus.overhyped}
+        isPositive={false}
+      />
     </div>
   );
 }
@@ -328,7 +360,7 @@ function ContrarianMeter({ contrarian }) {
       </div>
 
       <p className="rt-rebel-stats">
-        <span className="rt-rebel-stats-line">
+        <span>
           <span className="rt-rebel-stats-val tabular-nums">±{meanAbsDelta.toFixed(2)}</span> avg stars gap
           <span className="rt-rebel-stats-sep">·</span>
           <span className="rt-rebel-stats-val tabular-nums">{sampleSize.toLocaleString()}</span> films compared
@@ -404,7 +436,7 @@ function visibleDecadeCount(total, columns) {
 }
 
 /**
- * Interactive poster wall for a single decade, with hover tooltips.
+ * Static poster wall for a single decade.
  *
  * Posters flow into an auto-filling grid and only the two highest rows are
  * kept, so every decade reads like the same tidy wall of covers.
@@ -416,19 +448,7 @@ function visibleDecadeCount(total, columns) {
  *   JSX.Element: A decade row with poster grid.
  */
 function DecadeRow({ decade }) {
-  const containerRef = useRef(null);
   const [postersRef, columns] = useGridColumns();
-  const [hover, setHover] = useState(null);
-
-  const handlePointerEnter = useCallback((e, film) => {
-    const wrap = containerRef.current;
-    if (!wrap) return;
-    setHover({ film, ...tipPosition(wrap, e.currentTarget, 100) });
-  }, []);
-
-  const handlePointerLeave = useCallback(() => {
-    setHover(null);
-  }, []);
 
   const shownFilms = decade.films.slice(
     0,
@@ -436,7 +456,7 @@ function DecadeRow({ decade }) {
   );
 
   return (
-    <div className="rt-decade-row" ref={containerRef}>
+    <div className="rt-decade-row">
       <div className="rt-decade-meta">
         <span className="rt-decade-label">{decade.label}</span>
         <span className="rt-decade-avg">
@@ -446,13 +466,9 @@ function DecadeRow({ decade }) {
         <span className="rt-decade-count">{decade.count} films</span>
       </div>
 
-      <div className="rt-decade-posters" ref={postersRef} onPointerLeave={handlePointerLeave}>
+      <div className="rt-decade-posters" ref={postersRef}>
         {shownFilms.map((film, i) => (
-          <div
-            key={i}
-            className="rt-decade-poster"
-            onPointerEnter={(e) => handlePointerEnter(e, film)}
-          >
+          <div key={i} className="rt-decade-poster">
             {film.posterPath ? (
               <img
                 src={TMDB_POSTER_SMALL + film.posterPath}
@@ -468,28 +484,6 @@ function DecadeRow({ decade }) {
           </div>
         ))}
       </div>
-
-      {hover && (
-        <div
-          className="rt-poster-hover-tip"
-          style={{ left: hover.x, top: hover.y }}
-        >
-          {hover.film.posterPath && (
-            <img
-              className="rt-poster-hover-tip-poster"
-              src={TMDB_POSTER_SMALL + hover.film.posterPath}
-              alt=""
-            />
-          )}
-          <div className="rt-poster-hover-tip-info">
-            <span className="rt-poster-hover-tip-title">{hover.film.name}</span>
-            {hover.film.year && <span className="rt-poster-hover-tip-year">{hover.film.year}</span>}
-            <span className="rt-poster-hover-tip-rating">
-              ★ {hover.film.rating.toFixed(1)} / 5
-            </span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -534,22 +528,21 @@ function DecadeShowcase({ decades }) {
 // Main Section Component
 
 /**
- * Section 04: Valoraciones Ratings deep dive.
+ * Section 04: Ratings deep dive.
  *
  * Returns:
  *   JSX.Element: The Ratings section.
  */
 export default function Ratings() {
-  const { rawData, enrichedData } = useData();
+  const { enrichedData } = useData();
   const stats = useRatingStats(enrichedData);
-  const username = rawData?.profile?.username;
 
   if (!stats.hasData) {
     return (
       <div className="rt-section">
         <header className="rt-header">
-          <div className="rt-section-label">SECTION 04 RATINGS</div>
-          <h2 className="rt-title">Your rating fingerprint.</h2>
+          <div className="rt-section-label">Section 04 / Ratings</div>
+          <h2 className="rt-title">Your rating <span className="lb-hl-green">fingerprint</span>.</h2>
           <p className="rt-subtitle">Add some watches so we can analyse how you rate.</p>
         </header>
       </div>
@@ -559,12 +552,8 @@ export default function Ratings() {
   return (
     <div className="rt-section">
       <header className="rt-header">
-        <div className="rt-section-label">SECTION 04 RATINGS</div>
-        <h2 className="rt-title">
-          {username ? (
-            <>Your rating fingerprint, <span className="rt-username">@{username}</span>.</>
-          ) : 'Your rating fingerprint.'}
-        </h2>
+        <div className="rt-section-label">Section 04 / Ratings</div>
+        <h2 className="rt-title">Your rating <span className="lb-hl-green">fingerprint</span>.</h2>
         <p className="rt-subtitle">
           How you rate compared to everyone else, how contrarian you really are, and which decades you love the most.
         </p>
@@ -607,9 +596,6 @@ export default function Ratings() {
               </div>
               <div className="rt-card-label">Highest Rated Decades</div>
             </div>
-            {stats.decades.length > 0 && (
-              <div className="rt-card-note">hover any poster for details</div>
-            )}
           </div>
           <DecadeShowcase decades={stats.decades} />
         </section>
