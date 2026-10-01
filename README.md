@@ -16,7 +16,7 @@ Everything runs **100% in your browser** — no data ever leaves your machine. I
 2. Enriches each movie with extra data (runtime, directors, genres, budget, posters, etc.) from the TMDB API.
 3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" spectrum, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, random fun stats, and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
 
-> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies), 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map), 04 (Ratings / consensus, contrarian level & decades), 05 (Cast & Money / most watched faces, favourite duo, studios, budget vs box office) and 06 (Reviews / word cloud, review length box plot & most substantial reviews) are built and wired into the app. The remaining scroll sections are the next steps.
+> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies), 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map), 04 (Ratings / consensus, contrarian level & decades), 05 (Cast & Money / most watched faces, favourite duo, studios, budget vs box office), 06 (Reviews / word cloud, review length box plot & most substantial reviews), and 07 (Watchlist / graveyard, growth chart, average wait) are built and wired into the app. The remaining scroll sections are the next steps.
 
 The free TMDB API rate limit is generous but not unlimited, so the app batches requests, caches results in `localStorage`, and shows a live progress screen while it enriches your films. The same export is cached to speed up future loads.
 
@@ -97,7 +97,8 @@ letterboxd stats/
 │   │   ├── useLetterboxdData.js # Orchestrates ZIP parse → TMDB enrichment
 │   │   ├── useRatingStats.js  # Derives all stats for the Ratings section
 │   │   ├── useReviewStats.js  # Derives all stats for the Reviews section
-│   │   └── useRhythmStats.js  # Derives all temporal stats for the Rhythm section
+│   │   ├── useRhythmStats.js  # Derives all temporal stats for the Rhythm section
+│   │   └── useWatchlistStats.js # Derives stats for the Watchlist section
 │   ├── services/
 │   │   ├── zipParser.js       # Unzips export and parses the CSVs
 │   │   └── tmdbApi.js         # TMDB search/enrichment, scored matching + cache
@@ -120,7 +121,8 @@ letterboxd stats/
 │   │   ├── QuickFacts/           # Section 01: quick facts (Bento dashboard)
 │   │   ├── Ratings/              # Section 04: consensus, contrarian level, decades
 │   │   ├── Reviews/              # Section 06: word cloud, review length box plot, best reviews
-│   │   └── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
+│   │   ├── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
+│   │   └── Watchlist/            # Section 07: graveyard, growth chart, average wait
 │   └── styles/
 │       ├── tokens.css         # Design tokens (colors, spacing, radii)
 │       └── global.css         # Global base styles + animated space background

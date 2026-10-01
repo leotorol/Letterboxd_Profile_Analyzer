@@ -1,0 +1,524 @@
+/* Watchlist.css Section 07: the films still waiting */
+
+.wl-section {
+  min-height: 100vh;
+  padding: var(--space-12) 80px var(--space-16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.wl-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+  max-width: 900px;
+}
+
+.wl-section-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: var(--space-4);
+}
+
+.wl-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.wl-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Bento grid, 12 columns matching the other sections */
+.wl-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1400px;
+}
+
+.wl-grid > * {
+  min-width: 0;
+}
+
+.wl-col-12 { grid-column: span 12; }
+.wl-col-8  { grid-column: span 8;  }
+.wl-col-4  { grid-column: span 4;  }
+
+/* Card base */
+.wl-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.wl-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wl-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.wl-card-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+}
+
+.wl-card-label {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.wl-card-note {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.wl-empty {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 70ch;
+}
+
+/* ============================================================
+   GRAVEYARD: the oldest movies still waiting
+   ============================================================ */
+
+.wl-graveyard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.wl-graveyard-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.wl-grave {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+}
+
+.wl-grave-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+.wl-grave-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* desaturate the poster to sell the "graveyard" vibe */
+  filter: saturate(0.45) brightness(0.75);
+}
+
+.wl-grave-poster-missing {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-text-faint);
+  text-align: center;
+  word-break: break-word;
+}
+
+/* age badge floating on the poster corner */
+.wl-grave-age-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  padding: 3px 7px;
+  background: rgba(13, 13, 26, 0.88);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--color-accent-warm);
+  white-space: nowrap;
+}
+
+.wl-grave-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wl-grave-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wl-grave-meta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.wl-graveyard-note {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-faint);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+   GROWTH CHART: stacked area showing additions vs watches
+   ============================================================ */
+
+.wl-growth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.wl-growth-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.wl-growth-grid {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1;
+}
+
+.wl-growth-axis {
+  fill: var(--color-text-faint);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.wl-growth-area-added {
+  fill: rgba(255, 107, 107, 0.18);
+}
+
+.wl-growth-area-watched {
+  fill: rgba(0, 224, 84, 0.18);
+}
+
+.wl-growth-line-added {
+  fill: none;
+  stroke: var(--color-accent-warm);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wl-growth-line-watched {
+  fill: none;
+  stroke: var(--color-lb-green);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wl-growth-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.wl-growth-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wl-growth-legend-swatch {
+  width: 16px;
+  height: 0;
+  border-top: 2.5px solid;
+  border-radius: 1px;
+}
+
+.wl-growth-legend-swatch.is-added {
+  border-color: var(--color-accent-warm);
+}
+
+.wl-growth-legend-swatch.is-watched {
+  border-color: var(--color-lb-green);
+}
+
+/* hover column highlight */
+.wl-growth-hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.wl-growth-tip {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 11px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  transform: translateX(-50%);
+  left: clamp(70px, var(--tip-x), calc(100% - 70px));
+  top: 0;
+}
+
+.wl-growth-tip-month {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+
+.wl-growth-tip-row {
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wl-growth-tip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wl-growth-tip-val {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+/* ============================================================
+   VERDICT + STATS BLOCK
+   ============================================================ */
+
+.wl-verdict {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.wl-verdict-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verdict-color, var(--color-lb-blue));
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   AGE CARD: big hero number + context rows
+   ============================================================ */
+
+.wl-age {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+  justify-content: space-between;
+}
+
+.wl-age-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-6) 0;
+}
+
+.wl-age-hero-value {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.wl-age-hero-unit {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.wl-age-hero-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.wl-age-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.wl-age-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 11px 0;
+}
+
+.wl-age-row + .wl-age-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.wl-age-row-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.wl-age-row-value {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--color-text);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .wl-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wl-col-12,
+  .wl-col-8,
+  .wl-col-4 {
+    grid-column: span 2;
+  }
+
+  .wl-graveyard-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .wl-section {
+    padding: var(--space-10) 24px var(--space-12);
+  }
+
+  .wl-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wl-col-12,
+  .wl-col-8,
+  .wl-col-4 {
+    grid-column: span 1;
+  }
+
+  .wl-graveyard-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .wl-card-note {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .wl-section {
+    padding: var(--space-8) var(--space-6) var(--space-10);
+  }
+
+  .wl-card {
+    padding: var(--space-6);
+  }
+
+  .wl-graveyard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wl-grave-name {
+    font-size: 0.82rem;
+  }
+
+  .wl-grave-meta {
+    font-size: 0.68rem;
+  }
+}

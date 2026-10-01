@@ -16,6 +16,7 @@ export function DataProvider({ children }) {
   const [progress, setProgress] = useState({ processed: 0, total: 0 });
   const [rawData, setRawData] = useState(null);
   const [enrichedData, setEnrichedData] = useState(null);
+  const [enrichedWatchlist, setEnrichedWatchlist] = useState(null);
   const [enrichmentReport, setEnrichmentReport] = useState(null);
 
   return (
@@ -24,6 +25,7 @@ export function DataProvider({ children }) {
       progress, setProgress,
       rawData, setRawData,
       enrichedData, setEnrichedData,
+      enrichedWatchlist, setEnrichedWatchlist,
       enrichmentReport, setEnrichmentReport,
     }}>
       {children}

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { MONTH_LABELS } from '../utils/dateFormat';
+import { MONTH_LABELS, parseLbDate, addDays, diffDays, monthIndex } from '../utils/dateFormat';
 import { TMDB_POSTER_LARGE, TMDB_POSTER_SMALL } from '../utils/tmdbImages';
 
 const DISPLAY_WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -8,25 +8,6 @@ const DISPLAY_WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const PACE_WINDOW_DAYS = 56;
 const PACE_WINDOW_WEEKS = PACE_WINDOW_DAYS / 7;
 
-/**
- * Parses a Letterboxd date string (YYYY-MM-DD) into a local Date object.
- *
- * Uses a manual split instead of `new Date(str)` so the day lands on the right
- * local midnight instead of drifting a day with the UTC shift.
- *
- * Args:
- *   value (string): Raw date value from watched/ratings CSV.
- *
- * Returns:
- *   Date|null: Local Date at midnight, or null when the value isn't a real date.
- */
-function parseLbDate(value) {
-  if (!value) return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value));
-  if (!match) return null;
-  const d = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-  return Number.isNaN(d.getTime()) ? null : d;
-}
 
 /**
  * Formats a Date into an ISO YYYY-MM-DD string using local time.
@@ -44,19 +25,6 @@ function toISO(date) {
   return `${y}-${m}-${d}`;
 }
 
-/**
- * Returns a new Date shifted by a number of days.
- *
- * Args:
- *   date (Date): Base date.
- *   days (number): Days to add (can be negative).
- *
- * Returns:
- *   Date: New shifted Date.
- */
-function addDays(date, days) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
-}
 
 /**
  * Rolls a Date back to the Sunday that starts its week (getDay 0 === Sunday).
@@ -71,21 +39,6 @@ function startOfWeekSunday(date) {
   return addDays(date, -date.getDay());
 }
 
-/**
- * Whole-day difference between two dates.
- *
- * Uses Math.round so DST transitions don't leave a 23/25 hour remainder.
- *
- * Args:
- *   a (Date): Earlier date.
- *   b (Date): Later date.
- *
- * Returns:
- *   number: Days from a to b.
- */
-function diffDays(a, b) {
-  return Math.round((b.getTime() - a.getTime()) / 86400000);
-}
 
 /**
  * Counts how many watches happened on each calendar day.
@@ -339,14 +292,14 @@ function buildRhythmPatterns(rows) {
  *   zero-count months in between watches.
  */
 function buildEvolution(rows) {
-  const monthIndex = new Map();
+  const monthCountMap = new Map();
   let minIndex = null;
   let maxIndex = null;
   for (const row of rows) {
     const d = parseLbDate(row.date);
     if (!d) continue;
-    const index = d.getFullYear() * 12 + d.getMonth();
-    monthIndex.set(index, (monthIndex.get(index) || 0) + 1);
+    const index = monthIndex(d);
+    monthCountMap.set(index, (monthCountMap.get(index) || 0) + 1);
     if (minIndex === null || index < minIndex) minIndex = index;
     if (maxIndex === null || index > maxIndex) maxIndex = index;
   }
@@ -360,7 +313,7 @@ function buildEvolution(rows) {
       year,
       month,
       label: MONTH_LABELS[month],
-      count: monthIndex.get(i) || 0,
+      count: monthCountMap.get(i) || 0,
     });
   }
   return series;

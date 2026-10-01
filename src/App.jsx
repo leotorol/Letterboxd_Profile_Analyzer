@@ -8,6 +8,7 @@ import CinephileProfile from './components/CinephileProfile/CinephileProfile';
 import Ratings from './components/Ratings/Ratings';
 import Cast from './components/Cast/Cast';
 import Reviews from './components/Reviews/Reviews';
+import Watchlist from './components/Watchlist/Watchlist';
 import CinematicBackground from './components/CinematicBackground/CinematicBackground';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
@@ -55,6 +56,7 @@ export default function App() {
             <Ratings />
             <Cast />
             <Reviews />
+            <Watchlist />
             {/* Always rendered at the very bottom of the page, horizontally centered */}
             <div className="qf-reset-wrap">
               <button className="qf-reset-btn" onClick={handleReset} aria-label="Upload a different ZIP file">

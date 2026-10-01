@@ -2,6 +2,7 @@ import { useData } from '../context/DataContext';
 import { parseLetterboxdZip } from '../services/zipParser';
 import { enrichMovies, getEnrichmentReport, TMDB_API_KEY } from '../services/tmdbApi';
 import { TMDB_POSTER_SMALL } from '../utils/tmdbImages';
+import { GRAVEYARD_LIMIT, selectOldestWatchlist } from '../utils/watchlist';
 
 /**
  * Hook to orchestrate ZIP upload parsing, TMDB enrichment, and state progression.
@@ -10,7 +11,7 @@ import { TMDB_POSTER_SMALL } from '../utils/tmdbImages';
  *   Object: Function object containing processZip method.
  */
 export function useLetterboxdData() {
-  const { setAppState, setProgress, setRawData, setEnrichedData, setEnrichmentReport } = useData();
+  const { setAppState, setProgress, setRawData, setEnrichedData, setEnrichedWatchlist, setEnrichmentReport } = useData();
 
   /**
    * Processes uploaded Letterboxd export ZIP file.
@@ -55,6 +56,17 @@ export function useLetterboxdData() {
       );
 
       setEnrichedData(enriched);
+
+      // Enrich the oldest watchlist movies so the graveyard has posters
+      const oldestWatchlist = selectOldestWatchlist(parsed.watchlist, GRAVEYARD_LIMIT);
+
+      if (oldestWatchlist.length > 0) {
+        const enrichedWatchlist = await enrichMovies(oldestWatchlist, TMDB_API_KEY, () => {});
+        setEnrichedWatchlist(enrichedWatchlist);
+      } else {
+        setEnrichedWatchlist([]);
+      }
+
       setEnrichmentReport(getEnrichmentReport());
       setAppState('ready');
     } catch (err) {
