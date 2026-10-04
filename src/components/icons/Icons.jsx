@@ -40,6 +40,25 @@ export function ClockIcon({ size = 20 }) {
 }
 
 /**
+ * Clock icon with the hands pointing the other way, so the era card doesn't
+ * look like a carbon copy of the runtime card next to it.
+ *
+ * Args:
+ *   size (number, optional): Icon width and height in px. Defaults to 20.
+ *
+ * Returns:
+ *   JSX.Element: Inline SVG icon.
+ */
+export function ClockIconAlt({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 8 14" />
+    </svg>
+  );
+}
+
+/**
  * Upward trend icon shared by the pace and correlation cards.
  *
  * Args:
@@ -53,6 +72,24 @@ export function TrendIcon({ size = 20 }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
       <polyline points="17 6 23 6 23 12" />
+    </svg>
+  );
+}
+
+/**
+ * Compass icon for the projection card, so it stops looking like the pace card.
+ *
+ * Args:
+ *   size (number, optional): Icon width and height in px. Defaults to 20.
+ *
+ * Returns:
+ *   JSX.Element: Inline SVG icon.
+ */
+export function CompassIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
     </svg>
   );
 }

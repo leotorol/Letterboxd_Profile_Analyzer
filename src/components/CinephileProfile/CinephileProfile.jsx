@@ -6,7 +6,7 @@ import { polarToCartesian } from '../../utils/geometry';
 import { ratingColor } from '../../utils/ratingColor';
 import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
 import { tipPosition } from '../../utils/positionTip';
-import { ClockIcon, TrendIcon } from '../icons/Icons';
+import { ClockIcon, ClockIconAlt, TrendIcon } from '../icons/Icons';
 import PosterTip from '../PosterTip/PosterTip';
 import './CinephileProfile.css';
 
@@ -664,9 +664,9 @@ function TasteEvolutionChart({ taste }) {
   const yTicks = [1, 2, 3, 4, 5];
 
   const verdictMap = {
-    up: { text: 'Your ratings have gotten more generous over time', color: 'var(--color-accent)' },
-    down: { text: 'Your ratings have gotten tougher over time', color: 'var(--color-accent-warm)' },
-    steady: { text: 'Your taste has been remarkably steady', color: 'var(--color-accent-4)' },
+    up: { text: 'Your ratings have gotten more generous over time' },
+    down: { text: 'Your ratings have gotten tougher over time' },
+    steady: { text: 'Your taste has been remarkably steady' },
   };
   const verdict = verdictMap[taste.direction];
 
@@ -699,8 +699,7 @@ function TasteEvolutionChart({ taste }) {
           />
         )}
       </svg>
-      <div className="cp-taste-verdict" style={{ '--verdict-color': verdict.color }}>
-        <span className="cp-verdict-dot" />
+      <div className="cp-taste-verdict">
         {verdict.text}
         {taste.delta !== 0 && (
           <span className="cp-taste-delta tabular-nums">
@@ -1902,8 +1901,7 @@ export default function CinephileProfile() {
             <div className="cp-card-note">runtime (min) vs your rating scatter</div>
           </div>
           <TickDensityChart data={durationCorr} xLabel="Runtime" accent="var(--color-accent-3)" />
-          <div className="cp-takeaway" style={{ '--accent': 'var(--color-accent-3)' }}>
-            <span className="cp-takeaway-dot" />
+          <div className="cp-takeaway cp-takeaway-plain">
             <span>{durationVerdict}</span>
           </div>
         </section>
@@ -1913,15 +1911,14 @@ export default function CinephileProfile() {
           <div className="cp-card-head">
             <div className="cp-card-title-group">
               <div className="cp-card-icon" style={{ color: 'var(--color-accent-4)' }}>
-                <ClockIcon />
+                <ClockIconAlt />
               </div>
               <div className="cp-card-label">Old or New Films</div>
             </div>
             <div className="cp-card-note">release year vs your rating scatter</div>
           </div>
           <TickDensityChart data={eraCorr} xLabel="Release year" accent="var(--color-accent-4)" />
-          <div className="cp-takeaway" style={{ '--accent': 'var(--color-accent-4)' }}>
-            <span className="cp-takeaway-dot" />
+          <div className="cp-takeaway cp-takeaway-plain">
             <span>{eraVerdict}</span>
           </div>
         </section>
@@ -1945,7 +1942,7 @@ export default function CinephileProfile() {
           </div>
           <DiversityCard diversity={stats.diversity} />
           {directorSampleCount > 0 && (
-            <div className="cp-takeaway" style={{ '--accent': 'var(--color-accent-2)' }}>
+            <div className="cp-takeaway">
               <span>
                 {loyaltyPct != null
                   ? `Director Loyalty: ${loyaltyPct}% of your watches are from directors you've returned to 2+ times (based on ${directorSampleCount.toLocaleString()} films with director data).`

@@ -429,14 +429,6 @@
   line-height: 1.5;
 }
 
-.rv-verdict-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--verdict-color, var(--color-lb-blue));
-  flex-shrink: 0;
-}
-
 .rv-verdict-delta {
   margin-left: auto;
   font-family: var(--font-display);
@@ -456,15 +448,15 @@
   justify-content: space-between;
 }
 
-/* rows stretch to fill the card so no single dead block opens up above the note */
+/* rows share the card height evenly so each one sits dead centre between its rules */
 .rv-fingerprint-rows {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 .rv-fingerprint-row {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;

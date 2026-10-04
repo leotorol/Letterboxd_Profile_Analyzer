@@ -141,20 +141,18 @@ function PosterImage({ film }) {
 }
 
 /**
- * One-line takeaway banner with an accent dot.
+ * One-line takeaway banner.
  *
  * Args:
- *   accent (string): CSS colour for the dot.
  *   muted (boolean, optional): Renders the quieter secondary variant.
  *   children (ReactNode): The takeaway sentence.
  *
  * Returns:
  *   JSX.Element: The takeaway line.
  */
-function Takeaway({ accent, muted = false, children }) {
+function Takeaway({ muted = false, children }) {
   return (
-    <div className={`cs-takeaway${muted ? ' cs-takeaway-muted' : ''}`} style={{ '--accent': accent }}>
-      <span className="cs-takeaway-dot" />
+    <div className={`cs-takeaway${muted ? ' cs-takeaway-muted' : ''}`}>
       <span>{children}</span>
     </div>
   );
@@ -339,7 +337,7 @@ function DuoCard({ duo }) {
       </div>
 
       {duoAvg != null && (
-        <Takeaway accent="var(--color-accent-2)">
+        <Takeaway>
           You rate their collaborations ★{duoAvg.toFixed(1)} on average.
         </Takeaway>
       )}
@@ -649,10 +647,10 @@ function MoneyBoard({ budget }) {
       </div>
 
       {preferenceText && (
-        <Takeaway accent="var(--color-accent-3)">{preferenceText}</Takeaway>
+        <Takeaway>{preferenceText}</Takeaway>
       )}
       {correlationText && (
-        <Takeaway accent="var(--color-accent-4)" muted>{correlationText}</Takeaway>
+        <Takeaway muted>{correlationText}</Takeaway>
       )}
     </div>
   );

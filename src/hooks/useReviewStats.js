@@ -53,7 +53,7 @@ const STOPWORDS = new Set([
   'ser', 'estar', 'haber', 'es', 'son', 'era', 'eran', 'fue', 'fueron', 'estoy',
   'estas', 'esta', 'estamos', 'estan', 'estaba', 'estaban', 'he', 'has', 'ha',
   'han', 'hay', 'habia', 'puede', 'pueden', 'podia', 'debe', 'deben', 'sea',
-  'sido', 'siendo',
+  'sido', 'siendo', 'como',
   // Spanish negators, degree, focus and deictic particles
   'no',
   // French function words, some reviewers write in French too
@@ -70,8 +70,10 @@ const STOPWORDS = new Set([
   'doivent', 'cela', 'celui', 'celle', 'ne', 'pas', 'non', 'oui',
 ]);
 
-// how much of the cloud we even bother computing, the layout drops the rest
-const WORD_CLOUD_LIMIT = 60;
+// how much of the cloud we even bother computing, the layout drops the rest.
+// generous so a wide card can pack extra words instead of leaving gaps, the
+// mobile format just skips whatever does not fit
+const WORD_CLOUD_LIMIT = 200;
 // reviews shown in the featured picker, the first one becomes the hero. Kept
 // at five so the ranked list stays about as tall as the hero beside it and the
 // card does not end up with a dead column.

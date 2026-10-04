@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useReviewStats } from '../../hooks/useReviewStats';
 import { TMDB_POSTER_SMALL, TMDB_POSTER_MEDIUM } from '../../utils/tmdbImages';
@@ -95,28 +95,32 @@ function packCloud(words, width, height, fontFamily, measureText) {
   if (!words.length || width <= 0 || height <= 0) return [];
 
   const maxCount = words[0].count;
-  const minCount = words[words.length - 1].count;
+  // lock the size scale to the top words so extra fill words on a wide card
+  // stay small and never resize the words we already had
+  const SCALE_REFERENCE = 60;
+  const minCount = words[Math.min(words.length - 1, SCALE_REFERENCE - 1)].count;
   // when every word is used the same number of times there is no spread to
   // scale on, so they all land mid size instead of collapsing to the minimum
   const flat = maxCount === minCount;
   const span = Math.max(1, maxCount - minCount);
   // wide size range so the words you lean on dwarf the rare ones
-  const maxSize = Math.max(24, Math.min(78, width / 5.6));
-  const minSize = Math.max(11, maxSize * 0.2);
+  const maxSize = Math.max(26, Math.min(104, width / 4.4));
+  const minSize = Math.max(10, maxSize * 0.12);
   const cx = width / 2;
   const cy = height / 2;
-  // a tall narrow container should use its height, a wide one its width
-  const portrait = height > width * 0.85;
-  const xMul = portrait ? 1 : 1.2;
-  const yMul = portrait ? 1.05 : 0.66;
+  // stretch the spiral onto the container's real aspect ratio, otherwise a wide
+  // card only ever fills a narrow circle in the middle and leaves the sides dead
+  const base = Math.max(1, Math.min(width, height));
+  const xMul = width / base;
+  const yMul = height / base;
   const placed = [];
   const result = [];
 
   for (const item of words) {
-    // linear scaling instead of a square root keeps the big words big and the
-    // small ones small, so the contrast actually reads
-    const t = flat ? 0.55 : (item.count - minCount) / span;
-    const size = minSize + t * (maxSize - minSize);
+    // linear scaling keeps the big words big, then we curve it so the heavy
+    // hitters blow up hard and the rare ones shrink right down for real contrast
+    const t = flat ? 0.55 : Math.max(0, Math.min(1, (item.count - minCount) / span));
+    const size = minSize + t ** 1.15 * (maxSize - minSize);
     const font = `800 ${size}px ${fontFamily}`;
     const w = measureText(item.word, font) + 5;
     const h = size * 1.1;
@@ -351,10 +355,10 @@ function LengthBars({ series, verdict }) {
   const { yAt, xAt, slot, barW, ticks, trend } = chart;
 
   const verdictMap = {
-    up: { text: 'Your reviews have gotten longer over the years', color: 'var(--color-lb-green)' },
-    down: { text: 'Your reviews have gotten shorter over the years', color: 'var(--color-accent-warm)' },
-    steady: { text: 'Your review length has stayed pretty consistent', color: 'var(--color-lb-blue)' },
-    none: { text: 'Not enough history for a clear trend yet', color: 'var(--color-text-faint)' },
+    up: { text: 'Your reviews have gotten longer over the years' },
+    down: { text: 'Your reviews have gotten shorter over the years' },
+    steady: { text: 'Your review length has stayed pretty consistent' },
+    none: { text: 'Not enough history for a clear trend yet' },
   };
   const verdictInfo = verdictMap[verdict.direction] || verdictMap.none;
 
@@ -451,8 +455,7 @@ function LengthBars({ series, verdict }) {
         <span className="rv-bars-legend-item"><span className="rv-bars-legend-line" /> trend</span>
       </div>
 
-      <div className="rv-verdict" style={{ '--verdict-color': verdictInfo.color }}>
-        <span className="rv-verdict-dot" />
+      <div className="rv-verdict">
         {verdictInfo.text}
         {verdict.direction !== 'none' && verdict.direction !== 'steady' && (
           <span className="rv-verdict-delta tabular-nums">
@@ -531,14 +534,35 @@ function FeaturedReviews({ featured }) {
   // stores which review is expanded instead of a boolean, so picking another
   // review collapses the old one without an effect resetting state
   const [expandedIdx, setExpandedIdx] = useState(null);
+  const textRef = useRef(null);
+  // whether the collapsed take is actually cut off, measured for real instead
+  // of guessing from char count, otherwise short takes still ask you to expand
+  const [clipped, setClipped] = useState(false);
+
+  const active = featured[activeIdx];
+  const expanded = expandedIdx === activeIdx;
+
+  useLayoutEffect(() => {
+    const el = textRef.current;
+    if (!el || expanded) return;
+    // the clamped box is narrower because overflow:hidden forms a BFC beside
+    // the floating picker, while expanding lets the text wrap underneath it.
+    // so compare the collapsed height against the real expanded height,
+    // otherwise reviews that only overflow while narrow still offer to expand
+    const clampedHeight = el.getBoundingClientRect().height;
+    el.style.display = 'block';
+    el.style.webkitLineClamp = 'unset';
+    el.style.overflow = 'visible';
+    const expandedHeight = el.getBoundingClientRect().height;
+    el.style.display = '';
+    el.style.webkitLineClamp = '';
+    el.style.overflow = '';
+    setClipped(expandedHeight > clampedHeight + 2);
+  }, [activeIdx, active?.text, expanded, featured]);
 
   if (!featured.length) {
     return <p className="rv-empty">No reviews to feature yet.</p>;
   }
-
-  const active = featured[activeIdx];
-  const isLong = active.text.length > 420;
-  const expanded = expandedIdx === activeIdx;
 
   // the poster is its own fixed column so the text never runs underneath it.
   // inside the right column the picker floats, so an expanded review flows
@@ -595,9 +619,9 @@ function FeaturedReviews({ featured }) {
             </div>
           </div>
 
-          <p className={`rv-feature-text${isLong && !expanded ? ' is-clamped' : ''}`}>{active.text}</p>
+          <p ref={textRef} className={`rv-feature-text${!expanded ? ' is-clamped' : ''}`}>{active.text}</p>
 
-          {isLong && (
+          {(clipped || expanded) && (
             <button type="button" className="rv-feature-more" onClick={() => setExpandedIdx(expanded ? null : activeIdx)}>
               {expanded ? 'Show less' : 'Read the whole thing'}
             </button>

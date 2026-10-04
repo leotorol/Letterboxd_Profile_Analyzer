@@ -18,14 +18,12 @@ import './Watchlist.css';
 
 // SVG icons owned by this section
 
-const SkullIcon = () => (
+const GravestoneIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="10" r="8" />
-    <path d="M12 18v4" />
-    <path d="M8 22h8" />
-    <circle cx="9" cy="10" r="1.5" fill="currentColor" stroke="none" />
-    <circle cx="15" cy="10" r="1.5" fill="currentColor" stroke="none" />
-    <path d="M10 15h4" />
+    <path d="M5 21V11a7 7 0 0 1 14 0v10" />
+    <path d="M3 21h18" />
+    <path d="M12 8v7" />
+    <path d="M8.5 11.5h7" />
   </svg>
 );
 
@@ -317,7 +315,7 @@ function AgeCard({ averageAgeDays, growth, watchlistSize }) {
           <span className="wl-age-row-value tabular-nums">{growth.watchedPerMonth}</span>
         </div>
         <div className="wl-age-row">
-          <span className="wl-age-row-label">time to clear watchlist</span>
+          <span className="wl-age-row-label">time to clear watchlist (last 6 months rate)</span>
           <span className="wl-age-row-value tabular-nums">{clearLabel}</span>
         </div>
       </div>
@@ -374,19 +372,15 @@ export default function Watchlist() {
   const verdictMap = {
     losing: {
       text: 'You are adding films faster than you watch them. The pile keeps growing.',
-      color: 'var(--color-accent-warm)',
     },
     winning: {
       text: 'You are watching faster than you add. The pile is actually shrinking.',
-      color: 'var(--color-lb-green)',
     },
     even: {
       text: 'Additions and watches are roughly balanced. The pile stays about the same.',
-      color: 'var(--color-lb-blue)',
     },
     none: {
       text: 'Not enough recent data to judge the trend.',
-      color: 'var(--color-text-faint)',
     },
   };
   const verdictInfo = verdictMap[growth.verdict] || verdictMap.none;
@@ -403,7 +397,7 @@ export default function Watchlist() {
           <div className="wl-card-head">
             <div className="wl-card-title-group">
               <div className="wl-card-icon" style={{ color: 'var(--color-accent-warm)' }}>
-                <SkullIcon />
+                <GravestoneIcon />
               </div>
               <div className="wl-card-label">The Graveyard</div>
             </div>
@@ -424,8 +418,7 @@ export default function Watchlist() {
             <div className="wl-card-note">additions vs watches per month</div>
           </div>
           <GrowthChart series={growth.series} />
-          <div className="wl-verdict" style={{ '--verdict-color': verdictInfo.color }}>
-            <span className="wl-verdict-dot" />
+          <div className="wl-verdict">
             {verdictInfo.text}
           </div>
         </section>

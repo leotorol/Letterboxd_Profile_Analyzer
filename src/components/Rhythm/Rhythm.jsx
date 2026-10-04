@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useRhythmStats, buildYearGrid } from '../../hooks/useRhythmStats';
 import { useCountUp } from '../../hooks/useCountUp';
 import { formatIsoDate, FULL_DAYS, FULL_MONTHS } from '../../utils/dateFormat';
-import { CalendarIcon, ClockIcon, TrendIcon } from '../icons/Icons';
+import { CalendarIcon, ClockIcon, CompassIcon, TrendIcon } from '../icons/Icons';
 import Heatmap from './Heatmap';
 import './Rhythm.css';
 
@@ -597,8 +597,8 @@ export default function Rhythm() {
           <section className="ry-card" aria-label="Where you're headed">
             <div className="ry-card-head">
               <div className="ry-card-title-group">
-                <div className="ry-card-icon" style={{ color: 'var(--color-accent-4)' }}>
-                  <TrendIcon />
+                <div className="ry-card-icon" style={{ color: 'var(--color-lb-orange)' }}>
+                  <CompassIcon />
                 </div>
                 <div className="ry-card-label">Where You're Headed</div>
               </div>

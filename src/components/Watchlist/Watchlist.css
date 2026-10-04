@@ -372,14 +372,6 @@
   line-height: 1.5;
 }
 
-.wl-verdict-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--verdict-color, var(--color-lb-blue));
-  flex-shrink: 0;
-}
-
 /* ============================================================
    AGE CARD: big hero number + context rows
    ============================================================ */
