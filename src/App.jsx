@@ -10,6 +10,7 @@ import Cast from './components/Cast/Cast';
 import Reviews from './components/Reviews/Reviews';
 import Watchlist from './components/Watchlist/Watchlist';
 import Random from './components/Random/Random';
+import ChapterRail from './components/ChapterRail/ChapterRail';
 import CinematicBackground from './components/CinematicBackground/CinematicBackground';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
@@ -51,6 +52,7 @@ export default function App() {
         {appState === 'loading' && <LoadingScreen />}
         {appState === 'ready'   && (
           <>
+            <ChapterRail />
             <QuickFacts />
             <Rhythm />
             <CinephileProfile />

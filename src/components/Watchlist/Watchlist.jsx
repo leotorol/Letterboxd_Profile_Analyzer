@@ -2,18 +2,22 @@ import { useMemo, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useWatchlistStats, formatAge } from '../../hooks/useWatchlistStats';
 import { formatIsoDate } from '../../utils/dateFormat';
+import ChapterHeading from '../shared/ChapterHeading';
+import PanelHead from '../shared/PanelHead';
 import './Watchlist.css';
 
 /*
  * Section 07 contract
  * THESIS: the watchlist is the shadow side of everything before it. Those
  *   sections read your past; this one reads what you still owe yourself.
- * OWN-WORLD: same dark bento, Letterboxd orange as section accent, graveyard
- *   posters desaturated, area chart in warm red vs green.
+ * OWN-WORLD: the vault. Near black panels on the darkest step of the chapter
+ *   ramp, Letterboxd orange accent, graveyard posters desaturated, area chart
+ *   in warm red vs green.
  * STORY: user sees the oldest neglected films, whether they are gaining or
  *   losing ground, and how long a movie waits on average.
- * FIRST VIEWPORT: full width graveyard card with faded posters and age badges.
- * FORM: local extension of the established world, no new identity.
+ * FIRST VIEWPORT: full width graveyard panel with faded posters and age badges.
+ * FORM: last lit chapter before the section 08 dossier, so it sits closest to
+ *   the dossier ground without matching it.
  */
 
 // SVG icons owned by this section
@@ -334,11 +338,13 @@ function AgeCard({ averageAgeDays, growth, watchlistSize }) {
  */
 function SectionHeader({ subtitle }) {
   return (
-    <header className="wl-header">
-      <div className="wl-section-label">Section 07 / Watchlist</div>
-      <h2 className="wl-title">The ones still <span className="lb-hl-green">waiting</span>.</h2>
-      <p className="wl-subtitle">{subtitle}</p>
-    </header>
+    <ChapterHeading
+      number="07"
+      name="Watchlist"
+      variant="narrow"
+      title={<>The ones still <span className="lb-hl-green">waiting</span>.</>}
+      subtitle={subtitle}
+    />
   );
 }
 
@@ -354,10 +360,15 @@ export default function Watchlist() {
 
   if (!stats.hasData) {
     return (
-      <div className="wl-section">
+      <div
+        className="lb-chapter wl-section"
+        id="section-07"
+        data-section
+        style={{ '--chapter-ambient': '255, 107, 107' }}
+      >
         <SectionHeader subtitle="Your watchlist is empty. Add some films on Letterboxd, export your data again, and this section will show you what you have been putting off." />
-        <div className="wl-grid">
-          <section className="wl-card wl-col-12">
+        <div className="lb-grid">
+          <section className="lb-panel is-vault wl-card lb-col-12">
             <p className="wl-empty">
               Nothing to see here yet. Start building your watchlist on Letterboxd and come back.
             </p>
@@ -386,37 +397,36 @@ export default function Watchlist() {
   const verdictInfo = verdictMap[growth.verdict] || verdictMap.none;
 
   return (
-    <div className="wl-section">
+    <div
+      className="lb-chapter wl-section"
+      id="section-07"
+      data-section
+      style={{ '--chapter-ambient': '255, 107, 107' }}
+    >
       <SectionHeader
         subtitle={`You have watched a lot. But there are ${stats.watchlistSize.toLocaleString()} films you told yourself you would get to. Let's see how that is going.`}
       />
 
-      <div className="wl-grid">
-        {/* Graveyard: full width hero card */}
-        <section className="wl-card wl-col-12" aria-label="Watchlist graveyard">
-          <div className="wl-card-head">
-            <div className="wl-card-title-group">
-              <div className="wl-card-icon" style={{ color: 'var(--color-accent-warm)' }}>
-                <GravestoneIcon />
-              </div>
-              <div className="wl-card-label">The Graveyard</div>
-            </div>
-            <div className="wl-card-note">films waiting the longest</div>
-          </div>
+      <div className="lb-grid">
+        {/* Graveyard: full width hero panel */}
+        <section className="lb-panel is-vault wl-card lb-col-12" aria-label="Watchlist graveyard">
+          <PanelHead
+            icon={<GravestoneIcon />}
+            accent="var(--color-accent-warm)"
+            label="The Graveyard"
+            note="films waiting the longest"
+          />
           <GraveyardBoard graveyard={stats.graveyard} />
         </section>
 
         {/* Growth chart */}
-        <section className="wl-card wl-col-8" aria-label="Watchlist growth over time">
-          <div className="wl-card-head">
-            <div className="wl-card-title-group">
-              <div className="wl-card-icon" style={{ color: 'var(--color-lb-green)' }}>
-                <TrendIcon />
-              </div>
-              <div className="wl-card-label">Gaining or Losing Ground</div>
-            </div>
-            <div className="wl-card-note">additions vs watches per month</div>
-          </div>
+        <section className="lb-panel is-vault wl-card lb-col-8" aria-label="Watchlist growth over time">
+          <PanelHead
+            icon={<TrendIcon />}
+            accent="var(--color-lb-green)"
+            label="Gaining or Losing Ground"
+            note="additions vs watches per month"
+          />
           <GrowthChart series={growth.series} />
           <div className="wl-verdict">
             {verdictInfo.text}
@@ -424,15 +434,12 @@ export default function Watchlist() {
         </section>
 
         {/* Average age card */}
-        <section className="wl-card wl-col-4" aria-label="Average watchlist age">
-          <div className="wl-card-head">
-            <div className="wl-card-title-group">
-              <div className="wl-card-icon" style={{ color: 'var(--color-accent-3)' }}>
-                <ClockIcon />
-              </div>
-              <div className="wl-card-label">The Wait</div>
-            </div>
-          </div>
+        <section className="lb-panel is-vault wl-card lb-col-4" aria-label="Average watchlist age">
+          <PanelHead
+            icon={<ClockIcon />}
+            accent="var(--color-accent-3)"
+            label="The Wait"
+          />
           <AgeCard
             averageAgeDays={stats.averageAgeDays}
             growth={growth}

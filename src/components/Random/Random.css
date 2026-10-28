@@ -1,7 +1,7 @@
 /* Random.css Section 08: the archive dossier */
 
 .rd-section {
-  --rd-ground: #0b0b16;
+  --rd-ground: var(--color-panel-08);
   --rd-panel: #131322;
   --rd-panel-raised: #1a1a2c;
   --rd-rule: rgba(255, 255, 255, 0.09);
@@ -11,8 +11,12 @@
   --rd-dim: #9d9db2;
   width: 100%;
   padding: var(--space-16) 0;
-  background: var(--rd-ground);
-  border-top: 1px solid var(--rd-rule);
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 13, 26, 0) 0,
+    var(--rd-ground) 140px,
+    var(--rd-ground) 100%
+  );
   position: relative;
 }
 
@@ -26,18 +30,23 @@
 .rd-header-inner {
   display: grid;
   grid-template-columns: 180px minmax(0, 1fr);
-  gap: var(--space-8);
+  gap: var(--space-4);
   align-items: end;
 }
 
 .rd-ghost-number {
-  font-family: var(--font-display);
-  font-size: clamp(6rem, 12vw, 9rem);
-  font-weight: 900;
-  line-height: 0.74;
-  letter-spacing: -0.04em;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.04em;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(5.8rem, 9.6vw, 9rem);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 128, 0, 0.45);
+  -webkit-text-stroke: 1px rgba(255, 128, 0, 0.5);
   user-select: none;
 }
 
@@ -73,52 +82,12 @@
   color: var(--rd-dim);
 }
 
-/* Chapter index */
+/* Bands */
 
-.rd-chapters {
-  width: 100%;
-  max-width: 1400px;
-  margin: var(--space-10) auto 0;
-  padding: 0 80px;
-  display: flex;
-  gap: var(--space-8);
-  border-top: 1px solid var(--rd-rule);
-  border-bottom: 1px solid var(--rd-rule);
-}
-
-.rd-chapter-link {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  padding: 13px 0;
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--rd-dim);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
-}
-
-.rd-chapter-link:hover {
-  color: var(--rd-paper);
-  border-bottom-color: var(--rd-orange);
-}
-
-.rd-chapter-num {
-  font-size: 0.62rem;
-  color: var(--rd-orange);
-}
-
-.rd-chapter-link:focus-visible,
 .rd-retry:focus-visible {
   outline: 2px solid var(--rd-orange);
   outline-offset: 3px;
 }
-
-/* Bands */
 
 .rd-band {
   width: 100%;
@@ -524,7 +493,8 @@
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 1px;
   cursor: pointer;
-  transition: transform 120ms ease, background-color 120ms ease;
+  /* no transition here. animating the transform made chrome repaint the whole
+     reel on every cell crossing and this hover crawled next to the others. */
 }
 
 .rd-cell.is-seen {
@@ -539,8 +509,6 @@
 
 .rd-cell:hover {
   transform: scale(1.15);
-  position: relative;
-  z-index: 2;
 }
 
 .rd-coverage-legend {
@@ -1313,9 +1281,15 @@
 
 /* Responsive */
 
+/* the dossier now lives to the right of the chapter rail */
+@media (min-width: 1200px) {
+  .rd-section {
+    padding-left: 162px;
+  }
+}
+
 @media (max-width: 1100px) {
   .rd-header,
-  .rd-chapters,
   .rd-band-inner {
     padding-left: 40px;
     padding-right: 40px;
@@ -1370,13 +1344,9 @@
   }
 
   .rd-ghost-number {
-    font-size: 5rem;
+    justify-content: flex-start;
+    font-size: 6rem;
     line-height: 1;
-  }
-
-  .rd-chapters {
-    flex-wrap: wrap;
-    gap: var(--space-4) var(--space-8);
   }
 
   .rd-band-head {
@@ -1458,14 +1428,9 @@
   }
 
   .rd-header,
-  .rd-chapters,
   .rd-band-inner {
     padding-left: 24px;
     padding-right: 24px;
-  }
-
-  .rd-chapters {
-    margin-top: var(--space-6);
   }
 
   .rd-band {
@@ -1596,15 +1561,6 @@
 
   .rd-rating-call-body {
     flex-direction: column;
-  }
-
-  .rd-chapters {
-    gap: var(--space-3) var(--space-5);
-  }
-
-  .rd-chapter-link {
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
   }
 
   .rd-cell {

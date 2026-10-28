@@ -1,0 +1,387 @@
+/* Shared chapter mechanics. Every section owns its layout, this file owns the
+   bones they all need so we are not copy pasting the same six blocks forever. */
+
+.lb-chapter {
+  position: relative;
+  width: 100%;
+  padding: clamp(40px, 4.8vw, 72px) clamp(20px, 5vw, 80px) clamp(40px, 5vw, 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  isolation: isolate;
+}
+
+.lb-chapter > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* the subtle per chapter ambience, same sky, different mood.
+   the mask fades the tint in and out at the chapter edges so two chapters never
+   meet on a hard seam, they bleed through the star field instead. */
+.lb-chapter[data-section]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 78% 48% at 50% 38%,
+    rgba(var(--chapter-ambient), 0.065),
+    transparent 72%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+/* Chapter heading */
+
+.lb-head {
+  width: 100%;
+  max-width: 1400px;
+  margin-bottom: clamp(24px, 3.2vw, 40px);
+}
+
+.lb-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.lb-mark-num {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--chapter-accent, var(--color-accent));
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-mark-name {
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
+
+.lb-mark-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--color-rule);
+}
+
+.lb-head-copy {
+  min-width: 0;
+}
+
+.lb-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--color-text);
+  text-wrap: balance;
+}
+
+.lb-sub {
+  margin-top: var(--space-4);
+  max-width: 62ch;
+  font-size: 1.03rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* Heading variants, each section picks one and then bends it */
+
+.lb-head.is-center {
+  max-width: 920px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.lb-head.is-center .lb-mark {
+  justify-content: center;
+}
+
+.lb-head.is-center .lb-mark::before {
+  content: '';
+  flex: 0 0 56px;
+  height: 1px;
+  background: var(--color-rule);
+}
+
+.lb-head.is-center .lb-mark-rule {
+  flex: 0 0 56px;
+}
+
+.lb-head.is-center .lb-sub {
+  margin-inline: auto;
+}
+
+.lb-head.is-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 34%);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+}
+
+.lb-head.is-split .lb-mark {
+  grid-column: 1 / -1;
+}
+
+.lb-head-aside {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.lb-head.is-masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-6);
+  align-items: end;
+}
+
+.lb-head.is-masthead .lb-mark {
+  grid-column: 1 / -1;
+  margin-bottom: var(--space-4);
+}
+
+.lb-head.is-masthead .lb-title {
+  font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+}
+
+.lb-head.is-masthead .lb-sub {
+  margin-top: var(--space-2);
+  max-width: 58ch;
+  font-size: 0.96rem;
+}
+
+.lb-head.is-narrow {
+  max-width: 760px;
+  align-self: flex-start;
+  margin-left: 0;
+}
+
+.lb-head.is-left {
+  max-width: 1000px;
+  align-self: flex-start;
+  margin-left: 0;
+}
+
+.lb-head.is-credit .lb-title {
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  letter-spacing: -0.02em;
+}
+
+.lb-head.is-manuscript .lb-title {
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+  letter-spacing: -0.025em;
+}
+
+/* Grid */
+
+.lb-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1400px;
+}
+
+.lb-grid > * {
+  min-width: 0;
+}
+
+.lb-col-12 { grid-column: span 12; }
+.lb-col-8 { grid-column: span 8; }
+.lb-col-7 { grid-column: span 7; }
+.lb-col-6 { grid-column: span 6; }
+.lb-col-5 { grid-column: span 5; }
+.lb-col-4 { grid-column: span 4; }
+.lb-col-3 { grid-column: span 3; }
+
+/* Panel shells */
+
+.lb-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: relative;
+  min-width: 0;
+  background: var(--chapter-surface, var(--color-surface));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: clamp(20px, 2.2vw, 32px);
+  overflow: hidden;
+}
+
+/* flat: a ruled band with no card skin, keeps the page breathing */
+.lb-panel.is-flat {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--color-rule);
+  border-radius: 0;
+  padding: var(--space-6) 0 0;
+  overflow: visible;
+}
+
+/* plain: just spacing, no shell at all */
+.lb-panel.is-plain {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+/* sheet: warmer manuscript surface */
+.lb-panel.is-sheet {
+  background: var(--chapter-surface, var(--color-surface-sheet));
+  border-color: var(--color-rule);
+}
+
+/* vault: near black, hairline */
+.lb-panel.is-vault {
+  background: var(--chapter-surface, var(--color-surface-vault));
+  border-color: rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+
+/* atlas: a cool plate for charts that need their own ground */
+.lb-panel.is-atlas {
+  background: var(--chapter-surface, var(--color-surface-atlas));
+  border-color: var(--color-rule);
+  border-radius: var(--radius-md);
+}
+
+/* Panel head mechanics */
+
+.lb-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.lb-panel-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.lb-panel-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-rule);
+  background: transparent;
+}
+
+.lb-panel-label {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  min-width: 0;
+}
+
+.lb-panel-note {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  text-align: right;
+}
+
+/* Takeaway and empty states */
+
+.lb-takeaway {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-rule);
+  padding-top: var(--space-3);
+}
+
+.lb-empty {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 62ch;
+}
+
+.lb-takeaway.is-muted {
+  font-weight: 500;
+  color: var(--color-text-faint);
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .lb-head.is-split,
+  .lb-head.is-masthead {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .lb-head-aside {
+    justify-content: flex-start;
+  }
+
+  .lb-col-8,
+  .lb-col-7,
+  .lb-col-6,
+  .lb-col-5,
+  .lb-col-4,
+  .lb-col-3 {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 640px) {
+  .lb-chapter {
+    padding: var(--space-12) var(--space-5) var(--space-16);
+  }
+
+  .lb-grid {
+    gap: var(--space-4);
+  }
+
+  .lb-panel-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .lb-panel-note {
+    text-align: left;
+  }
+}

@@ -55,7 +55,12 @@ Path: `C:\Users\usuario\Downloads\ejemplos zip lbx`
 
 - `src/components/<Section>/` — one folder per stats section, each with a
   `.jsx` and matching `.css`.
-- `src/hooks/` — stats derivation (e.g. `useWatchlistStats.js`).
+- `src/components/ChapterRail/` — the sticky chapter index.
+- `src/components/shared/` — `ChapterHeading` and `PanelHead` primitives.
+- `src/hooks/` — stats derivation (e.g. `useWatchlistStats.js`) and
+  `useActiveSection.js` for the rail.
 - `src/context/DataContext.jsx` — parsed data + TMDB enriched lookup.
 - `src/styles/global.css` — design tokens and shared helpers (`lb-hl-green`,
   `lb-hl-orange`, etc.).
+- `src/styles/sections.css` — shared chapter layout, panel shells, heading
+  variants and the ambient tint.

@@ -1,255 +1,161 @@
 /* QuickFacts.css */
 
 .qf-section {
+  --chapter-accent: var(--color-accent);
+  --chapter-surface: var(--color-panel-01);
   min-height: 100vh;
-  padding: var(--space-12) 80px var(--space-16);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-/* Header */
-.qf-header {
-  text-align: center;
-  margin-bottom: var(--space-12);
-  max-width: 900px;
-}
-
-.qf-section-label {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--color-text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: var(--space-4);
-}
-
-.qf-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
-  font-weight: 900;
-  color: var(--color-text);
-  margin-bottom: var(--space-3);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  padding-top: clamp(40px, 5vw, 72px);
+  padding-bottom: clamp(48px, 6vw, 80px);
+  justify-content: center;
 }
 
 .qf-username {
   color: var(--color-accent);
 }
 
-.qf-subtitle {
-  font-size: 1.2rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-/* Bento Grid Architecture - 12 Columns */
-.qf-bento-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: var(--space-6);
+.qf-enrichment {
   width: 100%;
   max-width: 1400px;
-}
-
-.qf-col-12 { grid-column: span 12; }
-.qf-col-8 { grid-column: span 8; }
-.qf-col-4 { grid-column: span 4; }
-
-/* Generic Bento Card Base */
-.bento-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: var(--space-8);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
-  cursor: default;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-}
-
-/* Card Header & Icon */
-.bento-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   margin-bottom: var(--space-5);
-}
-
-.bento-title-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.bento-icon {
-  font-size: 1.6rem;
-  width: 44px;
-  height: 44px;
-  background: var(--color-surface-raised);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
-}
-
-.bento-label {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--color-text);
-}
-
-
-
-/* Bento Hero Numbers */
-.bento-number {
-  font-family: var(--font-display);
-  font-size: clamp(3.2rem, 5vw, 4.5rem);
-  font-weight: 900;
-  line-height: 1;
-  color: var(--color-text);
-  letter-spacing: -0.03em;
-  margin-bottom: var(--space-2);
-}
-
-.bento-number-unit {
-  font-size: 0.55em;
-  color: var(--color-text-muted);
-  margin-left: 4px;
-}
-
-.bento-number-sub-minutes {
-  font-size: 0.4em;
-  color: var(--color-text-muted);
-  margin-left: 6px;
-  font-weight: 700;
-}
-
-.bento-subtext {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-}
-
-/* Specialized Widget 1: Watched Meter */
-.bento-meter-wrap {
-  margin-top: var(--space-6);
-  padding: 0;
-  background: none;
-  border-radius: 0;
-  border: none;
-}
-
-.bento-meter-bar {
-  height: 8px;
-  background: var(--color-muted-blue);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  margin-bottom: var(--space-2);
-}
-
-.bento-meter-fill {
-  height: 100%;
-  background: var(--color-accent);
-  border-radius: var(--radius-sm);
-}
-
-.bento-meter-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-/* Specialized Widget 2: Star Rating Gauge */
-.rating-stars-gauge {
-  display: flex;
-  gap: 6px;
-  margin: var(--space-4) 0;
-}
-
-.star-box {
-  flex: 1;
-  height: 8px;
-  background: var(--color-surface-raised);
-  border-radius: 3px;
-  position: relative;
-  overflow: hidden;
-}
-
-.star-box-fill {
-  height: 100%;
-  background: var(--color-accent-3);
-  border-radius: 3px;
-}
-
-/* Specialized Widget 3: Watchlist Dual Split */
-.watchlist-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-8);
-  margin-top: var(--space-4);
-}
-
-.watchlist-stat-box {
-  padding: 0;
-  background: none;
-  border: none;
-  border-radius: 0;
-}
-
-.watchlist-stat-box:first-child {
-  border-right: 1px solid var(--color-border);
-  padding-right: var(--space-8);
-}
-
-.watchlist-stat-box:last-child {
-  padding-left: var(--space-8);
-}
-
-/* Enrichment Report Banner */
-.qf-enrichment-banner {
-  width: 100%;
-  max-width: 1400px;
-  padding: var(--space-4) var(--space-6);
-  background: rgba(255, 165, 0, 0.08);
-  border: 1px solid rgba(255, 165, 0, 0.25);
-  border-radius: var(--radius-card);
-  margin-bottom: var(--space-8);
-  font-size: 0.9rem;
+  padding: var(--space-3) 0;
+  border-top: 1px solid rgba(255, 107, 107, 0.4);
+  font-size: 0.86rem;
   font-weight: 600;
   color: var(--color-accent-warm);
 }
 
-/* Responsive */
+.qf-grid {
+  gap: var(--space-4);
+}
+
+.qf-card {
+  padding: clamp(18px, 1.8vw, 24px);
+  gap: var(--space-3);
+  justify-content: flex-start;
+}
+
+.qf-number {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 3.4vw, 3.1rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.qf-number-unit {
+  font-size: 0.5em;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-left: 5px;
+  letter-spacing: -0.01em;
+}
+
+.qf-number-sub {
+  font-size: 0.42em;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-left: 6px;
+}
+
+.qf-sub {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.qf-meter {
+  margin-top: auto;
+}
+
+.qf-meter-bar {
+  height: 6px;
+  background: var(--color-muted-blue);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.qf-meter-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 3px;
+}
+
+.qf-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-text-faint);
+}
+
+.qf-stars {
+  display: flex;
+  gap: 5px;
+  margin: 10px 0 8px;
+}
+
+.qf-star {
+  flex: 1;
+  height: 6px;
+  background: var(--color-surface-raised);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.qf-star-fill {
+  height: 100%;
+  background: var(--color-accent-3);
+}
+
+.qf-watchlist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin-top: auto;
+}
+
+.qf-watchlist-box:first-child {
+  padding-right: var(--space-6);
+  border-right: 1px solid var(--color-rule);
+}
+
 @media (max-width: 1100px) {
-  .qf-bento-grid {
+  .qf-section {
+    justify-content: flex-start;
+  }
+
+  .qf-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .qf-col-12, .qf-col-8, .qf-col-4 {
-    grid-column: span 2;
+
+  .qf-grid > * {
+    grid-column: auto !important;
+  }
+
+  .qf-grid > :last-child {
+    grid-column: 1 / -1 !important;
   }
 }
 
-@media (max-width: 768px) {
-  .qf-bento-grid {
+@media (max-width: 720px) {
+  .qf-grid {
     grid-template-columns: 1fr;
   }
-  .qf-col-12, .qf-col-8, .qf-col-4 {
-    grid-column: span 1;
-  }
-  .watchlist-split {
+
+  .qf-watchlist {
     grid-template-columns: 1fr;
     gap: var(--space-4);
+  }
+
+  .qf-watchlist-box:first-child {
+    padding-right: 0;
+    border-right: 0;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-rule);
   }
 }

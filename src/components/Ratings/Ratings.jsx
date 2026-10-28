@@ -4,6 +4,8 @@ import { useRatingStats, CONTRARIAN_BANDS, MIN_DECADE_FILMS } from '../../hooks/
 import { polarToCartesian } from '../../utils/geometry';
 import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
 import { CalendarIcon } from '../icons/Icons';
+import ChapterHeading from '../shared/ChapterHeading';
+import PanelHead from '../shared/PanelHead';
 import './Ratings.css';
 
 // SVG icons
@@ -43,23 +45,22 @@ const RebelIcon = () => (
 // Consensus Card component
 
 /**
- * Renders a single consensus film: poster + name + rating comparison.
+ * Renders a single consensus film as a ruled row: poster, title and both scores.
  *
  * Args:
- *   film (Object): Consensus entry with name, posterPath, userRating, tmdbAvg5, delta.
+ *   film (Object): Consensus entry with name, year, posterPath, userRating, tmdbAvg5, delta.
  *   isPositive (boolean): True for a hidden gem, false for an overhyped pick.
- *   index (number): Position in the grid, used to alternate the column split.
  *
  * Returns:
- *   JSX.Element: A film card within the consensus grid.
+ *   JSX.Element: A film row within the consensus list.
  */
-function ConsensusItem({ film, isPositive, index }) {
+function ConsensusItem({ film, isPositive }) {
   const { delta } = film;
   const sign = delta > 0 ? '+' : '';
   const badgeClass = isPositive ? 'is-positive' : 'is-negative';
 
   return (
-    <div className={`rt-consensus-item ${index % 2 === 0 ? 'is-left-col' : ''}`}>
+    <div className="rt-consensus-item">
       <div className="rt-consensus-poster-wrap">
         {film.posterPath ? (
           <img
@@ -75,17 +76,13 @@ function ConsensusItem({ film, isPositive, index }) {
         </span>
       </div>
       <div className="rt-consensus-info">
-        <span className="rt-consensus-name">{film.name}</span>
+        <span className="rt-consensus-name">
+          {film.name}
+          {film.year ? <span className="rt-consensus-year">{film.year}</span> : null}
+        </span>
         <div className="rt-consensus-ratings">
-          <div className="rt-consensus-rating-block">
-            <span className="rt-consensus-you">You: ★</span>
-            <span className="rt-consensus-you" style={{ fontSize: '1.1rem' }}>{film.userRating.toFixed(1)}</span>
-          </div>
-          <span className="rt-consensus-vs" style={{ margin: '0 4px' }}>vs</span>
-          <div className="rt-consensus-rating-block">
-            <span className="rt-consensus-tmdb">Avg: ★</span>
-            <span className="rt-consensus-tmdb" style={{ fontSize: '1.1rem' }}>{film.tmdbAvg5.toFixed(1)}</span>
-          </div>
+          <span className="rt-consensus-you">You <strong className="tabular-nums">{film.userRating.toFixed(1)}</strong></span>
+          <span className="rt-consensus-tmdb">World <strong className="tabular-nums">{film.tmdbAvg5.toFixed(1)}</strong></span>
         </div>
       </div>
     </div>
@@ -93,12 +90,10 @@ function ConsensusItem({ film, isPositive, index }) {
 }
 
 /**
- * One labelled half of the consensus card: a heading plus its film grid.
- *
- * The gems and overhyped halves were the same markup twice, so they share this.
+ * One labelled half of the consensus panel: a heading plus its film list.
  *
  * Args:
- *   label (string): Heading shown above the grid.
+ *   label (string): Heading shown above the list.
  *   labelClass (string): Extra class that colours the heading.
  *   films (Array<Object>): Consensus entries to render.
  *   isPositive (boolean): True for hidden gems, false for overhyped picks.
@@ -110,12 +105,10 @@ function ConsensusHalf({ label, labelClass, films, isPositive }) {
   const keyPrefix = isPositive ? 'gem' : 'hype';
   return (
     <div className="rt-consensus-half">
-      <div className={`rt-consensus-label ${labelClass}`}>
-        <span>★</span> {label}
-      </div>
-      <div className="rt-consensus-grid">
+      <div className={`rt-consensus-label ${labelClass}`}>{label}</div>
+      <div className="rt-consensus-list">
         {films.map((film, i) => (
-          <ConsensusItem key={`${keyPrefix}-${i}-${film.name}-${film.year}`} film={film} isPositive={isPositive} index={i} />
+          <ConsensusItem key={`${keyPrefix}-${i}-${film.name}-${film.year}`} film={film} isPositive={isPositive} />
         ))}
       </div>
     </div>
@@ -145,7 +138,7 @@ function ConsensusCard({ consensus }) {
     <div className="rt-consensus-wrap">
       {/* Hidden gems: user rates ABOVE consensus */}
       <ConsensusHalf
-        label="Hidden gems underrated by the world"
+        label="Hidden gems the world underrates"
         labelClass="rt-consensus-label-gems"
         films={consensus.gems}
         isPositive={true}
@@ -155,7 +148,7 @@ function ConsensusCard({ consensus }) {
 
       {/* Overhyped: user rates BELOW consensus */}
       <ConsensusHalf
-        label="Overhyped don't get the hype"
+        label="Overhyped picks you do not buy"
         labelClass="rt-consensus-label-hype"
         films={consensus.overhyped}
         isPositive={false}
@@ -539,64 +532,67 @@ export default function Ratings() {
 
   if (!stats.hasData) {
     return (
-      <div className="rt-section">
-        <header className="rt-header">
-          <div className="rt-section-label">Section 04 / Ratings</div>
-          <h2 className="rt-title">Your rating <span className="lb-hl-green">fingerprint</span>.</h2>
-          <p className="rt-subtitle">Add some watches so we can analyse how you rate.</p>
-        </header>
+      <div
+        className="lb-chapter rt-section"
+        id="section-04"
+        data-section
+        style={{ '--chapter-ambient': '0, 224, 84' }}
+      >
+        <ChapterHeading
+          number="04"
+          name="Ratings"
+          variant="left"
+          title={<>Your rating <span className="lb-hl-green">fingerprint</span>.</>}
+          subtitle="Add some watches so we can analyse how you rate."
+        />
       </div>
     );
   }
 
   return (
-    <div className="rt-section">
-      <header className="rt-header">
-        <div className="rt-section-label">Section 04 / Ratings</div>
-        <h2 className="rt-title">Your rating <span className="lb-hl-green">fingerprint</span>.</h2>
-        <p className="rt-subtitle">
-          How you rate compared to everyone else, how contrarian you really are, and which decades you love the most.
-        </p>
-      </header>
+    <div
+      className="lb-chapter rt-section"
+      id="section-04"
+      data-section
+      style={{ '--chapter-ambient': '0, 224, 84' }}
+    >
+      <ChapterHeading
+        number="04"
+        name="Ratings"
+        variant="left"
+        title={<>Your rating <span className="lb-hl-green">fingerprint</span>.</>}
+        subtitle="How you rate compared to everyone else, how contrarian you really are, and which decades you love the most."
+      />
 
-      <div className="rt-grid">
+      <div className="lb-grid">
         {/* 01: You vs the Consensus */}
-        <section className="rt-card rt-col-8" aria-label="You vs the consensus">
-          <div className="rt-card-head">
-            <div className="rt-card-title-group">
-              <div className="rt-card-icon" style={{ color: 'var(--color-accent)' }}>
-                <ScaleIcon />
-              </div>
-              <div className="rt-card-label">You vs. the Consensus</div>
-            </div>
-            <div className="rt-card-note">your biggest disagreements with the crowd</div>
-          </div>
+        <section className="lb-panel rt-card lb-col-8" aria-label="You vs the consensus">
+          <PanelHead
+            icon={<ScaleIcon />}
+            accent="var(--color-accent)"
+            label="You vs. the Consensus"
+            note="biggest disagreements"
+          />
           <ConsensusCard consensus={stats.consensus} />
         </section>
 
         {/* 02: Contrarian Meter */}
-        <section className="rt-card rt-col-4" aria-label="Contrarian score">
-          <div className="rt-card-head">
-            <div className="rt-card-title-group">
-              <div className="rt-card-icon" style={{ color: 'var(--color-accent-3)' }}>
-                <RebelIcon />
-              </div>
-              <div className="rt-card-label">Contrarian Level</div>
-            </div>
-          </div>
+        <section className="lb-panel is-flat rt-card lb-col-4" aria-label="Contrarian score">
+          <PanelHead
+            icon={<RebelIcon />}
+            accent="var(--color-accent-3)"
+            label="Contrarian Level"
+          />
           <ContrarianMeter contrarian={stats.contrarian} />
         </section>
 
         {/* 03: Highest Rated Decades */}
-        <section className="rt-card rt-col-12" aria-label="Highest rated decades">
-          <div className="rt-card-head">
-            <div className="rt-card-title-group">
-              <div className="rt-card-icon" style={{ color: 'var(--color-accent-4)' }}>
-                <CalendarIcon />
-              </div>
-              <div className="rt-card-label">Highest Rated Decades</div>
-            </div>
-          </div>
+        <section className="lb-panel is-flat rt-card lb-col-12" aria-label="Highest rated decades">
+          <PanelHead
+            icon={<CalendarIcon />}
+            accent="var(--color-accent-4)"
+            label="Highest Rated Decades"
+          />
           <DecadeShowcase decades={stats.decades} />
         </section>
       </div>

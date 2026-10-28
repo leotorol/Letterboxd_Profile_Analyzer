@@ -2,11 +2,13 @@ import { useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { useCountUp } from '../../hooks/useCountUp';
 import { ClockIcon } from '../icons/Icons';
+import ChapterHeading from '../shared/ChapterHeading';
+import PanelHead from '../shared/PanelHead';
 import './QuickFacts.css';
 
 /* Vector SVG Icons */
 const FilmIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
     <line x1="7" y1="2" x2="7" y2="22" />
     <line x1="17" y1="2" x2="17" y2="22" />
@@ -19,20 +21,20 @@ const FilmIcon = () => (
 );
 
 const StarIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
 
 const CameraIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M23 7l-7 5 7 5V7z" />
     <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
   </svg>
 );
 
 const ListIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="8" y1="6" x2="21" y2="6" />
     <line x1="8" y1="12" x2="21" y2="12" />
     <line x1="8" y1="18" x2="21" y2="18" />
@@ -144,7 +146,10 @@ function calcStats(enriched, rawData) {
 }
 
 /**
- * QuickFacts section component rendering Spotify Wrapped style informal stats in Bento Grid.
+ * QuickFacts section: the compact opening spread.
+ *
+ * Five numbers, one screen. The chapter heading carries a direct jump to Rhythm
+ * so the hook never traps the reader in a wall of cards.
  *
  * Returns:
  *   JSX.Element: QuickFacts section dashboard.
@@ -167,187 +172,146 @@ export default function QuickFacts() {
   const animRatingRaw = useCountUp(Math.round(stats.avgRating * 10), 1600);
   const animRating = (animRatingRaw / 10).toFixed(1);
 
-  return (
-    <div className="qf-section">
-      {/* Header */}
-      <header className="qf-header">
-        <div className="qf-section-label">
-          Section 01 / Quick Facts
-        </div>
-        <h2 className="qf-title">
-          {username ? (
-            <>
-              Here's your film life, <span className="qf-username">@{username}</span>.
-            </>
-          ) : (
-            'Here is your film life in numbers.'
-          )}
-        </h2>
-        <p className="qf-subtitle">
-          You've been spending some quality time in front of the screen. Let's look at what you logged.
-        </p>
-      </header>
+  const ratedShare = stats.totalWatched > 0 ? (stats.ratedCount / stats.totalWatched) * 100 : 0;
 
-      {/* Enrichment Report Banner */}
+  return (
+    <div
+      className="lb-chapter qf-section"
+      id="section-01"
+      data-section
+      style={{ '--chapter-ambient': '0, 232, 122' }}
+    >
+      <ChapterHeading
+        number="01"
+        name="Quick Facts"
+        variant="masthead"
+        title={username ? (
+          <>Here's your film life, <span className="qf-username">@{username}</span>.</>
+        ) : (
+          'Here is your film life in numbers.'
+        )}
+        subtitle="The numbers to set the scene. Everything after this is the story behind them."
+      />
+
       {enrichmentReport && enrichmentReport.failed.length > 0 && (
-        <div className="qf-enrichment-banner">
-          <span>
-            {enrichmentReport.failed.length} {enrichmentReport.failed.length === 1 ? 'title' : 'titles'} couldn't be matched with TMDB data. They won't appear on the report. Sorry :(
-          </span>
+        <div className="qf-enrichment">
+          {enrichmentReport.failed.length} {enrichmentReport.failed.length === 1 ? 'title' : 'titles'} could not be matched with TMDB data, so they stay out of the report.
         </div>
       )}
 
-      {/* Asymmetrical Bento Grid */}
-      <div className="qf-bento-grid">
-
-        {/* Bento 1: Movies Watched Hero */}
-        <div className="bento-card qf-col-8">
+      <div className="lb-grid qf-grid">
+        <div className="lb-panel qf-card lb-col-5">
+          <PanelHead
+            icon={<FilmIcon />}
+            accent="var(--color-accent)"
+            label="Movies Watched"
+          />
           <div>
-            <div className="bento-header">
-              <div className="bento-title-group">
-                <div className="bento-icon" style={{ color: 'var(--color-accent)' }}>
-                  <FilmIcon />
-                </div>
-                <div className="bento-label">Movies Watched</div>
-              </div>
-            </div>
-            <div className="bento-number tabular-nums">
-              {animWatched.toLocaleString()}
-            </div>
-            <div className="bento-subtext">
+            <div className="qf-number tabular-nums">{animWatched.toLocaleString()}</div>
+            <div className="qf-sub">
               {stats.totalWatched < 150
-                ? "Still building your collection. Keep watching!"
-                : "That's a lot of popcorn. Total films logged in your history."}
+                ? 'Still building your collection. Keep watching.'
+                : 'Total films logged in your history.'}
             </div>
           </div>
 
-          {/* Meter Bar */}
-          <div className="bento-meter-wrap">
-            <div className="bento-meter-bar">
-              <div
-                className="bento-meter-fill"
-                style={{ width: `${stats.totalWatched > 0 ? (stats.ratedCount / stats.totalWatched) * 100 : 0}%` }}
-              />
-            </div>
-            <div className="bento-meter-labels tabular-nums">
-              <span>{stats.ratedCount} rated films</span>
-              <span>{stats.unratedCount} unrated</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bento 2: Average Rating */}
-        <div className="bento-card qf-col-4">
-          <div className="bento-header">
-            <div className="bento-title-group">
-              <div className="bento-icon" style={{ color: 'var(--color-accent-3)' }}>
-                <StarIcon />
+          {stats.ratedCount > 0 && stats.unratedCount > 0 && (
+            <div className="qf-meter">
+              <div className="qf-meter-bar">
+                <div className="qf-meter-fill" style={{ width: `${ratedShare}%` }} />
               </div>
-              <div className="bento-label">Average Rating</div>
-            </div>
-          </div>
-          <div>
-            <div className="bento-number tabular-nums">
-              {animRating}
-              <span className="bento-number-unit">/ 5.0</span>
-            </div>
-            {/* 5-Star visual gauge */}
-            <div className="rating-stars-gauge" title={`${stats.avgRating.toFixed(2)} out of 5 stars`}>
-              {[1, 2, 3, 4, 5].map((starIndex) => {
-                const fillAmount = Math.max(0, Math.min(1, stats.avgRating - (starIndex - 1)));
-                return (
-                  <div key={starIndex} className="star-box">
-                    <div className="star-box-fill" style={{ width: `${fillAmount * 100}%` }} />
-                  </div>
-                );
-              })}
-            </div>
-            <div className="bento-subtext">
-              Across {stats.ratedCount} rated titles. {stats.avgRating < 3 ? "You're kind of a critic, huh?" : 'You know what you like.'}
-            </div>
-          </div>
-        </div>
-
-        {/* Bento 3: Watch Time Breakdown */}
-        <div className="bento-card qf-col-8">
-          <div>
-            <div className="bento-header">
-              <div className="bento-title-group">
-                <div className="bento-icon" style={{ color: 'var(--color-accent-2)' }}>
-                  <ClockIcon />
-                </div>
-                <div className="bento-label">Total Watch Time</div>
+              <div className="qf-meter-labels tabular-nums">
+                <span>{stats.ratedCount} rated</span>
+                <span>{stats.unratedCount} unrated</span>
               </div>
             </div>
-            <div className="bento-number tabular-nums">
-              {animHours.toLocaleString()} {"h"}
-              <span className="bento-number-sub-minutes tabular-nums">
-                {watchedTime.mins}m
-              </span>
+          )}
+          {stats.ratedCount > 0 && stats.unratedCount === 0 && (
+            <div className="qf-meter-labels tabular-nums">
+              <span>{stats.ratedCount} rated</span>
+              <span>0 unrated</span>
             </div>
-            <div className="bento-subtext">
+          )}
+        </div>
+
+        <div className="lb-panel qf-card lb-col-4">
+          <PanelHead
+            icon={<ClockIcon />}
+            accent="var(--color-accent-2)"
+            label="Total Watch Time"
+          />
+          <div>
+            <div className="qf-number tabular-nums">
+              {animHours.toLocaleString()}h
+              <span className="qf-number-sub tabular-nums">{watchedTime.mins}m</span>
+            </div>
+            <div className="qf-sub">
               {stats.totalMinutes > 0
-                ? (buildWatchTimeNote(stats.totalMinutes) ?? '')
+                ? (buildWatchTimeNote(stats.totalMinutes) ?? `${watchedTime.days} full days in the dark.`)
                 : 'Configure VITE_TMDB_API_KEY in .env to calculate exact runtimes.'}
             </div>
           </div>
         </div>
 
-        {/* Bento 4: Unique Directors */}
-        <div className="bento-card qf-col-4">
-          <div className="bento-header">
-            <div className="bento-title-group">
-              <div className="bento-icon">
-                <CameraIcon />
-              </div>
-              <div className="bento-label">Directors</div>
-            </div>
-          </div>
+        <div className="lb-panel qf-card lb-col-3">
+          <PanelHead
+            icon={<StarIcon />}
+            accent="var(--color-accent-3)"
+            label="Average Rating"
+          />
           <div>
-            <div className="bento-number tabular-nums">
-              {animDirectors.toLocaleString()}
+            <div className="qf-number tabular-nums">
+              {animRating}<span className="qf-number-unit">/5.0</span>
             </div>
-            <div className="bento-subtext">
+            <div className="qf-stars" title={`${stats.avgRating.toFixed(2)} out of 5 stars`}>
+              {[1, 2, 3, 4, 5].map((starIndex) => {
+                const fillAmount = Math.max(0, Math.min(1, stats.avgRating - (starIndex - 1)));
+                return (
+                  <div key={starIndex} className="qf-star">
+                    <div className="qf-star-fill" style={{ width: `${fillAmount * 100}%` }} />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="qf-sub">Across {stats.ratedCount} rated titles.</div>
+          </div>
+        </div>
+
+        <div className="lb-panel qf-card lb-col-4">
+          <PanelHead
+            icon={<CameraIcon />}
+            label="Directors"
+          />
+          <div>
+            <div className="qf-number tabular-nums">{animDirectors.toLocaleString()}</div>
+            <div className="qf-sub">
               {stats.uniqueDirectors > 0
-                ? `Filmmakers explored. Average ${(stats.totalWatched / Math.max(stats.uniqueDirectors, 1)).toFixed(1)} films per director.`
+                ? `${(stats.totalWatched / Math.max(stats.uniqueDirectors, 1)).toFixed(1)} films per director on average.`
                 : 'Unique filmmakers discovered.'}
             </div>
           </div>
         </div>
 
-        {/* Bento 5: Watchlist Dual Split Card */}
-        <div className="bento-card qf-col-12">
-          <div className="bento-header">
-            <div className="bento-title-group">
-              <div className="bento-icon">
-                <ListIcon />
-              </div>
-              <div className="bento-label">Watchlist Queue</div>
+        <div className="lb-panel qf-card lb-col-8">
+          <PanelHead
+            icon={<ListIcon />}
+            label="Watchlist Queue"
+          />
+          <div className="qf-watchlist">
+            <div className="qf-watchlist-box">
+              <div className="qf-number tabular-nums">{animWatchlist.toLocaleString()}</div>
+              <div className="qf-sub">Films waiting for you on Letterboxd.</div>
             </div>
-          </div>
-
-          <div className="watchlist-split">
-            <div className="watchlist-stat-box">
-              <div className="bento-number tabular-nums">
-                {animWatchlist.toLocaleString()}
+            <div className="qf-watchlist-box">
+              <div className="qf-number tabular-nums">
+                {animWatchlistHours.toLocaleString()}<span className="qf-number-unit">hours</span>
               </div>
-              <div className="bento-subtext">
-                Movies waiting for you on your Letterboxd watchlist.
-              </div>
-            </div>
-
-            <div className="watchlist-stat-box">
-              <div className="bento-number tabular-nums">
-                {animWatchlistHours.toLocaleString()}
-                <span className="bento-number-unit">hours</span>
-              </div>
-              <div className="bento-subtext">
-                That's {calcSleeplessNights(stats.watchlistEstimatedMinutes)} sleepless nights to clear it all. Worth it?
+              <div className="qf-sub">
+                {calcSleeplessNights(stats.watchlistEstimatedMinutes)} sleepless nights to clear the pile.
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

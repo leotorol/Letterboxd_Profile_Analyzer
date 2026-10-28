@@ -1,134 +1,47 @@
 /* CinephileProfile.css */
 
 .cp-section {
-  min-height: 100vh;
-  padding: var(--space-12) 80px var(--space-16);
+  --chapter-accent: var(--color-accent-4);
+  --chapter-surface: var(--color-panel-03);
+}
+
+/* two facts ride beside the chapter title, atlas style */
+.cp-head-facts {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.cp-header {
-  text-align: center;
-  margin-bottom: var(--space-12);
-  max-width: 900px;
-}
-
-.cp-section-label {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--color-text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: var(--space-4);
-}
-
-.cp-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
-  font-weight: 900;
-  color: var(--color-text);
-  margin-bottom: var(--space-3);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.cp-subtitle {
-  font-size: 1.2rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-/* Bento grid - 12 columns for ultimate precision */
-.cp-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
   gap: var(--space-6);
-  width: 100%;
-  max-width: 1400px;
 }
 
-/* keep fr tracks from flooring at the intrinsic width of posters / svgs */
-.cp-grid > * {
-  min-width: 0;
-}
-
-.cp-col-12 {
-  grid-column: span 12;
-}
-
-.cp-col-8 {
-  grid-column: span 8;
-}
-
-.cp-col-6 {
-  grid-column: span 6;
-}
-
-.cp-col-4 {
-  grid-column: span 4;
-}
-
-/* Card base */
-.cp-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: var(--space-8);
+.cp-head-fact {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  gap: 2px;
 }
 
-/* tooltips need to pop out of the card boundary */
+.cp-head-fact-val {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+}
+
+.cp-head-fact-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+.cp-card {
+  gap: var(--space-4);
+}
+
+/* tooltips need to pop out of the panel boundary */
 .cp-card:has(.poster-tip),
 .cp-card:has(.cp-map-tip) {
   overflow: visible;
-}
-
-/* Card head */
-.cp-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.cp-card-title-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.cp-card-icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  background: var(--color-surface-raised);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
-}
-
-.cp-card-label {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--color-text);
-}
-
-.cp-card-note {
-  font-size: 0.86rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  text-align: right;
 }
 
 .cp-chart-empty {
@@ -136,6 +49,12 @@
   font-weight: 500;
   color: var(--color-text-muted);
   line-height: 1.5;
+}
+
+/* an empty chart still fills its row, so keep the message in the optical middle */
+.cp-card > .cp-chart-empty {
+  margin-block: auto;
+  max-width: 44ch;
 }
 
 /* Shared chart elements */
@@ -175,22 +94,12 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-rule);
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--color-text-muted);
   line-height: 1.5;
-}
-
-/* Text only variant, no nested card look */
-.cp-takeaway-plain {
-  padding: 0;
-  background: none;
-  border: none;
-  border-radius: 0;
 }
 
 /* Genre Fingerprint Card: radial donut */
@@ -1214,17 +1123,20 @@
 }
 
 .cp-poster-accent-strip {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-4);
   width: 100%;
 }
 
 .cp-poster-accent-item {
+  flex: 1 1 0;
+  min-width: 112px;
+  max-width: 190px;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  width: 100%;
 }
 
 .cp-poster-accent-img {
@@ -1275,39 +1187,7 @@
 }
 
 /* Responsive */
-@media (max-width: 1100px) {
-  .cp-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .cp-col-12,
-  .cp-col-8,
-  .cp-col-6,
-  .cp-col-4 {
-    grid-column: span 2;
-  }
-}
-
 @media (max-width: 768px) {
-  .cp-section {
-    padding: var(--space-10) 24px var(--space-12);
-  }
-
-  .cp-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .cp-col-12,
-  .cp-col-8,
-  .cp-col-6,
-  .cp-col-4 {
-    grid-column: span 1;
-  }
-
-  .cp-card-note {
-    display: none;
-  }
-
   .cp-diversity-gauges {
     justify-content: center;
   }
@@ -1323,21 +1203,9 @@
     flex: 0 0 46px;
     min-width: 46px;
   }
-
-  .cp-poster-accent-strip {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  }
 }
 
 @media (max-width: 640px) {
-  .cp-section {
-    padding: var(--space-8) var(--space-6) var(--space-10);
-  }
-
-  .cp-card {
-    padding: var(--space-6);
-  }
-
   .cp-spectrum-pole {
     min-width: 55px;
     font-size: 0.74rem;
@@ -1347,7 +1215,7 @@
     height: 200px;
   }
 
-  .cp-poster-accent-strip {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  .cp-poster-accent-item {
+    min-width: 96px;
   }
 }

@@ -4,6 +4,8 @@ import { useRhythmStats, buildYearGrid } from '../../hooks/useRhythmStats';
 import { useCountUp } from '../../hooks/useCountUp';
 import { formatIsoDate, FULL_DAYS, FULL_MONTHS } from '../../utils/dateFormat';
 import { CalendarIcon, ClockIcon, CompassIcon, TrendIcon } from '../icons/Icons';
+import ChapterHeading from '../shared/ChapterHeading';
+import PanelHead from '../shared/PanelHead';
 import Heatmap from './Heatmap';
 import './Rhythm.css';
 
@@ -67,8 +69,8 @@ function formatWeeks(weeks) {
  */
 function patternNote(item, kind) {
   if (!item || !item.count) return null;
-  if (kind === 'day') return `Most of your watching lands on ${FULL_DAYS[item.label] || item.label}.`;
-  return `${item.label} is your busiest month.`;
+  if (kind === 'day') return `${FULL_DAYS[item.label] || item.label} leads the week`;
+  return `${item.label} leads the year`;
 }
 
 /**
@@ -407,20 +409,45 @@ export default function Rhythm() {
   const comfortShown = Math.min(COMFORT_LIMIT, stats.rewatch.comfortMovies.length);
 
   return (
-    <div className="ry-section">
-      <header className="ry-header">
-        <div className="ry-section-label">Section 02 / Rhythm</div>
-        <h2 className="ry-title">
-          You've got a <span className="lb-hl-orange">rhythm</span>, let's take a look at it.
-        </h2>
-        <p className="ry-subtitle">
-          You've seen boring facts. Now let's start with the fun part: when, how often, and
-          patterns hiding inside your film watching routine.
-        </p>
-      </header>
+    <div
+      className="lb-chapter ry-section"
+      id="section-02"
+      data-section
+      style={{ '--chapter-ambient': '245, 166, 35' }}
+    >
+      <ChapterHeading
+        number="02"
+        name="Rhythm"
+        variant="split"
+        title={<>You've got a <span className="lb-hl-orange">rhythm</span>, let's take a look at it.</>}
+        subtitle="When, how often, and the patterns hiding inside your film watching routine."
+        aside={(
+          <div className="ry-year-nav" role="group" aria-label="Select viewing year">
+            <button
+              type="button"
+              className="ry-year-btn"
+              onClick={() => prevYear != null && setViewYear(prevYear)}
+              disabled={prevYear == null}
+              aria-label={`View ${year - 1}`}
+            >
+              <ChevronLeftIcon />
+            </button>
+            <span className="ry-year-value tabular-nums">{year}</span>
+            <button
+              type="button"
+              className="ry-year-btn"
+              onClick={() => nextYear != null && setViewYear(nextYear)}
+              disabled={nextYear == null}
+              aria-label={`View ${year + 1}`}
+            >
+              <ChevronRightIcon />
+            </button>
+          </div>
+        )}
+      />
 
       {empty ? (
-        <div className="ry-empty">
+        <div className="lb-empty ry-empty">
           <CalendarIcon />
           <p>
             We couldn't find any watch dates in your export, so there's no rhythm to
@@ -428,43 +455,15 @@ export default function Rhythm() {
           </p>
         </div>
       ) : (
-        <div className="ry-grid">
+        <div className="lb-grid">
           {/* 01 — Heatmap hero */}
-          <section className="ry-card ry-span-3" aria-label="Year at a glance">
-            <div className="ry-card-head">
-              <div className="ry-card-title-group">
-                <div className="ry-card-icon" style={{ color: 'var(--color-accent)' }}>
-                  <CalendarIcon />
-                </div>
-                <div className="ry-card-label">Year at a Glance</div>
-              </div>
-
-              <div className="ry-year-nav" role="group" aria-label="Select viewing year">
-                <button
-                  type="button"
-                  className="ry-year-btn"
-                  onClick={() => prevYear != null && setViewYear(prevYear)}
-                  disabled={prevYear == null}
-                  aria-label={`View ${year - 1}`}
-                >
-                  <ChevronLeftIcon />
-                </button>
-                <span className="ry-year-value tabular-nums">{year}</span>
-                <button
-                  type="button"
-                  className="ry-year-btn"
-                  onClick={() => nextYear != null && setViewYear(nextYear)}
-                  disabled={nextYear == null}
-                  aria-label={`View ${year + 1}`}
-                >
-                  <ChevronRightIcon />
-                </button>
-              </div>
-            </div>
-
-            <p className="ry-click-hint">
-              Click a day to see which films you watched on that day.
-            </p>
+          <section className="lb-panel is-flat ry-card lb-col-12" aria-label="Year at a glance">
+            <PanelHead
+              icon={<CalendarIcon />}
+              accent="var(--color-accent)"
+              label="Year at a Glance"
+              note="scroll the year, tap a day"
+            />
 
             <div className="ry-hero-numbers">
               <div>
@@ -491,15 +490,12 @@ export default function Rhythm() {
           </section>
 
           {/* 02 — Streaks */}
-          <section className="ry-card" aria-label="Streaks">
-            <div className="ry-card-head">
-              <div className="ry-card-title-group">
-                <div className="ry-card-icon" style={{ color: 'var(--color-accent-warm)' }}>
-                  <FlameIcon />
-                </div>
-                <div className="ry-card-label">Streaks</div>
-              </div>
-            </div>
+          <section className="lb-panel ry-card lb-col-4" aria-label="Streaks">
+            <PanelHead
+              icon={<FlameIcon />}
+              accent="var(--color-accent-warm)"
+              label="Streaks"
+            />
 
             <div className="ry-streak-block">
               <span className="ry-streak-number tabular-nums">{animStreak}</span>
@@ -537,18 +533,13 @@ export default function Rhythm() {
           </section>
 
           {/* 03 — When you watch (weekday + month bars) */}
-          <section className="ry-card ry-span-2" aria-label="When you watch">
-            <div className="ry-card-head">
-              <div className="ry-card-title-group">
-                <div className="ry-card-icon" style={{ color: 'var(--color-accent-3)' }}>
-                  <ClockIcon />
-                </div>
-                <div className="ry-card-label">When You Watch</div>
-              </div>
-              {stats.patterns && (
-                <div className="ry-card-note">{patternNote(stats.patterns.favoriteDay, 'day')}</div>
-              )}
-            </div>
+          <section className="lb-panel is-flat ry-card lb-col-8" aria-label="When you watch">
+            <PanelHead
+              icon={<ClockIcon />}
+              accent="var(--color-accent-3)"
+              label="When You Watch"
+              note={stats.patterns ? patternNote(stats.patterns.favoriteDay, 'day') : undefined}
+            />
 
             <div className="ry-bars" aria-label="Watches by weekday">
               {stats.patterns.weekdayRank.map((w) => (
@@ -579,30 +570,23 @@ export default function Rhythm() {
           </section>
 
           {/* 04 — Pace over time */}
-          <section className="ry-card ry-span-2" aria-label="Your pace over time">
-            <div className="ry-card-head">
-              <div className="ry-card-title-group">
-                <div className="ry-card-icon" style={{ color: 'var(--color-accent-4)' }}>
-                  <TrendIcon />
-                </div>
-                <div className="ry-card-label">Your Pace Over Time</div>
-              </div>
-              <div className="ry-card-note">watched per month</div>
-            </div>
-
+          <section className="lb-panel is-flat ry-card lb-col-8" aria-label="Your pace over time">
+            <PanelHead
+              icon={<TrendIcon />}
+              accent="var(--color-accent-4)"
+              label="Your Pace Over Time"
+              note="watched per month"
+            />
             <TrendChart series={stats.evolution} />
           </section>
 
           {/* 05 — Projection */}
-          <section className="ry-card" aria-label="Where you're headed">
-            <div className="ry-card-head">
-              <div className="ry-card-title-group">
-                <div className="ry-card-icon" style={{ color: 'var(--color-lb-orange)' }}>
-                  <CompassIcon />
-                </div>
-                <div className="ry-card-label">Where You're Headed</div>
-              </div>
-            </div>
+          <section className="lb-panel ry-card lb-col-4" aria-label="Where you're headed">
+            <PanelHead
+              icon={<CompassIcon />}
+              accent="var(--color-lb-orange)"
+              label="Where You're Headed"
+            />
 
             {stats.projection.avgPerWeek > 0 ? (
               <>
@@ -613,7 +597,7 @@ export default function Rhythm() {
                 </div>
 
                 <div className="ry-mini ry-mini-solo">
-                  <span className="ry-mini-number">{watchlistLabel || '—'}</span>
+                  <span className="ry-mini-number">{watchlistLabel || 'not now'}</span>
                   <span className="ry-mini-label">to clear your watchlist</span>
                 </div>
               </>
@@ -630,18 +614,13 @@ export default function Rhythm() {
           </section>
 
           {/* 06 — Comfort movies */}
-          <section className="ry-card ry-span-3" aria-label="Comfort movies">
-            <div className="ry-card-head">
-              <div className="ry-card-title-group">
-                <div className="ry-card-icon" style={{ color: 'var(--color-accent-2)' }}>
-                  <RepeatIcon />
-                </div>
-                <div className="ry-card-label">Your Comfort Movies</div>
-              </div>
-              {stats.rewatch.comfortMovies.length > 0 && (
-                <div className="ry-card-note">Top {comfortShown} you couldn't leave alone</div>
-              )}
-            </div>
+          <section className="lb-panel is-flat ry-card lb-col-12" aria-label="Comfort movies">
+            <PanelHead
+              icon={<RepeatIcon />}
+              accent="var(--color-accent-2)"
+              label="Your Comfort Movies"
+              note={stats.rewatch.comfortMovies.length > 0 ? `top ${comfortShown} you could not leave alone` : undefined}
+            />
 
             {stats.rewatch.comfortMovies.length > 0 ? (
               <div className="ry-comfort-list">
@@ -657,7 +636,7 @@ export default function Rhythm() {
                     <div className="ry-comfort-info">
                       <div className="ry-comfort-top">
                         <span className="ry-comfort-rank">Top {i + 1}</span>
-                        <span className="ry-comfort-count tabular-nums">×{movie.count}</span>
+                        <span className="ry-comfort-count tabular-nums">x{movie.count}</span>
                       </div>
                       <div className="ry-comfort-title">
                         {movie.name}

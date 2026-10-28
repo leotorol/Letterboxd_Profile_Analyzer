@@ -7,6 +7,8 @@ import { ratingColor } from '../../utils/ratingColor';
 import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
 import { tipPosition } from '../../utils/positionTip';
 import { ClockIcon, ClockIconAlt, TrendIcon } from '../icons/Icons';
+import ChapterHeading from '../shared/ChapterHeading';
+import PanelHead from '../shared/PanelHead';
 import PosterTip from '../PosterTip/PosterTip';
 import './CinephileProfile.css';
 
@@ -1775,12 +1777,19 @@ export default function CinephileProfile() {
 
   if (!stats.hasData) {
     return (
-      <div className="cp-section">
-        <header className="cp-header">
-          <div className="cp-section-label">Section 03 / Cinephile Profile</div>
-          <h2 className="cp-title">Your cinematic <span className="lb-hl-blue">DNA</span>.</h2>
-          <p className="cp-subtitle">Add some watches so we can work out who you are as a viewer.</p>
-        </header>
+      <div
+        className="lb-chapter cp-section"
+        id="section-03"
+        data-section
+        style={{ '--chapter-ambient': '69, 182, 255' }}
+      >
+        <ChapterHeading
+          number="03"
+          name="Profile"
+          variant="split"
+          title={<>Your cinematic <span className="lb-hl-blue">DNA</span>.</>}
+          subtitle="Add some watches so we can work out who you are as a viewer."
+        />
       </div>
     );
   }
@@ -1806,148 +1815,141 @@ export default function CinephileProfile() {
   const directorSampleCount = stats.diversity.totalWithDirectors || stats.diversity.femaleInfo;
 
   return (
-    <div className="cp-section">
-      <header className="cp-header">
-        <div className="cp-section-label">Section 03 / Cinephile Profile</div>
-        <h2 className="cp-title">Your cinematic <span className="lb-hl-blue">DNA</span>.</h2>
-        <p className="cp-subtitle">
-          Who you are as a viewer. What you lean into, what you avoid, and how your taste has shifted over the years.
-        </p>
-      </header>
-
-      <div className="cp-grid">
-        {/* 01: Cinephile spectrum bars */}
-        <section className="cp-card cp-col-8" aria-label="Your cinephile spectrum">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent)' }}>
-                <DnaIcon />
-              </div>
-              <div className="cp-card-label">Your Cinephile DNA</div>
+    <div
+      className="lb-chapter cp-section"
+      id="section-03"
+      data-section
+      style={{ '--chapter-ambient': '69, 182, 255' }}
+    >
+      <ChapterHeading
+        number="03"
+        name="Profile"
+        variant="split"
+        title={<>Your cinematic <span className="lb-hl-blue">DNA</span>.</>}
+        subtitle="Who you are as a viewer. What you lean into, what you avoid, and how your taste has shifted over the years."
+        aside={(
+          <div className="cp-head-facts">
+            <div className="cp-head-fact">
+              <span className="cp-head-fact-val tabular-nums">{stats.genre.distinctCount}</span>
+              <span className="cp-head-fact-label">genres</span>
             </div>
-            <div className="cp-card-note">hover or focus the markers for the calculation details</div>
+            <div className="cp-head-fact">
+              <span className="cp-head-fact-val tabular-nums">{stats.worldMap.totalCountries}</span>
+              <span className="cp-head-fact-label">countries</span>
+            </div>
           </div>
+        )}
+      />
+
+      <div className="lb-grid">
+        {/* 01: Cinephile spectrum bars */}
+        <section className="lb-panel is-flat cp-card lb-col-7" aria-label="Your cinephile spectrum">
+          <PanelHead
+            icon={<DnaIcon />}
+            accent="var(--color-accent)"
+            label="Your Cinephile DNA"
+            note="hover the markers"
+          />
           <CinephileSpectrum axes={stats.spectrum} />
         </section>
 
         {/* 02: Genre diversity score */}
-        <section className="cp-card cp-col-4" aria-label="Genre diversity index">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent-2)' }}>
-                <GenreIcon />
-              </div>
-              <div className="cp-card-label">Genre Diversity</div>
-            </div>
-          </div>
+        <section className="lb-panel is-atlas cp-card lb-col-5" aria-label="Genre diversity index">
+          <PanelHead
+            icon={<GenreIcon />}
+            accent="var(--color-accent-2)"
+            label="Genre Diversity"
+          />
           <GenreDiversityCard genre={stats.genre} />
         </section>
 
         {/* 03: Genre dotplot (full width) */}
-        <section className="cp-card cp-col-12" aria-label="Genre distribution dotplot">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent-2)' }}>
-                <GenreIcon />
-              </div>
-              <div className="cp-card-label">Genres, Ranked</div>
-            </div>
-            <div className="cp-card-note">Hover or tap the dots for movie poster & details</div>
-          </div>
+        <section className="lb-panel is-atlas cp-card lb-col-12" aria-label="Genre distribution dotplot">
+          <PanelHead
+            icon={<GenreIcon />}
+            accent="var(--color-accent-2)"
+            label="Genres, Ranked"
+            note="hover the dots for posters"
+          />
           <GenreDotplot genre={stats.genre} />
         </section>
 
         {/* POSTER ACCENT: top genre picks */}
         {topGenreFilms.length > 0 && (
-          <div className="cp-col-12">
-            <PosterAccent films={topGenreFilms} title="Your highest-rated picks by genre" />
+          <div className="lb-col-12">
+            <PosterAccent films={topGenreFilms} title="Your highest rated picks by genre" />
           </div>
         )}
 
         {/* 04: Taste evolution */}
-        <section className="cp-card cp-col-8" aria-label="Taste evolution">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent-4)' }}>
-                <TrendIcon />
-              </div>
-              <div className="cp-card-label">How Your Taste Evolved</div>
-            </div>
-            <div className="cp-card-note">average rating per year of watching</div>
-          </div>
+        <section className="lb-panel is-flat cp-card lb-col-7" aria-label="Taste evolution">
+          <PanelHead
+            icon={<TrendIcon />}
+            accent="var(--color-accent-4)"
+            label="How Your Taste Evolved"
+            note="average rating per year"
+          />
           <TasteEvolutionChart taste={stats.taste} />
         </section>
 
         {/* 05: Genre reward card */}
-        <section className="cp-card cp-col-4 cp-reward-card" aria-label="What you most reward">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent-3)' }}>
-                <GenreIcon />
-              </div>
-              <div className="cp-card-label">Favourite / Least Favourite Genre</div>
-            </div>
-          </div>
+        <section className="lb-panel is-flat cp-card cp-reward-card lb-col-5" aria-label="What you most reward">
+          <PanelHead
+            icon={<GenreIcon />}
+            accent="var(--color-accent-3)"
+            label="Favourite / Least Favourite Genre"
+          />
           <GenreRewardCard reward={stats.genreReward} />
         </section>
 
         {/* 06: Duration correlation */}
-        <section className="cp-card cp-col-6" aria-label="Runtime vs your rating">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent-3)' }}>
-                <ClockIcon />
-              </div>
-              <div className="cp-card-label">Long or Short Films</div>
-            </div>
-            <div className="cp-card-note">runtime (min) vs your rating scatter</div>
-          </div>
+        <section className="lb-panel is-atlas cp-card lb-col-6" aria-label="Runtime vs your rating">
+          <PanelHead
+            icon={<ClockIcon />}
+            accent="var(--color-accent-3)"
+            label="Long or Short Films"
+            note="runtime vs rating"
+          />
           <TickDensityChart data={durationCorr} xLabel="Runtime" accent="var(--color-accent-3)" />
-          <div className="cp-takeaway cp-takeaway-plain">
+          <div className="cp-takeaway">
             <span>{durationVerdict}</span>
           </div>
         </section>
 
         {/* 07: Era correlation */}
-        <section className="cp-card cp-col-6" aria-label="Release year vs your rating">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent-4)' }}>
-                <ClockIconAlt />
-              </div>
-              <div className="cp-card-label">Old or New Films</div>
-            </div>
-            <div className="cp-card-note">release year vs your rating scatter</div>
-          </div>
+        <section className="lb-panel is-atlas cp-card lb-col-6" aria-label="Release year vs your rating">
+          <PanelHead
+            icon={<ClockIconAlt />}
+            accent="var(--color-accent-4)"
+            label="Old or New Films"
+            note="release year vs rating"
+          />
           <TickDensityChart data={eraCorr} xLabel="Release year" accent="var(--color-accent-4)" />
-          <div className="cp-takeaway cp-takeaway-plain">
+          <div className="cp-takeaway">
             <span>{eraVerdict}</span>
           </div>
         </section>
 
         {/* POSTER ACCENT: international films */}
         {internationalFilms.length > 0 && (
-          <div className="cp-col-12">
-            <PosterAccent films={internationalFilms} title="Some of your top-rated international films" />
+          <div className="lb-col-12">
+            <PosterAccent films={internationalFilms} title="Some of your top rated international films" />
           </div>
         )}
 
         {/* 08: Diversity behind the camera */}
-        <section className="cp-card cp-col-4" aria-label="Diversity behind the camera">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent-2)' }}>
-                <LensIcon />
-              </div>
-              <div className="cp-card-label">Behind the Lens</div>
-            </div>
-          </div>
+        <section className="lb-panel is-flat cp-card lb-col-4" aria-label="Diversity behind the camera">
+          <PanelHead
+            icon={<LensIcon />}
+            accent="var(--color-accent-2)"
+            label="Behind the Lens"
+          />
           <DiversityCard diversity={stats.diversity} />
           {directorSampleCount > 0 && (
-            <div className="cp-takeaway">
+            <div className="lb-takeaway">
               <span>
                 {loyaltyPct != null
-                  ? `Director Loyalty: ${loyaltyPct}% of your watches are from directors you've returned to 2+ times (based on ${directorSampleCount.toLocaleString()} films with director data).`
+                  ? `Director loyalty: ${loyaltyPct}% of your watches come from directors you have returned to twice or more, based on ${directorSampleCount.toLocaleString()} films with director data.`
                   : `Based on ${directorSampleCount.toLocaleString()} films with director data from TMDB.`}
               </span>
             </div>
@@ -1955,16 +1957,13 @@ export default function CinephileProfile() {
         </section>
 
         {/* 09: World map */}
-        <section className="cp-card cp-col-8" aria-label="World map of your films">
-          <div className="cp-card-head">
-            <div className="cp-card-title-group">
-              <div className="cp-card-icon" style={{ color: 'var(--color-accent)' }}>
-                <GlobeIcon />
-              </div>
-              <div className="cp-card-label">Where Your Films Come From</div>
-            </div>
-            <div className="cp-card-note">hover or tap a country for its film count. drag to pan, use the buttons or ctrl scroll to zoom.</div>
-          </div>
+        <section className="lb-panel is-atlas cp-card lb-col-8" aria-label="World map of your films">
+          <PanelHead
+            icon={<GlobeIcon />}
+            accent="var(--color-accent)"
+            label="Where Your Films Come From"
+            note="drag to pan, ctrl scroll to zoom"
+          />
           <WorldMapChart worldMap={stats.worldMap} />
         </section>
       </div>

@@ -1,119 +1,46 @@
-/* Reviews.css Section 06: Análisis de tus propias reseñas */
+/* Reviews.css Section 06: the manuscript */
 
 .rv-section {
-  min-height: 100vh;
-  padding: var(--space-12) 80px var(--space-16);
+  --chapter-accent: var(--color-lb-blue);
+  --chapter-surface: var(--color-panel-06);
+}
+
+/* the two writing numbers ride beside the running head */
+.rv-head-facts {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.rv-header {
-  text-align: center;
-  margin-bottom: var(--space-12);
-  max-width: 900px;
-}
-
-.rv-section-label {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--color-text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: var(--space-4);
-}
-
-.rv-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
-  font-weight: 900;
-  color: var(--color-text);
-  margin-bottom: var(--space-3);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.rv-subtitle {
-  font-size: 1.2rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-/* Bento grid, 12 columns matching the other sections */
-.rv-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
   gap: var(--space-6);
-  width: 100%;
-  max-width: 1400px;
 }
 
-.rv-grid > * {
-  min-width: 0;
-}
-
-.rv-col-12 { grid-column: span 12; }
-.rv-col-7  { grid-column: span 7;  }
-.rv-col-5  { grid-column: span 5;  }
-
-/* Card base */
-.rv-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: var(--space-8);
+.rv-head-fact {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  gap: 2px;
 }
 
-/* let the cloud tooltip escape the card instead of getting clipped */
+.rv-head-fact-val {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+}
+
+.rv-head-fact-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+
+.rv-card {
+  gap: var(--space-4);
+}
+
+/* let the cloud tooltip escape the panel instead of getting clipped */
 .rv-card:has(.rv-cloud-tip) {
   overflow: visible;
-}
-
-.rv-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.rv-card-title-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.rv-card-icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  background: var(--color-surface-raised);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
-}
-
-.rv-card-label {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--color-text);
-}
-
-.rv-card-note {
-  font-size: 0.86rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  text-align: right;
 }
 
 .rv-empty {
@@ -759,18 +686,6 @@
    RESPONSIVE
    ============================================================ */
 
-@media (max-width: 1100px) {
-  .rv-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .rv-col-12,
-  .rv-col-7,
-  .rv-col-5 {
-    grid-column: span 2;
-  }
-}
-
 /* too narrow for the side column, so stack poster, review, then the picker */
 @media (max-width: 1080px) {
   .rv-featured {
@@ -804,36 +719,23 @@
 }
 
 @media (max-width: 768px) {
-  .rv-section {
-    padding: var(--space-10) 24px var(--space-12);
-  }
-
-  .rv-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .rv-col-12,
-  .rv-col-7,
-  .rv-col-5 {
-    grid-column: span 1;
-  }
-
-  .rv-card-note {
-    display: none;
-  }
-
   .rv-cloud {
     height: clamp(300px, 52vh, 380px);
   }
 }
 
 @media (max-width: 640px) {
-  .rv-section {
-    padding: var(--space-8) var(--space-6) var(--space-10);
+  .rv-head-facts {
+    display: none;
   }
 
-  .rv-card {
-    padding: var(--space-6);
+  .rv-cloud-foot {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .rv-cloud-foot-label {
+    flex: 1 0 100%;
   }
 
   .rv-feature-hero {

@@ -27,6 +27,16 @@ Everything runs **100% in your browser** — no data ever leaves your machine. I
 
 The free TMDB API rate limit is generous but not unlimited, so the app batches requests, caches results in `localStorage`, and shows a live progress screen while it enriches your films. The same export is cached to speed up future loads. The global all-time lists are cached separately for seven days.
 
+## Chapter system
+
+The scroll is built as eight chapters, each with its own editorial format, joined by a fixed chapter rail (a vertical spine on desktop, a swipeable strip on mobile). Three shared pieces keep them coherent without making them identical:
+
+- `ChapterHeading`: the number, the chapter name, the title and an optional aside. Each section picks a variant (masthead, split, center, narrow, credit, manuscript).
+- `PanelHead`: the icon, label and micro note used by every panel.
+- A progressive panel surface ramp, from the light hook in `01` to the dark dossier in `08`. Flat panels stay transparent so the page keeps some air and variety.
+
+Each chapter also gets a subtle ambient tint, masked to fade in and out at the edges so consecutive chapters blend instead of meeting on a hard seam. Section `08` keeps its own archive dossier world and only inherits the rail offset.
+
 ## Tech stack
 
 - **Vite** — build tool and dev server
@@ -98,6 +108,7 @@ letterboxd stats/
 │   ├── context/
 │   │   └── DataContext.jsx    # Global app state + parsed/enriched data store
 │   ├── hooks/
+│   │   ├── useActiveSection.js # Tracks the chapter crossing the viewport middle
 │   │   ├── useCastStats.js    # Derives all stats for the Cast & Money section
 │   │   ├── useCinephileStats.js # Derives all stats for the Cinephile Profile section
 │   │   ├── useCountUp.js      # Animated number counter hook
@@ -119,21 +130,24 @@ letterboxd stats/
 │   │   ├── stats.js           # Shared mean / median / pearson helpers
 │   │   └── tmdbImages.js      # TMDB poster, profile and logo URL constants
 │   ├── components/
-│   │   ├── Cast/                 # Section 05: faces, duo, studios, budget vs box office
+│   │   ├── Cast/                 # Section 05: credits sheet (faces, duo, studios, money)
+│   │   ├── ChapterRail/          # Sticky chapter index (spine on desktop, strip on mobile)
 │   │   ├── CinematicBackground/  # Animated space background with stars and nebula
-│   │   ├── CinephileProfile/     # Section 03: spectrum, genres, taste, diversity, world map
+│   │   ├── CinephileProfile/     # Section 03: atlas (spectrum, genres, taste, world map)
 │   │   ├── DropZone/             # Drag-and-drop ZIP upload screen
 │   │   ├── ErrorBoundary.jsx     # Catches render errors so the UI never breaks
 │   │   ├── icons/                # Shared inline SVG icons
 │   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
-│   │   ├── QuickFacts/           # Section 01: quick facts (Bento dashboard)
+│   │   ├── QuickFacts/           # Section 01: compact masthead with five fact cards
 │   │   ├── Random/               # Section 08: the deep cuts (gap, extremes, bookends, ledger)
-│   │   ├── Ratings/              # Section 04: consensus, contrarian level, decades
-│   │   ├── Reviews/              # Section 06: word cloud, review length box plot, best reviews
-│   │   ├── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
-│   │   └── Watchlist/            # Section 07: graveyard, growth chart, average wait
+│   │   ├── Ratings/              # Section 04: review page (consensus, contrarian, decades)
+│   │   ├── Reviews/              # Section 06: manuscript (word cloud, length, best reviews)
+│   │   ├── Rhythm/               # Section 02: instrument panel (heatmap, streaks, pace)
+│   │   ├── shared/               # ChapterHeading + PanelHead shared primitives
+│   │   └── Watchlist/            # Section 07: vault (graveyard, growth chart, wait)
 │   └── styles/
-│       ├── tokens.css         # Design tokens (colors, spacing, radii)
+│       ├── tokens.css         # Design tokens + progressive chapter surface ramp
+│       ├── sections.css       # Shared chapter layout, headings, panels, ambient tint
 │       └── global.css         # Global base styles + animated space background
 ```
 

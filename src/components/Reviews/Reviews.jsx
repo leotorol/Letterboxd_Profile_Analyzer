@@ -2,19 +2,22 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useReviewStats } from '../../hooks/useReviewStats';
 import { TMDB_POSTER_SMALL, TMDB_POSTER_MEDIUM } from '../../utils/tmdbImages';
+import ChapterHeading from '../shared/ChapterHeading';
+import PanelHead from '../shared/PanelHead';
 import './Reviews.css';
 
 /*
  * Section 06 contract
  * THESIS: every other section reads what you watch; this one reads how you
  *   write. One packed word cloud is the thesis, refusing the stock tag list.
- * OWN-WORLD: the shared dark bento, Letterboxd blue as the section accent, a
- *   cloud painted in the Letterboxd tri colour and a hand drawn box plot.
+ * OWN-WORLD: the manuscript. Letterboxd blue as the section accent, a warmer
+ *   sheet surface for the cover and the featured review, flat ruled panels for
+ *   the charts, and a word cloud painted in the Letterboxd tri colour.
  * STORY: the writer sees the words they lean on, how their takes got longer or
  *   shorter, and the reviews they went hardest on, then picks one to reread.
- * FIRST VIEWPORT: full width word cloud card, sizes by frequency, hover for the
+ * FIRST VIEWPORT: full width word cloud sheet, sizes by frequency, hover for the
  *   count and the film it came from.
- * FORM: local extension of the established world, no new identity.
+ * FORM: the quiet text chapter between the credits sheet and the vault.
  */
 
 const FONT_FAMILY = "'Plus Jakarta Sans', 'Inter', sans-serif";
@@ -644,16 +647,21 @@ export default function Reviews() {
 
   if (!stats.hasData) {
     return (
-      <div className="rv-section">
-        <header className="rv-header">
-          <div className="rv-section-label">Section 06 / Reviews</div>
-          <h2 className="rv-title">The voice behind the <span className="lb-hl-blue">watcher</span>.</h2>
-          <p className="rv-subtitle">
-            This is where we read what you had to say. Your export has no written reviews yet, so there is nothing to analyse here.
-          </p>
-        </header>
-        <div className="rv-grid">
-          <section className="rv-card rv-col-12">
+      <div
+        className="lb-chapter rv-section"
+        id="section-06"
+        data-section
+        style={{ '--chapter-ambient': '124, 109, 240' }}
+      >
+        <ChapterHeading
+          number="06"
+          name="Reviews"
+          variant="manuscript"
+          title={<>The voice behind the <span className="lb-hl-blue">watcher</span>.</>}
+          subtitle="This is where we read what you had to say. Your export has no written reviews yet, so there is nothing to analyse here."
+        />
+        <div className="lb-grid">
+          <section className="lb-panel is-sheet rv-card lb-col-12">
             <p className="rv-empty">
               Write a few reviews on Letterboxd, export your data again, and drop the ZIP back in. This section will fill up with the words you lean on, how long your takes run, and the reviews you went hardest on.
             </p>
@@ -666,26 +674,40 @@ export default function Reviews() {
   const { stats: writing } = stats;
 
   return (
-    <div className="rv-section">
-      <header className="rv-header">
-        <div className="rv-section-label">Section 06 / Reviews</div>
-        <h2 className="rv-title">The voice behind the <span className="lb-hl-blue">watcher</span>.</h2>
-        <p className="rv-subtitle">
-          You have watched a lot. Now let's read what you actually wrote about it: the words you reach for, how long your takes run, and the ones you went hardest on.
-        </p>
-      </header>
-
-      <div className="rv-grid">
-        <section className="rv-card rv-col-12" aria-label="Your word cloud">
-          <div className="rv-card-head">
-            <div className="rv-card-title-group">
-              <div className="rv-card-icon" style={{ color: 'var(--color-lb-blue)' }}>
-                <CloudIcon />
-              </div>
-              <div className="rv-card-label">Your Writing, In One Picture</div>
+    <div
+      className="lb-chapter rv-section"
+      id="section-06"
+      data-section
+      style={{ '--chapter-ambient': '124, 109, 240' }}
+    >
+      <ChapterHeading
+        number="06"
+        name="Reviews"
+        variant="manuscript"
+        title={<>The voice behind the <span className="lb-hl-blue">watcher</span>.</>}
+        subtitle="You have watched a lot. Now let's read what you actually wrote about it: the words you reach for, how long your takes run, and the ones you went hardest on."
+        aside={(
+          <div className="rv-head-facts">
+            <div className="rv-head-fact">
+              <span className="rv-head-fact-val tabular-nums">{writing.totalReviews.toLocaleString()}</span>
+              <span className="rv-head-fact-label">reviews</span>
             </div>
-            <div className="rv-card-note">every word sized by how often you use it</div>
+            <div className="rv-head-fact">
+              <span className="rv-head-fact-val tabular-nums">{Math.round(writing.avgWords)}</span>
+              <span className="rv-head-fact-label">words each</span>
+            </div>
           </div>
+        )}
+      />
+
+      <div className="lb-grid">
+        <section className="lb-panel is-sheet rv-card lb-col-12" aria-label="Your word cloud">
+          <PanelHead
+            icon={<CloudIcon />}
+            accent="var(--color-lb-blue)"
+            label="Your Writing, In One Picture"
+            note="every word sized by use"
+          />
 
           <WordCloud words={stats.wordCloud} />
 
@@ -698,41 +720,32 @@ export default function Reviews() {
           )}
         </section>
 
-        <section className="rv-card rv-col-7" aria-label="Review length over time">
-          <div className="rv-card-head">
-            <div className="rv-card-title-group">
-              <div className="rv-card-icon" style={{ color: 'var(--color-lb-orange)' }}>
-                <BarsIcon />
-              </div>
-              <div className="rv-card-label">How Long Your Takes Run</div>
-            </div>
-            <div className="rv-card-note">words per review, by year</div>
-          </div>
+        <section className="lb-panel is-flat rv-card lb-col-7" aria-label="Review length over time">
+          <PanelHead
+            icon={<BarsIcon />}
+            accent="var(--color-lb-orange)"
+            label="How Long Your Takes Run"
+            note="words per review, by year"
+          />
           <LengthBars series={stats.lengthByYear} verdict={stats.lengthVerdict} />
         </section>
 
-        <section className="rv-card rv-col-5" aria-label="Your writing fingerprint">
-          <div className="rv-card-head">
-            <div className="rv-card-title-group">
-              <div className="rv-card-icon" style={{ color: 'var(--color-accent-2)' }}>
-                <WaveIcon />
-              </div>
-              <div className="rv-card-label">Your Writing Fingerprint</div>
-            </div>
-          </div>
+        <section className="lb-panel is-flat rv-card lb-col-5" aria-label="Your writing fingerprint">
+          <PanelHead
+            icon={<WaveIcon />}
+            accent="var(--color-accent-2)"
+            label="Your Writing Fingerprint"
+          />
           <WritingFingerprint stats={writing} />
         </section>
 
-        <section className="rv-card rv-col-12" aria-label="Your longest reviews">
-          <div className="rv-card-head">
-            <div className="rv-card-title-group">
-              <div className="rv-card-icon" style={{ color: 'var(--color-accent-3)' }}>
-                <QuillIcon />
-              </div>
-              <div className="rv-card-label">The Ones With The Most Meat</div>
-            </div>
-            <div className="rv-card-note">pick one to reread</div>
-          </div>
+        <section className="lb-panel is-sheet rv-card lb-col-12" aria-label="Your longest reviews">
+          <PanelHead
+            icon={<QuillIcon />}
+            accent="var(--color-accent-3)"
+            label="The Ones With The Most Meat"
+            note="pick one to reread"
+          />
           <FeaturedReviews featured={stats.featured} />
         </section>
       </div>

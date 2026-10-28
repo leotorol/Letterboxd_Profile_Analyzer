@@ -10,6 +10,24 @@
   /* Borders */
   --color-border: rgba(255, 255, 255, 0.1);
   --color-border-hover: rgba(255, 255, 255, 0.22);
+  --color-rule: rgba(255, 255, 255, 0.09);
+  --color-rule-strong: rgba(255, 255, 255, 0.17);
+
+  /* Chapter surface tones, one per editorial format */
+  --color-surface-sheet: #141420;
+  --color-surface-vault: #0c0c15;
+  --color-surface-atlas: #101020;
+
+  /* Progressive panel ramp: lightest at the hook, darkest before the dossier.
+     Keeps neighbouring chapters from jumping between random surface tones. */
+  --color-panel-01: #16162a;
+  --color-panel-02: #151529;
+  --color-panel-03: #141428;
+  --color-panel-04: #131327;
+  --color-panel-05: #121226;
+  --color-panel-06: #111125;
+  --color-panel-07: #101024;
+  --color-panel-08: #0d0d1a;
 
   /* Solid Accents */
   --color-accent: #00e87a;

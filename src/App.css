@@ -7,6 +7,12 @@
   padding: 0 80px;
 }
 
+@media (max-width: 1199px) {
+  .qf-reset-wrap {
+    padding-bottom: 76px;
+  }
+}
+
 .qf-reset-btn {
   margin-top: var(--space-12);
   display: inline-flex;

@@ -4,6 +4,8 @@ import { useCastStats } from '../../hooks/useCastStats';
 import { ratingColor } from '../../utils/ratingColor';
 import { TMDB_POSTER_SMALL, TMDB_PROFILE_SMALL } from '../../utils/tmdbImages';
 import { tipPosition } from '../../utils/positionTip';
+import ChapterHeading from '../shared/ChapterHeading';
+import PanelHead from '../shared/PanelHead';
 import PosterTip from '../PosterTip/PosterTip';
 import './Cast.css';
 
@@ -152,35 +154,7 @@ function PosterImage({ film }) {
  */
 function Takeaway({ muted = false, children }) {
   return (
-    <div className={`cs-takeaway${muted ? ' cs-takeaway-muted' : ''}`}>
-      <span>{children}</span>
-    </div>
-  );
-}
-
-/**
- * Card header: icon chip, label and an optional right-aligned note.
- *
- * Args:
- *   icon (ReactNode): Icon rendered inside the chip.
- *   accent (string): CSS colour for the icon.
- *   label (string): Card title.
- *   note (string, optional): Small note on the right.
- *
- * Returns:
- *   JSX.Element: The card header.
- */
-function CardHead({ icon, accent, label, note }) {
-  return (
-    <div className="cs-card-head">
-      <div className="cs-card-title-group">
-        <div className="cs-card-icon" style={{ color: accent }}>
-          {icon}
-        </div>
-        <div className="cs-card-label">{label}</div>
-      </div>
-      {note && <div className="cs-card-note">{note}</div>}
-    </div>
+    <p className={`lb-takeaway${muted ? ' is-muted' : ''}`}>{children}</p>
   );
 }
 
@@ -669,29 +643,52 @@ export default function Cast() {
 
   if (!stats.hasData) {
     return (
-      <div className="cs-section">
-        <header className="cs-header">
-          <div className="cs-section-label">Section 05 / Cast &amp; Money</div>
-          <h2 className="cs-title">The faces and the <span className="lb-hl-orange">money</span>.</h2>
-          <p className="cs-subtitle">Add some watches so we can show you who and what is behind your films.</p>
-        </header>
+      <div
+        className="lb-chapter cs-section"
+        id="section-05"
+        data-section
+        style={{ '--chapter-ambient': '255, 128, 0' }}
+      >
+        <ChapterHeading
+          number="05"
+          name="Cast & Money"
+          variant="credit"
+          title={<>The faces and the <span className="lb-hl-orange">money</span>.</>}
+          subtitle="Add some watches so we can show you who and what is behind your films."
+        />
       </div>
     );
   }
 
-  return (
-    <div className="cs-section">
-      <header className="cs-header">
-        <div className="cs-section-label">Section 05 / Cast &amp; Money</div>
-        <h2 className="cs-title">The people and the <span className="lb-hl-orange">money</span>.</h2>
-        <p className="cs-subtitle">
-          Who keeps showing up on screen, which studios you keep coming back to, and whether your taste runs blockbuster or indie.
-        </p>
-      </header>
+  const headerFaces = stats.topActors.filter((actor) => actor.profilePath).slice(0, 3);
 
-      <div className="cs-grid">
-        <section className="cs-card cs-col-7" aria-label="Most watched cast">
-          <CardHead
+  return (
+    <div
+      className="lb-chapter cs-section"
+      id="section-05"
+      data-section
+      style={{ '--chapter-ambient': '255, 128, 0' }}
+    >
+      <ChapterHeading
+        number="05"
+        name="Cast & Money"
+        variant="credit"
+        title={<>The people and the <span className="lb-hl-orange">money</span>.</>}
+        subtitle="Who keeps showing up on screen, which studios you keep coming back to, and whether your taste runs blockbuster or indie."
+        aside={headerFaces.length > 0 ? (
+          <div className="cs-head-faces" aria-hidden="true">
+            {headerFaces.map((actor) => (
+              <div className="cs-head-face" key={actor.name}>
+                <img src={TMDB_PROFILE_SMALL + actor.profilePath} alt="" loading="lazy" />
+              </div>
+            ))}
+          </div>
+        ) : undefined}
+      />
+
+      <div className="lb-grid">
+        <section className="lb-panel cs-card lb-col-7" aria-label="Most watched cast">
+          <PanelHead
             icon={<CastIcon />}
             accent="var(--color-accent)"
             label="Most Watched Faces"
@@ -700,8 +697,8 @@ export default function Cast() {
           <CastBoard topActors={stats.topActors} />
         </section>
 
-        <section className="cs-card cs-col-5" aria-label="Favourite director and actor duo">
-          <CardHead
+        <section className="lb-panel is-flat cs-card lb-col-5" aria-label="Favourite director and actor duo">
+          <PanelHead
             icon={<DuoIcon />}
             accent="var(--color-accent-2)"
             label="Favourite Duo"
@@ -709,18 +706,18 @@ export default function Cast() {
           <DuoCard duo={stats.duo} />
         </section>
 
-        <section className="cs-card cs-col-6" aria-label="Favourite studios">
-          <CardHead
+        <section className="lb-panel is-flat cs-card lb-col-5" aria-label="Favourite studios">
+          <PanelHead
             icon={<StudioIcon />}
             accent="var(--color-accent-3)"
             label="Studios You Trust"
-            note="dot is your average rating"
+            note="dot is your average"
           />
           <StudiosBoard studios={stats.studios} />
         </section>
 
-        <section className="cs-card cs-col-6" aria-label="Budget and box office">
-          <CardHead
+        <section className="lb-panel is-flat cs-card lb-col-7" aria-label="Budget and box office">
+          <PanelHead
             icon={<MoneyIcon />}
             accent="var(--color-accent-4)"
             label="The Money Behind It"

@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useRandomStats } from '../../hooks/useRandomStats';
 import { formatIsoDate } from '../../utils/dateFormat';
@@ -20,13 +20,6 @@ import './Random.css';
  *   then the missing blockbuster as a full poster with a NOT SEEN stamp.
  * FORM: local extension of the established world, no new identity.
  */
-
-const CHAPTERS = [
-  { id: 'rd-gap', number: '01', label: 'The Gap' },
-  { id: 'rd-extremes', number: '02', label: 'The Extremes' },
-  { id: 'rd-bookends', number: '03', label: 'The Bookends' },
-  { id: 'rd-ledger', number: '04', label: 'The Ledger' },
-];
 
 const DOT_STEP = 8;
 
@@ -125,25 +118,6 @@ function FilmPoster({ film, size, className = '' }) {
 }
 
 /**
- * Renders the chapter index that doubles as in page navigation.
- *
- * Returns:
- *   JSX.Element: The four chapter links.
- */
-function ChapterIndex() {
-  return (
-    <nav className="rd-chapters" aria-label="Deep Cuts chapters">
-      {CHAPTERS.map((chapter) => (
-        <a key={chapter.id} href={`#${chapter.id}`} className="rd-chapter-link">
-          <span className="rd-chapter-num tabular-nums">{chapter.number}</span>
-          <span>{chapter.label}</span>
-        </a>
-      ))}
-    </nav>
-  );
-}
-
-/**
  * Renders the heading row shared by every band.
  *
  * Args:
@@ -223,16 +197,149 @@ function GapSkeleton() {
  */
 function CoverageStrip({ gap }) {
   const wrapRef = useRef(null);
+  const frameRef = useRef(0);
+  const pendingRef = useRef(null);
+  const hoverKeyRef = useRef(null);
   const [hover, setHover] = useState(null);
   const heroIndex = gap.popular
     ? gap.cells.findIndex((cell) => cell.tmdbId === gap.popular.tmdbId)
     : -1;
   const missingCount = gap.windowSize - gap.seenCount;
 
-  function showCell(cell, node) {
+  /**
+   * Computes the tooltip position once per animation frame.
+   *
+   * Every square used to read the layout on its own mouseenter, so a quick
+   * sweep across the reel forced a reflow per cell and the whole strip
+   * crawled. Batching it into one frame keeps it as snappy as the other charts.
+   *
+   * Args:
+   *   None
+   *
+   * Returns:
+   *   void
+   */
+  const commitHover = useCallback(() => {
+    frameRef.current = 0;
+    const pending = pendingRef.current;
+    if (!pending || !pending.node.isConnected) return;
+
+    const { cell, node } = pending;
+    if (hoverKeyRef.current === cell.tmdbId) return;
+
+    hoverKeyRef.current = cell.tmdbId;
     const { x, y } = tipPosition(wrapRef.current, node, 145);
     setHover({ cell, x, y });
-  }
+  }, []);
+
+  /**
+   * Queues a cell for the next frame instead of updating state immediately.
+   *
+   * Args:
+   *   cell (Object): Catalog film behind the square.
+   *   node (HTMLElement): The square that got the pointer.
+   *
+   * Returns:
+   *   void
+   */
+  const trackCell = useCallback((cell, node) => {
+    pendingRef.current = { cell, node };
+    if (!frameRef.current) frameRef.current = requestAnimationFrame(commitHover);
+  }, [commitHover]);
+
+  /**
+   * Drops the tooltip when the pointer leaves the whole reel.
+   *
+   * Args:
+   *   None
+   *
+   * Returns:
+   *   void
+   */
+  const clearHover = useCallback(() => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    frameRef.current = 0;
+    pendingRef.current = null;
+    hoverKeyRef.current = null;
+    setHover(null);
+  }, []);
+
+  useEffect(() => () => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+  }, []);
+
+  // keep the 100 squares stable across tooltip updates, otherwise every cell
+  // crossing re renders the entire strip and it feels like wet mud
+  const cellNodes = useMemo(() => gap.cells.map((cell) => {
+    const isGap = gap.popular != null && cell.tmdbId === gap.popular.tmdbId;
+    return (
+      <span
+        key={cell.tmdbId}
+        className={`rd-cell${cell.seen ? ' is-seen' : ' is-missing'}${isGap ? ' is-gap' : ''}`}
+        onPointerEnter={(event) => trackCell(cell, event.currentTarget)}
+        onPointerDown={(event) => trackCell(cell, event.currentTarget)}
+      />
+    );
+  }), [gap.cells, gap.popular, trackCell]);
+
+  // the reel only shows posters on hover, so warm the small thumbs once the
+  // block gets close to the viewport. without this the first sweep fetches a
+  // poster per cell and the tooltip looks stuck waiting for the network.
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const paths = gap.cells.map((cell) => cell.posterPath).filter(Boolean);
+    if (!wrap || paths.length === 0) return undefined;
+
+    const preloads = [];
+    let cancelled = false;
+    let started = false;
+    let index = 0;
+    let observer = null;
+
+    function loadBatch() {
+      if (cancelled) return;
+      const batch = paths.slice(index, index + 4);
+      index += batch.length;
+      for (const path of batch) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = TMDB_POSTER_SMALL + path;
+        preloads.push(img);
+      }
+      if (index < paths.length) schedule();
+    }
+
+    function schedule() {
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(loadBatch, { timeout: 2000 });
+      } else {
+        window.setTimeout(loadBatch, 60);
+      }
+    }
+
+    function start() {
+      if (started || cancelled) return;
+      started = true;
+      schedule();
+    }
+
+    if (typeof window.IntersectionObserver === 'function') {
+      observer = new window.IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        observer = null;
+        start();
+      }, { rootMargin: '700px 0px' });
+      observer.observe(wrap);
+    } else {
+      start();
+    }
+
+    return () => {
+      cancelled = true;
+      if (observer) observer.disconnect();
+    };
+  }, [gap.cells]);
 
   return (
     <div className="rd-coverage" ref={wrapRef}>
@@ -251,21 +358,10 @@ function CoverageStrip({ gap }) {
         className="rd-filmstrip"
         role="img"
         aria-label={`You have seen ${gap.seenCount} of the ${gap.windowSize} most rated films of all time on TMDB`}
+        onPointerLeave={clearHover}
+        onPointerCancel={clearHover}
       >
-        <div className="rd-filmstrip-cells">
-          {gap.cells.map((cell) => {
-            const isGap = gap.popular != null && cell.tmdbId === gap.popular.tmdbId;
-            return (
-              <span
-                key={cell.tmdbId}
-                className={`rd-cell${cell.seen ? ' is-seen' : ' is-missing'}${isGap ? ' is-gap' : ''}`}
-                onMouseEnter={(event) => showCell(cell, event.currentTarget)}
-                onMouseLeave={() => setHover(null)}
-                onClick={(event) => showCell(cell, event.currentTarget)}
-              />
-            );
-          })}
-        </div>
+        <div className="rd-filmstrip-cells">{cellNodes}</div>
       </div>
 
       <span className="rd-filmstrip-hint">Swipe the reel to see the rest.</span>
@@ -329,7 +425,7 @@ function GapBand({ gap, catalogState, retryCatalog }) {
     : 'This is the best rated film of all time on TMDB that is still missing from your log.';
 
   return (
-    <section className="rd-band" id="rd-gap" aria-labelledby="rd-gap-title">
+    <section className="rd-band" aria-labelledby="rd-gap-title">
       <div className="rd-band-inner">
         <BandHead id="rd-gap-title" number="01" title="The Gap" note="the films everyone else got to first" />
 
@@ -412,18 +508,17 @@ function GapBand({ gap, catalogState, retryCatalog }) {
 }
 
 /**
- * Memoised dot layer. Hover state lives in the parent, so without this every
- * mouseenter rebuilt the whole dot cloud and the tooltip crawled. Now the dots
- * render once and the tooltip is the only thing that updates. Coño.
+ * Static dot layer. It has no per dot listeners on purpose: the field tracks
+ * the pointer once and picks the nearest dot, otherwise 400 hover targets
+ * fight each other and the tooltip crawls. Coño.
  *
  * Args:
  *   dots (Array<Object>): Dot layout from the hook.
- *   onDotEnter (Function): Stable handler fired with the film and DOM node.
  *
  * Returns:
  *   JSX.Element: The dot spans.
  */
-const DotScatter = memo(function DotScatter({ dots, onDotEnter }) {
+const DotScatter = memo(function DotScatter({ dots }) {
   return (
     <>
       {dots.map((dot, index) => (
@@ -431,8 +526,6 @@ const DotScatter = memo(function DotScatter({ dots, onDotEnter }) {
           key={`${dot.film.name}-${dot.film.year}-${index}`}
           className="rd-dot"
           style={{ left: `${dot.x * 100}%`, bottom: `${dot.stack * DOT_STEP}px` }}
-          onMouseEnter={(event) => onDotEnter(dot.film, event.currentTarget)}
-          onClick={(event) => onDotEnter(dot.film, event.currentTarget)}
         />
       ))}
     </>
@@ -457,24 +550,94 @@ const DotScatter = memo(function DotScatter({ dots, onDotEnter }) {
  *   JSX.Element: The dot field and its tooltip.
  */
 function DotField({ dots, ariaLabel, subFor, className = '', children }) {
-  const wrapRef = useRef(null);
+  const plotRef = useRef(null);
+  const frameRef = useRef(0);
+  const pointerRef = useRef(null);
+  const hoverFilmRef = useRef(null);
   const [hover, setHover] = useState(null);
 
-  const showDot = useCallback((film, node) => {
-    const { x, y } = tipPosition(wrapRef.current, node, 152);
-    setHover({ film, x, y });
+  /**
+   * Finds the dot nearest to the last pointer position and updates the tooltip.
+   *
+   * One pointer handler beats hundreds of per dot mouseenter listeners, which
+   * overlapped each other and turned every quick mouse move into a state storm.
+   *
+   * Args:
+   *   None
+   *
+   * Returns:
+   *   void
+   */
+  const applyNearest = useCallback(() => {
+    frameRef.current = 0;
+    const point = pointerRef.current;
+    const plot = plotRef.current;
+    if (!point || !plot) return;
+
+    const rect = plot.getBoundingClientRect();
+    const px = point.x - rect.left;
+    const py = point.y - rect.top;
+
+    let best = null;
+    let bestDist = 22 * 22;
+
+    for (const dot of dots) {
+      const dx = dot.x * rect.width - px;
+      const dy = rect.height - dot.stack * DOT_STEP - 3.5 - py;
+      const dist = dx * dx + dy * dy;
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = dot;
+      }
+    }
+
+    if (!best || best.film === hoverFilmRef.current) return;
+    hoverFilmRef.current = best.film;
+
+    const margin = Math.min(152, Math.max(0, rect.width / 2 - 8));
+    const x = Math.max(margin, Math.min(rect.width - margin, best.x * rect.width)) + 4;
+    const y = rect.height - best.stack * DOT_STEP - 7;
+    setHover({ film: best.film, x, y });
+  }, [dots]);
+
+  const trackPointer = useCallback((event) => {
+    pointerRef.current = { x: event.clientX, y: event.clientY };
+    if (!frameRef.current) frameRef.current = requestAnimationFrame(applyNearest);
+  }, [applyNearest]);
+
+  const showAtPointer = useCallback((event) => {
+    pointerRef.current = { x: event.clientX, y: event.clientY };
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    frameRef.current = 0;
+    applyNearest();
+  }, [applyNearest]);
+
+  const clearHover = useCallback(() => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    frameRef.current = 0;
+    pointerRef.current = null;
+    hoverFilmRef.current = null;
+    setHover(null);
+  }, []);
+
+  useEffect(() => () => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
   }, []);
 
   return (
-    <div className={`rd-dotfield ${className}`.trim()} ref={wrapRef}>
+    <div className={`rd-dotfield ${className}`.trim()}>
       <div
         className="rd-dotfield-plot"
         role="img"
         aria-label={ariaLabel}
-        onMouseLeave={() => setHover(null)}
+        ref={plotRef}
+        onPointerMove={trackPointer}
+        onPointerDown={showAtPointer}
+        onPointerLeave={clearHover}
+        onPointerCancel={clearHover}
       >
         {children}
-        <DotScatter dots={dots} onDotEnter={showDot} />
+        <DotScatter dots={dots} />
       </div>
 
       {hover && (
@@ -736,7 +899,7 @@ function BookendsBand({ bookends }) {
   const sameRating = best && worst && best.rating === worst.rating;
 
   return (
-    <section className="rd-band" id="rd-bookends" aria-labelledby="rd-bookends-title">
+    <section className="rd-band" aria-labelledby="rd-bookends-title">
       <div className="rd-band-inner">
         <BandHead id="rd-bookends-title" number="03" title="The Bookends" note="where you started, where you are, and the calls you stand by" />
 
@@ -839,7 +1002,7 @@ function BookendsBand({ bookends }) {
  */
 function ExtremesBand({ popularity, era }) {
   return (
-    <section className="rd-band" id="rd-extremes" aria-labelledby="rd-extremes-title">
+    <section className="rd-band" aria-labelledby="rd-extremes-title">
       <div className="rd-band-inner">
         <BandHead id="rd-extremes-title" number="02" title="The Extremes" note="the shallow end, the deep end, and the edges of your timeline" />
 
@@ -901,7 +1064,7 @@ function ExtremesBand({ popularity, era }) {
  */
 function LedgerBand({ milestones }) {
   return (
-    <section className="rd-band" id="rd-ledger" aria-labelledby="rd-ledger-title">
+    <section className="rd-band" aria-labelledby="rd-ledger-title">
       <div className="rd-band-inner">
         <BandHead id="rd-ledger-title" number="04" title="The Ledger" note="the dates your log hit a round number" />
 
@@ -973,10 +1136,13 @@ export default function Random() {
   const stats = useRandomStats(enrichedData);
 
   return (
-    <div className="rd-section" id="section-08">
+    <div className="rd-section" id="section-08" data-section>
       <header className="rd-header">
         <div className="rd-header-inner">
-          <div className="rd-ghost-number" aria-hidden="true">08</div>
+          <div className="rd-ghost-number" aria-hidden="true">
+            <span>0</span>
+            <span>8</span>
+          </div>
           <div className="rd-header-copy">
             <div className="rd-section-label">Section 08 / The Deep Cuts</div>
             <h2 className="rd-title">
@@ -987,7 +1153,6 @@ export default function Random() {
             </p>
           </div>
         </div>
-        <ChapterIndex />
       </header>
 
       {!stats.hasData ? (

@@ -1,60 +1,20 @@
 /* Rhythm.css */
 
 .ry-section {
-  min-height: 100vh;
-  padding: var(--space-12) 80px var(--space-16);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-/* Header (matches the incumbent section header) */
-.ry-header {
-  text-align: center;
-  margin-bottom: var(--space-12);
-  max-width: 900px;
-}
-
-.ry-section-label {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--color-text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: var(--space-4);
-}
-
-.ry-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5.5vw, 4.2rem);
-  font-weight: 900;
-  color: var(--color-text);
-  margin-bottom: var(--space-3);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.ry-subtitle {
-  font-size: 1.2rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
+  --chapter-accent: var(--color-accent-3);
+  --chapter-surface: var(--color-panel-02);
 }
 
 /* Empty state */
 .ry-empty {
   max-width: 520px;
   width: 100%;
-  padding: var(--space-8);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
+  padding: var(--space-8) 0 0;
+  border-top: 1px solid var(--color-rule);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
-  text-align: center;
   color: var(--color-text-muted);
 }
 
@@ -66,90 +26,14 @@
   color: var(--color-accent);
 }
 
-/* Bento grid */
-.ry-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
-  width: 100%;
-  max-width: 1400px;
-}
-
-/* Card base */
+/* Ruled instrument panels */
 .ry-card {
-  min-width: 0;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: var(--space-8);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  gap: var(--space-4);
 }
 
-/* the heatmap card lets its tooltip float above everything else */
+/* the heatmap panel lets its tooltip float above everything else */
 .ry-card:has(.ry-heat) {
   overflow: visible;
-}
-
-.ry-span-2 {
-  grid-column: span 2;
-}
-
-.ry-span-3 {
-  grid-column: span 3;
-}
-
-/* Card head */
-.ry-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.ry-card-title-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.ry-card-icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  background: var(--color-surface-raised);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
-}
-
-.ry-card-label {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--color-text);
-}
-
-.ry-card-note {
-  font-size: 0.86rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  text-align: right;
-}
-
-/* helper line nudging users to click a heatmap day */
-.ry-click-hint {
-  margin-top: -4px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-faint);
-  letter-spacing: 0.01em;
 }
 
 /* Hero numbers */
@@ -192,27 +76,26 @@
 .ry-year-nav {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  align-self: center;
+  gap: var(--space-2);
 }
 
 .ry-year-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
+  width: 38px;
+  height: 38px;
+  background: transparent;
+  border: 1px solid var(--color-rule-strong);
   border-radius: var(--radius-sm);
   color: var(--color-text);
   transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
 }
 
 .ry-year-btn:hover:not(:disabled) {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  background: var(--color-surface-active);
+  border-color: var(--color-accent-3);
+  color: var(--color-accent-3);
+  background: var(--color-surface);
 }
 
 .ry-year-btn:disabled {
@@ -227,10 +110,10 @@
 
 .ry-year-value {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.35rem;
   font-weight: 900;
   color: var(--color-text);
-  min-width: 76px;
+  min-width: 58px;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
@@ -272,8 +155,7 @@
   gap: var(--space-3);
   flex: 1;
   min-height: 0;
-  margin: calc(var(--space-2) * -1) calc(var(--space-8) * -1);
-  padding: var(--space-3) var(--space-8);
+  padding: var(--space-2) 0;
   overflow-x: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--color-muted-blue) transparent;
@@ -334,10 +216,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-2);
-  padding: var(--space-5) var(--space-4);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-rule);
 }
 
 .ry-mini-number {
@@ -776,31 +656,14 @@
   color: var(--color-text-muted);
 }
 
-/* Responsive: collapse to single column */
+/* Responsive: charts get shorter, panels keep their rules */
 @media (max-width: 1024px) {
-  .ry-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ry-span-2,
-  .ry-span-3 {
-    grid-column: span 1;
-  }
-
-  .ry-card-note {
-    display: none;
-  }
-
   .ry-evo {
     height: 300px;
   }
 }
 
 @media (max-width: 768px) {
-  .ry-section {
-    padding: var(--space-10) 24px var(--space-12);
-  }
-
   .ry-evo {
     height: 270px;
   }
@@ -822,32 +685,8 @@
 }
 
 @media (max-width: 640px) {
-  .ry-section {
-    padding: var(--space-8) var(--space-6) var(--space-10);
-  }
-
-  .ry-card {
-    padding: var(--space-6);
-  }
-
-  /* Card heads stack so the title never fights the year nav for width */
-  .ry-card-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .ry-year-nav {
-    align-self: center;
-  }
-
-  .ry-year-btn {
-    width: 44px;
-    height: 44px;
-  }
-
-  .ry-year-value {
-    font-size: 1.6rem;
-    min-width: 58px;
+    align-self: flex-start;
   }
 
   .ry-hero-numbers {
@@ -856,14 +695,6 @@
 
   .ry-evo {
     height: 220px;
-  }
-
-  /* Strip bleeds to the smaller card padding on phones */
-  .ry-streak-films {
-    margin-left: calc(var(--space-6) * -1);
-    margin-right: calc(var(--space-6) * -1);
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
   }
 
   .ry-comfort-item {
