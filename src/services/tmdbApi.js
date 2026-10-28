@@ -1,6 +1,11 @@
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const CACHE_KEY_PREFIX = 'lbxd_tmdb_cache_';
 const CACHE_VERSION = 'v4';
+const CATALOG_CACHE_PREFIX = 'lbxd_tmdb_catalog_';
+const CATALOG_CACHE_VERSION = 'v3';
+const CATALOG_PAGES = 10;
+const CATALOG_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const CATALOG_KINDS = ['popular', 'top_rated'];
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 300;
 // how many top billed cast members we keep per film, enough for the "most
@@ -769,4 +774,120 @@ export async function enrichMovies(movies, apiKey, onProgress) {
 
   setCache(cacheKey, enriched);
   return enriched;
+}
+
+/**
+ * Reads a cached TMDB movie catalog when it is still fresh.
+ *
+ * The global lists barely change, so hammering discover every single page load
+ * is just burning requests for no reason. A week is enough.
+ *
+ * Args:
+ *   key (string): Versioned catalog cache key.
+ *
+ * Returns:
+ *   Array<Object>|null: Cached catalog items or null when missing or stale.
+ */
+function readCatalogCache(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.items)) return null;
+    if (Date.now() - (parsed.savedAt || 0) > CATALOG_TTL_MS) return null;
+    return parsed.items;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Persists a TMDB movie catalog with its timestamp.
+ *
+ * Args:
+ *   key (string): Versioned catalog cache key.
+ *   items (Array<Object>): Normalised catalog items.
+ *
+ * Returns:
+ *   void
+ */
+function writeCatalogCache(key, items) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), items }));
+  } catch (e) {
+    console.warn('tmdbApi: could not cache the global catalog list', e);
+  }
+}
+
+/**
+ * Normalises one TMDB discover result into the shape the app reads.
+ *
+ * Args:
+ *   result (Object): Raw TMDB movie result.
+ *
+ * Returns:
+ *   Object: Normalised catalog item with tmdbId, name, year, votes and poster.
+ */
+function normalizeCatalogItem(result) {
+  const year = result.release_date
+    ? parseInt(result.release_date.substring(0, 4), 10)
+    : null;
+
+  return {
+    tmdbId: result.id,
+    name: result.title || result.original_title || '',
+    year: Number.isFinite(year) ? year : null,
+    voteAverage: result.vote_average || null,
+    voteCount: result.vote_count || null,
+    popularity: result.popularity || null,
+    posterPath: result.poster_path || null,
+  };
+}
+
+/**
+ * Downloads a global all time TMDB movie catalog and caches it for a week.
+ *
+ * The section needs to know what everyone else has seen, not only what the
+ * user already logged, and it needs to be all time, not whatever is trending
+ * this week. So the popular list is sorted by total vote count, the closest
+ * thing TMDB has to "everyone has seen this", and the critics list is sorted
+ * by average rating with a 5,000 vote floor so a brand new direct to video
+ * title cannot sneak in with forty fanboys. Ten pages per list is 200 films,
+ * plenty to find a gap even for heavy users, and it happens once.
+ *
+ * Args:
+ *   kind (string): Either 'popular' or 'top_rated'.
+ *   apiKey (string, optional): TMDB API v3 key. Defaults to the env key.
+ *   pages (number, optional): Pages to fetch. Defaults to 10.
+ *
+ * Returns:
+ *   Promise<Array<Object>>: Normalised catalog items, deduped by TMDB id.
+ */
+export async function fetchMovieCatalog(kind, apiKey = TMDB_API_KEY, pages = CATALOG_PAGES) {
+  if (!CATALOG_KINDS.includes(kind) || !hasTmdbKey(apiKey)) return [];
+
+  const cacheKey = `${CATALOG_CACHE_PREFIX}${CATALOG_CACHE_VERSION}_${kind}_${pages}`;
+  const cached = readCatalogCache(cacheKey);
+  if (cached) return cached;
+
+  const items = [];
+  const seenIds = new Set();
+
+  for (let page = 1; page <= pages; page++) {
+    const params = kind === 'top_rated'
+      ? { sort_by: 'vote_average.desc', 'vote_count.gte': 5000, page }
+      : { sort_by: 'vote_count.desc', 'vote_count.gte': 1000, page };
+
+    const data = await fetchTmdb('/discover/movie', params, apiKey);
+    if (!data) break;
+
+    for (const result of data.results || []) {
+      if (!result || !result.id || seenIds.has(result.id)) continue;
+      seenIds.add(result.id);
+      items.push(normalizeCatalogItem(result));
+    }
+  }
+
+  if (items.length > 0) writeCatalogCache(cacheKey, items);
+  return items;
 }

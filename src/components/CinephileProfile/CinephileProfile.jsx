@@ -1373,8 +1373,10 @@ function WorldMapChart({ worldMap }) {
     if (!geoData) return [];
     return geoData.features
       .filter((f) => Number(f.id) !== 10)
-      .map((f) => ({
-        id: String(f.id).padStart(3, '0'),
+      .map((f, index) => ({
+        // some world-atlas features come back without an id, and stringifying
+        // undefined gave every one of them the same "undefined" key. Hostia.
+        id: f.id != null ? String(f.id).padStart(3, '0') : `x${index}`,
         d: geometryToPath(f.geometry),
       }));
   }, [geoData]);

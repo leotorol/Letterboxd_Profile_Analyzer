@@ -21,7 +21,13 @@ export default function PosterTip({ film, sub, stackCount = 0, style }) {
     <div className="poster-tip" style={style}>
       <div className="poster-tip-card">
         {film.posterPath && (
-          <img src={TMDB_POSTER_SMALL + film.posterPath} alt="" className="poster-tip-poster" />
+          <img
+            src={TMDB_POSTER_SMALL + film.posterPath}
+            alt=""
+            className="poster-tip-poster"
+            decoding="async"
+            draggable={false}
+          />
         )}
         <div className="poster-tip-info">
           <span className="poster-tip-title">{film.name}</span>

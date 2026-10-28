@@ -18,5 +18,11 @@ export function tipPosition(wrap, node, margin = 90) {
   const rect = node.getBoundingClientRect();
   const x = rect.left - wrapRect.left + rect.width / 2;
   const y = rect.top - wrapRect.top;
-  return { x: Math.max(margin, Math.min(wrapRect.width - margin, x)), y };
+  // a fixed clamp margin can be wider than half a narrow phone chart, which
+  // pushed the tooltip off screen. Cap it to the wrapper instead.
+  const safeMargin = Math.min(margin, Math.max(0, wrapRect.width / 2 - 8));
+  return {
+    x: Math.max(safeMargin, Math.min(wrapRect.width - safeMargin, x)),
+    y,
+  };
 }

@@ -13,12 +13,19 @@ Letterboxd lets you **export your entire account** as a ZIP file containing CSV 
 Everything runs **100% in your browser** — no data ever leaves your machine. It:
 
 1. Unzips and parses your Letterboxd export locally (via JSZip + PapaParse).
-2. Enriches each movie with extra data (runtime, directors, genres, budget, posters, etc.) from the TMDB API.
-3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" spectrum, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, random fun stats, and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
+2. Enriches each movie with extra data (runtime, directors, genres, budget, posters, etc.) from the TMDB API. Section 08 also pulls two public all-time TMDB lists (most rated and top rated) for the global gap, cached for a week.
+3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" spectrum, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, the deep cuts (global gap, popularity and release year extremes, first/last and best/worst bookends, adaptive milestone ledger), and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
 
-> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies), 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map), 04 (Ratings / consensus, contrarian level & decades), 05 (Cast & Money / most watched faces, favourite duo, studios, budget vs box office), 06 (Reviews / word cloud, review length box plot & most substantial reviews), and 07 (Watchlist / graveyard, growth chart, average wait) are built and wired into the app. The remaining scroll sections are the next steps.
+> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies), 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map), 04 (Ratings / consensus, contrarian level & decades), 05 (Cast & Money / most watched faces, favourite duo, studios, budget vs box office), 06 (Reviews / word cloud, review length box plot & most substantial reviews), 07 (Watchlist / graveyard, growth chart, average wait) and 08 (The Deep Cuts / global gap, popularity & release year extremes, first/last & best/worst bookends, adaptive milestone ledger) are built and wired into the app. The remaining scroll sections are the next steps.
 
-The free TMDB API rate limit is generous but not unlimited, so the app batches requests, caches results in `localStorage`, and shows a live progress screen while it enriches your films. The same export is cached to speed up future loads.
+### Section 08 in detail
+
+- **The Gap:** the most rated and the best rated all-time TMDB films that are still missing from your log, plus a 100 film coverage reel.
+- **The Extremes:** every film as a dot on a log scale of TMDB votes, and a release year timeline with the oldest and newest films.
+- **The Bookends:** where your log started, where it is now, and the films you rated highest and lowest.
+- **The Ledger:** milestones that adapt to the size of your log. Under 50 films it shows a nudge instead of an empty staircase, then steps of 50, 100, 500 and up as the library grows.
+
+The free TMDB API rate limit is generous but not unlimited, so the app batches requests, caches results in `localStorage`, and shows a live progress screen while it enriches your films. The same export is cached to speed up future loads. The global all-time lists are cached separately for seven days.
 
 ## Tech stack
 
@@ -33,7 +40,7 @@ The free TMDB API rate limit is generous but not unlimited, so the app batches r
 ## Prerequisites
 
 - [Node.js](https://nodejs.org) (v18+ recommended, along with npm)
-- A (free) [TMDB API key](https://www.themoviedb.org/settings/api) — only needed for runtime/director/genre enrichment. Without it the app still works, but those stats are unavailable.
+- A (free) [TMDB API key](https://www.themoviedb.org/settings/api) — needed for the TMDB powered sections (metadata enrichment, the all-time gap, popularity extremes and bookends ratings). Without it the app still works, but those stats fall back gracefully.
 
 ## Running locally
 
@@ -50,7 +57,7 @@ The free TMDB API rate limit is generous but not unlimited, so the app batches r
    VITE_TMDB_API_KEY=your_read_access_token_here
    ```
 
-   You can grab a free key from <https://www.themoviedb.org/settings/api>. If you skip this, the app won't crash — it just won't have runtime/director/genre data.
+   You can grab a free key from <https://www.themoviedb.org/settings/api>. If you skip this, the app won't crash. The TMDB powered sections show their fallback states instead.
 
 3. Start the dev server:
 
@@ -98,10 +105,11 @@ letterboxd stats/
 │   │   ├── useRatingStats.js  # Derives all stats for the Ratings section
 │   │   ├── useReviewStats.js  # Derives all stats for the Reviews section
 │   │   ├── useRhythmStats.js  # Derives all temporal stats for the Rhythm section
+│   │   ├── useRandomStats.js  # Derives the gap, extremes, bookends & milestone stats
 │   │   └── useWatchlistStats.js # Derives stats for the Watchlist section
 │   ├── services/
 │   │   ├── zipParser.js       # Unzips export and parses the CSVs
-│   │   └── tmdbApi.js         # TMDB search/enrichment, scored matching + cache
+│   │   └── tmdbApi.js         # TMDB search/enrichment, all-time catalogs, scored matching + cache
 │   ├── utils/
 │   │   ├── dateFormat.js      # Date formatting + shared month/day labels
 │   │   ├── films.js           # Shared rewatch dedupe for the stats hooks
@@ -119,6 +127,7 @@ letterboxd stats/
 │   │   ├── icons/                # Shared inline SVG icons
 │   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
 │   │   ├── QuickFacts/           # Section 01: quick facts (Bento dashboard)
+│   │   ├── Random/               # Section 08: the deep cuts (gap, extremes, bookends, ledger)
 │   │   ├── Ratings/              # Section 04: consensus, contrarian level, decades
 │   │   ├── Reviews/              # Section 06: word cloud, review length box plot, best reviews
 │   │   ├── Rhythm/               # Section 02: heatmap, streaks, pace, comfort movies
@@ -130,4 +139,4 @@ letterboxd stats/
 
 ## Data privacy
 
-Your Letterboxd export is parsed and enriched entirely in the browser. Raw movie metadata (title + year) is sent to TMDB to fetch extra details, but no personal account data is transmitted or stored anywhere. Enrichment results are cached in your browser's `localStorage` only.
+Your Letterboxd export is parsed and enriched entirely in the browser. Raw movie metadata (title + year) is sent to TMDB to fetch extra details, but no personal account data is transmitted or stored anywhere. Enrichment results are cached in your browser's `localStorage` only. The section 08 all-time lists are public TMDB catalog data, cached separately for seven days.
