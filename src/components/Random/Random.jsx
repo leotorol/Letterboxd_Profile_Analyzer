@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useRandomStats } from '../../hooks/useRandomStats';
+import useSectionMotion from '../../hooks/useSectionMotion';
 import { formatIsoDate } from '../../utils/dateFormat';
 import { tipPosition } from '../../utils/positionTip';
 import { TMDB_POSTER_LARGE, TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
@@ -22,6 +23,7 @@ import './Random.css';
  */
 
 const DOT_STEP = 8;
+const COUNT_FORMAT = new Intl.NumberFormat('en-US');
 
 /**
  * Formats a number with English thousands separators.
@@ -34,7 +36,7 @@ const DOT_STEP = 8;
  */
 function formatCount(value) {
   if (value == null || !Number.isFinite(value)) return '0';
-  return new Intl.NumberFormat('en-US').format(value);
+  return COUNT_FORMAT.format(value);
 }
 
 /**
@@ -270,12 +272,13 @@ function CoverageStrip({ gap }) {
 
   // keep the 100 squares stable across tooltip updates, otherwise every cell
   // crossing re renders the entire strip and it feels like wet mud
-  const cellNodes = useMemo(() => gap.cells.map((cell) => {
+  const cellNodes = useMemo(() => gap.cells.map((cell, index) => {
     const isGap = gap.popular != null && cell.tmdbId === gap.popular.tmdbId;
     return (
       <span
         key={cell.tmdbId}
         className={`rd-cell${cell.seen ? ' is-seen' : ' is-missing'}${isGap ? ' is-gap' : ''}`}
+        style={{ '--i': index }}
         onPointerEnter={(event) => trackCell(cell, event.currentTarget)}
         onPointerDown={(event) => trackCell(cell, event.currentTarget)}
       />
@@ -425,7 +428,7 @@ function GapBand({ gap, catalogState, retryCatalog }) {
     : 'This is the best rated film of all time on TMDB that is still missing from your log.';
 
   return (
-    <section className="rd-band" aria-labelledby="rd-gap-title">
+    <section className="rd-band" aria-labelledby="rd-gap-title" data-reveal>
       <div className="rd-band-inner">
         <BandHead id="rd-gap-title" number="01" title="The Gap" note="the films everyone else got to first" />
 
@@ -525,7 +528,11 @@ const DotScatter = memo(function DotScatter({ dots }) {
         <span
           key={`${dot.film.name}-${dot.film.year}-${index}`}
           className="rd-dot"
-          style={{ left: `${dot.x * 100}%`, bottom: `${dot.stack * DOT_STEP}px` }}
+          style={{
+            left: `${dot.x * 100}%`,
+            bottom: `${dot.stack * DOT_STEP}px`,
+            '--dot-x': dot.x,
+          }}
         />
       ))}
     </>
@@ -899,7 +906,7 @@ function BookendsBand({ bookends }) {
   const sameRating = best && worst && best.rating === worst.rating;
 
   return (
-    <section className="rd-band" aria-labelledby="rd-bookends-title">
+    <section className="rd-band" aria-labelledby="rd-bookends-title" data-reveal>
       <div className="rd-band-inner">
         <BandHead id="rd-bookends-title" number="03" title="The Bookends" note="where you started, where you are, and the calls you stand by" />
 
@@ -1002,7 +1009,7 @@ function BookendsBand({ bookends }) {
  */
 function ExtremesBand({ popularity, era }) {
   return (
-    <section className="rd-band" aria-labelledby="rd-extremes-title">
+    <section className="rd-band" aria-labelledby="rd-extremes-title" data-reveal>
       <div className="rd-band-inner">
         <BandHead id="rd-extremes-title" number="02" title="The Extremes" note="the shallow end, the deep end, and the edges of your timeline" />
 
@@ -1064,7 +1071,7 @@ function ExtremesBand({ popularity, era }) {
  */
 function LedgerBand({ milestones }) {
   return (
-    <section className="rd-band" aria-labelledby="rd-ledger-title">
+    <section className="rd-band" aria-labelledby="rd-ledger-title" data-reveal>
       <div className="rd-band-inner">
         <BandHead id="rd-ledger-title" number="04" title="The Ledger" note="the dates your log hit a round number" />
 
@@ -1134,11 +1141,13 @@ function LedgerBand({ milestones }) {
 export default function Random() {
   const { enrichedData } = useData();
   const stats = useRandomStats(enrichedData);
+  const sectionRef = useRef(null);
+  useSectionMotion(sectionRef);
 
   return (
-    <div className="rd-section" id="section-08" data-section>
+    <div className="rd-section" id="section-08" data-section ref={sectionRef}>
       <header className="rd-header">
-        <div className="rd-header-inner">
+        <div className="rd-header-inner" data-reveal>
           <div className="rd-ghost-number" aria-hidden="true">
             <span>0</span>
             <span>8</span>
@@ -1156,7 +1165,7 @@ export default function Random() {
       </header>
 
       {!stats.hasData ? (
-        <section className="rd-band">
+        <section className="rd-band" data-reveal>
           <div className="rd-band-inner">
             <PanelState
               title="Nothing to riff on yet"

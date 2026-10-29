@@ -22,6 +22,12 @@ import './Watchlist.css';
 
 // SVG icons owned by this section
 
+/**
+ * Gravestone glyph used by the graveyard panel head.
+ *
+ * Returns:
+ *   JSX.Element: The inline SVG icon.
+ */
 const GravestoneIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 21V11a7 7 0 0 1 14 0v10" />
@@ -31,6 +37,12 @@ const GravestoneIcon = () => (
   </svg>
 );
 
+/**
+ * Up and down trend glyph used by the growth panel head.
+ *
+ * Returns:
+ *   JSX.Element: The inline SVG icon.
+ */
 const TrendIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="22 12 18 8 14 12" />
@@ -40,6 +52,12 @@ const TrendIcon = () => (
   </svg>
 );
 
+/**
+ * Clock glyph used by the waiting time panel head.
+ *
+ * Returns:
+ *   JSX.Element: The inline SVG icon.
+ */
 const ClockIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
@@ -54,6 +72,14 @@ const PAD_L = 42;
 const PAD_R = 16;
 const PAD_T = 24;
 const PAD_B = 40;
+
+// verdict copy lives outside the component so it is not rebuilt every render
+const VERDICT_COPY = {
+  losing: 'You are adding films faster than you watch them. The pile keeps growing.',
+  winning: 'You are watching faster than you add. The pile is actually shrinking.',
+  even: 'Additions and watches are roughly balanced. The pile stays about the same.',
+  none: 'Not enough recent data to judge the trend.',
+};
 
 /**
  * Area chart overlaying monthly watchlist additions vs films watched.
@@ -122,10 +148,10 @@ function GrowthChart({ series }) {
   }
 
   const { trimmed, n, xAt, yAt, baseline, ticks, yearLabels } = chart;
-  const slotW = (CHART_W - PAD_L - PAD_R) / n;
+  const slotW = chart.plotW / n;
 
   return (
-    <div className="wl-growth" style={{ position: 'relative' }}>
+    <div className="wl-growth">
       <svg
         className="wl-growth-svg"
         viewBox={`0 0 ${CHART_W} ${CHART_H}`}
@@ -349,6 +375,30 @@ function SectionHeader({ subtitle }) {
 }
 
 /**
+ * Shared shell for the empty and populated watchlist states.
+ *
+ * Args:
+ *   subtitle (string): Contextual sentence shown under the title.
+ *   children (ReactNode): Section body.
+ *
+ * Returns:
+ *   JSX.Element: The watchlist chapter wrapper.
+ */
+function WatchlistShell({ subtitle, children }) {
+  return (
+    <div
+      className="lb-chapter wl-section"
+      id="section-07"
+      data-section
+      style={{ '--chapter-ambient': '255, 107, 107' }}
+    >
+      <SectionHeader subtitle={subtitle} />
+      {children}
+    </div>
+  );
+}
+
+/**
  * Section 07: Watchlist. Closes the analytical block by looking forward.
  *
  * Returns:
@@ -360,13 +410,7 @@ export default function Watchlist() {
 
   if (!stats.hasData) {
     return (
-      <div
-        className="lb-chapter wl-section"
-        id="section-07"
-        data-section
-        style={{ '--chapter-ambient': '255, 107, 107' }}
-      >
-        <SectionHeader subtitle="Your watchlist is empty. Add some films on Letterboxd, export your data again, and this section will show you what you have been putting off." />
+      <WatchlistShell subtitle="Your watchlist is empty. Add some films on Letterboxd, export your data again, and this section will show you what you have been putting off.">
         <div className="lb-grid">
           <section className="lb-panel is-vault wl-card lb-col-12">
             <p className="wl-empty">
@@ -374,39 +418,17 @@ export default function Watchlist() {
             </p>
           </section>
         </div>
-      </div>
+      </WatchlistShell>
     );
   }
 
   const { growth } = stats;
-
-  const verdictMap = {
-    losing: {
-      text: 'You are adding films faster than you watch them. The pile keeps growing.',
-    },
-    winning: {
-      text: 'You are watching faster than you add. The pile is actually shrinking.',
-    },
-    even: {
-      text: 'Additions and watches are roughly balanced. The pile stays about the same.',
-    },
-    none: {
-      text: 'Not enough recent data to judge the trend.',
-    },
-  };
-  const verdictInfo = verdictMap[growth.verdict] || verdictMap.none;
+  const verdictText = VERDICT_COPY[growth.verdict] || VERDICT_COPY.none;
 
   return (
-    <div
-      className="lb-chapter wl-section"
-      id="section-07"
-      data-section
-      style={{ '--chapter-ambient': '255, 107, 107' }}
+    <WatchlistShell
+      subtitle={`You have watched a lot. But there are ${stats.watchlistSize.toLocaleString()} films you told yourself you would get to. Let's see how that is going.`}
     >
-      <SectionHeader
-        subtitle={`You have watched a lot. But there are ${stats.watchlistSize.toLocaleString()} films you told yourself you would get to. Let's see how that is going.`}
-      />
-
       <div className="lb-grid">
         {/* Graveyard: full width hero panel */}
         <section className="lb-panel is-vault wl-card lb-col-12" aria-label="Watchlist graveyard">
@@ -429,12 +451,12 @@ export default function Watchlist() {
           />
           <GrowthChart series={growth.series} />
           <div className="wl-verdict">
-            {verdictInfo.text}
+            {verdictText}
           </div>
         </section>
 
         {/* Average age card */}
-        <section className="lb-panel is-vault wl-card lb-col-4" aria-label="Average watchlist age">
+        <section className="lb-panel is-vault wl-card wl-wait-card lb-col-4" aria-label="Average watchlist age">
           <PanelHead
             icon={<ClockIcon />}
             accent="var(--color-accent-3)"
@@ -447,6 +469,6 @@ export default function Watchlist() {
           />
         </section>
       </div>
-    </div>
+    </WatchlistShell>
   );
 }

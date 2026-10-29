@@ -13,6 +13,13 @@
   padding: 104px 18px 28px;
   background: #0a0a15;
   border-right: 1px solid var(--color-rule);
+  transition: background-color 280ms ease, border-color 280ms ease;
+}
+
+/* the last chapter kills the lights, rail included */
+.lb-rail.is-final {
+  background: #000;
+  border-right-color: rgba(255, 255, 255, 0.06);
 }
 
 .lb-rail-title {
@@ -62,6 +69,54 @@
   color: inherit;
 }
 
+/* the active number lights up with its chapter accent: green, orange, blue */
+.lb-rail-list > li:nth-child(3n + 1) .lb-rail-link.is-active .lb-rail-num {
+  color: var(--color-lb-green);
+}
+
+.lb-rail-list > li:nth-child(3n + 2) .lb-rail-link.is-active .lb-rail-num {
+  color: var(--color-lb-orange);
+}
+
+.lb-rail-list > li:nth-child(3n) .lb-rail-link.is-active .lb-rail-num {
+  color: var(--color-lb-blue);
+}
+
+/* the final round borrows all three accents in one perpetual sliding gradient */
+.lb-rail-list > li:nth-child(9) .lb-rail-link.is-active .lb-rail-num {
+  width: max-content;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-lb-green) 0%,
+    var(--color-lb-orange) 33.33%,
+    var(--color-lb-blue) 66.66%,
+    var(--color-lb-green) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: rail-shift 2.5s linear infinite alternate;
+}
+
+@keyframes rail-shift {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-rail-list > li:nth-child(9) .lb-rail-link.is-active .lb-rail-num {
+    animation: none;
+  }
+}
+
 .lb-rail-name {
   font-family: var(--font-display);
   font-size: 0.64rem;
@@ -76,10 +131,6 @@
 .lb-rail-link.is-active {
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.05);
-}
-
-.lb-rail-link.is-active .lb-rail-num {
-  color: var(--color-accent);
 }
 
 @media (min-width: 1200px) {
@@ -101,6 +152,11 @@
     border-right: 0;
     border-top: 1px solid var(--color-rule);
     background: #0a0a15;
+  }
+
+  .lb-rail.is-final {
+    background: #000;
+    border-top-color: rgba(255, 255, 255, 0.06);
   }
 
   .lb-rail-title {

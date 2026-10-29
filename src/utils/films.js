@@ -1,4 +1,18 @@
 /**
+ * Builds the identity key used to match a film across sources.
+ *
+ * Args:
+ *   name (string): Film title.
+ *   year (number|null): Release year.
+ *
+ * Returns:
+ *   string: Lowercased title plus year fingerprint.
+ */
+export function filmKey(name, year) {
+  return `${String(name || '').trim().toLowerCase()}::${year ?? ''}`;
+}
+
+/**
  * Drops duplicate logs of the same film.
  *
  * Letterboxd happily piles the same film up dozens of times (rewatches,
@@ -20,8 +34,7 @@ export function dedupeFilms(rows) {
 
   for (const movie of rows) {
     if (!movie) continue;
-    const name = String(movie.name || '').trim().toLowerCase();
-    const key = `${name}::${movie.year ?? ''}`;
+    const key = filmKey(movie.name, movie.year);
     if (seen.has(key)) continue;
     seen.add(key);
     unique.push(movie);

@@ -10,32 +10,37 @@ Letterboxd lets you **export your entire account** as a ZIP file containing CSV 
 
 ## What this app does
 
-Everything runs **100% in your browser** — no data ever leaves your machine. It:
+Everything is parsed and computed in your browser. Account data never leaves your machine; only movie titles and years go to TMDB for enrichment. It:
 
 1. Unzips and parses your Letterboxd export locally (via JSZip + PapaParse).
 2. Enriches each movie with extra data (runtime, directors, genres, budget, posters, etc.) from the TMDB API. Section 08 also pulls two public all-time TMDB lists (most rated and top rated) for the global gap, cached for a week.
-3. Renders a scoreboard of scroll sections: quick facts, watch-time habits & heatmaps, your "cinephile DNA" spectrum, ratings vs. consensus, actors, enriched metadata, your reviews as word clouds, watchlist graveyard, the deep cuts (global gap, popularity and release year extremes, first/last and best/worst bookends, adaptive milestone ledger), and a Pasapalabra-style trivia game. All wrapped in an animated space-themed background with twinkling stars and nebula effects.
+3. Renders nine scroll chapters wrapped in an animated space background with twinkling stars and nebula effects.
 
-> Status: Sections 01 (Quick Facts), 02 (Rhythm / heatmaps & comfort movies), 03 (Cinephile Profile / spectrum, genres, taste, diversity & world map), 04 (Ratings / consensus, contrarian level & decades), 05 (Cast & Money / most watched faces, favourite duo, studios, budget vs box office), 06 (Reviews / word cloud, review length box plot & most substantial reviews), 07 (Watchlist / graveyard, growth chart, average wait) and 08 (The Deep Cuts / global gap, popularity & release year extremes, first/last & best/worst bookends, adaptive milestone ledger) are built and wired into the app. The remaining scroll sections are the next steps.
+## Sections
 
-### Section 08 in detail
+| # | Chapter | What it shows |
+| - | ------- | ------------- |
+| 01 | Quick Facts | Watch time, film count, directors, average rating and watchlist size. |
+| 02 | Rhythm | GitHub style activity heatmap, streaks, weekday and month patterns, pace and comfort rewatches. |
+| 03 | Cinephile Profile | Taste spectrum, genre distribution, taste evolution, duration and year correlations, diversity and world map. |
+| 04 | Ratings | Your ratings against the Letterboxd consensus, contrarian level and highest rated decades. |
+| 05 | Cast and Money | Most watched faces, favourite director and actor duo, studios and budget vs box office. |
+| 06 | Reviews | Word cloud, review length over time and your most substantial reviews. |
+| 07 | Watchlist | The graveyard of films waiting the longest, growth vs watches and average wait. |
+| 08 | The Deep Cuts | The global gap, popularity and release year extremes, first and last bookends, best and worst calls, and the milestone ledger. |
+| 09 | A to Z | An interactive letter rosco with five record holders per letter, keyboard navigation and a next letter control. |
 
-- **The Gap:** the most rated and the best rated all-time TMDB films that are still missing from your log, plus a 100 film coverage reel.
-- **The Extremes:** every film as a dot on a log scale of TMDB votes, and a release year timeline with the oldest and newest films.
-- **The Bookends:** where your log started, where it is now, and the films you rated highest and lowest.
-- **The Ledger:** milestones that adapt to the size of your log. Under 50 films it shows a nudge instead of an empty staircase, then steps of 50, 100, 500 and up as the library grows.
+TMDB's free rate limit is generous but not unlimited, so enrichment requests are batched, results are cached in `localStorage` and the loading screen shows live progress. The all-time lists used by section 08 are cached separately for seven days.
 
-The free TMDB API rate limit is generous but not unlimited, so the app batches requests, caches results in `localStorage`, and shows a live progress screen while it enriches your films. The same export is cached to speed up future loads. The global all-time lists are cached separately for seven days.
+Section 10 (exporting the report as an image or PDF, plus vertical share cards) is still planned.
 
 ## Chapter system
 
-The scroll is built as eight chapters, each with its own editorial format, joined by a fixed chapter rail (a vertical spine on desktop, a swipeable strip on mobile). Three shared pieces keep them coherent without making them identical:
+The scroll is built as nine chapters, each with its own editorial format, joined by a fixed chapter rail (a vertical spine on desktop, a swipeable strip on mobile). Three shared pieces keep them coherent without making them identical:
 
 - `ChapterHeading`: the number, the chapter name, the title and an optional aside. Each section picks a variant (masthead, split, center, narrow, credit, manuscript).
 - `PanelHead`: the icon, label and micro note used by every panel.
 - A progressive panel surface ramp, from the light hook in `01` to the dark dossier in `08`. Flat panels stay transparent so the page keeps some air and variety.
-
-Each chapter also gets a subtle ambient tint, masked to fade in and out at the edges so consecutive chapters blend instead of meeting on a hard seam. Section `08` keeps its own archive dossier world and only inherits the rail offset.
 
 ## Tech stack
 
@@ -116,19 +121,22 @@ letterboxd stats/
 │   │   ├── useRatingStats.js  # Derives all stats for the Ratings section
 │   │   ├── useReviewStats.js  # Derives all stats for the Reviews section
 │   │   ├── useRhythmStats.js  # Derives all temporal stats for the Rhythm section
+│   │   ├── usePasapalabraStats.js # Derives the A to Z record cards for the final game
 │   │   ├── useRandomStats.js  # Derives the gap, extremes, bookends & milestone stats
+│   │   ├── useSectionMotion.js # Scroll reveals plus offscreen loop pausing
 │   │   └── useWatchlistStats.js # Derives stats for the Watchlist section
 │   ├── services/
 │   │   ├── zipParser.js       # Unzips export and parses the CSVs
 │   │   └── tmdbApi.js         # TMDB search/enrichment, all-time catalogs, scored matching + cache
 │   ├── utils/
 │   │   ├── dateFormat.js      # Date formatting + shared month/day labels
-│   │   ├── films.js           # Shared rewatch dedupe for the stats hooks
+│   │   ├── films.js           # Film identity key and rewatch dedupe
 │   │   ├── geometry.js        # Polar to cartesian helpers for SVG charts
 │   │   ├── positionTip.js     # Shared hover tooltip positioning for charts
 │   │   ├── ratingColor.js     # Shared 0..5 rating to emerald fill mapping
 │   │   ├── stats.js           # Shared mean / median / pearson helpers
-│   │   └── tmdbImages.js      # TMDB poster, profile and logo URL constants
+│   │   ├── tmdbImages.js      # TMDB poster, profile and logo URL constants
+│   │   └── watchlist.js       # Shared oldest watchlist selection and age window
 │   ├── components/
 │   │   ├── Cast/                 # Section 05: credits sheet (faces, duo, studios, money)
 │   │   ├── ChapterRail/          # Sticky chapter index (spine on desktop, strip on mobile)
@@ -138,6 +146,8 @@ letterboxd stats/
 │   │   ├── ErrorBoundary.jsx     # Catches render errors so the UI never breaks
 │   │   ├── icons/                # Shared inline SVG icons
 │   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
+│   │   ├── Pasapalabra/          # Section 09: black stage, letter rosco and answer card
+│   │   ├── PosterTip/            # Shared hover card used by the chart sections
 │   │   ├── QuickFacts/           # Section 01: compact masthead with five fact cards
 │   │   ├── Random/               # Section 08: the deep cuts (gap, extremes, bookends, ledger)
 │   │   ├── Ratings/              # Section 04: review page (consensus, contrarian, decades)

@@ -46,6 +46,21 @@
   );
 }
 
+/* Scroll reveals shared by the late chapters. the root is only armed by
+   useSectionMotion, so a dead script leaves the content fully visible. */
+.is-armed [data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 720ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.is-armed [data-reveal].is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Chapter heading */
 
 .lb-head {
@@ -273,6 +288,13 @@
   background: var(--chapter-surface, var(--color-surface-atlas));
   border-color: var(--color-rule);
   border-radius: var(--radius-md);
+}
+
+/* bare: no surface and no outline, but keep the card padding.
+   it sits after every surface modifier so it always wins the cascade */
+.lb-panel.is-bare {
+  background: transparent;
+  border-color: transparent;
 }
 
 /* Panel head mechanics */

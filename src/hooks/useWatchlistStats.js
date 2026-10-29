@@ -6,7 +6,6 @@ import { MONTH_LABELS, parseLbDate, diffDays, monthIndex } from '../utils/dateFo
 // months to look back when computing the recent pace
 const PACE_MONTHS = 6;
 
-
 /**
  * Builds the graveyard: the oldest movies still sitting in the watchlist.
  *
@@ -89,11 +88,12 @@ function computeAverageAge(watchlist, today) {
  * Args:
  *   watchlist (Array<Object>): Normalised watchlist rows.
  *   watched (Array<Object>): Normalised watched rows.
+ *   today (Date): Reference date for the recent pace window.
  *
  * Returns:
  *   Object: { series, addedPerMonth, watchedPerMonth, verdict }
  */
-function buildGrowthTimeline(watchlist, watched) {
+function buildGrowthTimeline(watchlist, watched, today) {
   const addedByMonth = new Map();
   const watchedByMonth = new Map();
   let minIdx = Infinity;
@@ -127,14 +127,12 @@ function buildGrowthTimeline(watchlist, watched) {
       year: Math.floor(i / 12),
       month: i % 12,
       label: `${MONTH_LABELS[i % 12]} ${Math.floor(i / 12)}`,
-      shortLabel: MONTH_LABELS[i % 12],
       added: addedByMonth.get(i) || 0,
       watched: watchedByMonth.get(i) || 0,
     });
   }
 
   // recent pace: last N months
-  const today = new Date();
   const recentStart = monthIndex(today) - PACE_MONTHS;
   let recentAdded = 0;
   let recentWatched = 0;
@@ -220,7 +218,7 @@ export function useWatchlistStats(rawData, enrichedWatchlist = null) {
     const today = new Date();
     const enrichedLookup = buildEnrichedLookup(enrichedWatchlist);
     const graveyard = buildGraveyard(watchlist, enrichedLookup, today);
-    const growth = buildGrowthTimeline(watchlist, watched);
+    const growth = buildGrowthTimeline(watchlist, watched, today);
     const averageAgeDays = computeAverageAge(watchlist, today);
 
     return {

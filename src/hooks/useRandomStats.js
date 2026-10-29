@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { dedupeFilms } from '../utils/films';
+import { dedupeFilms, filmKey } from '../utils/films';
 import { median } from '../utils/stats';
 import { diffDays, parseLbDate } from '../utils/dateFormat';
 import { fetchMovieCatalog, hasTmdbKey } from '../services/tmdbApi';
@@ -8,26 +8,19 @@ import { fetchMovieCatalog, hasTmdbKey } from '../services/tmdbApi';
 const CATALOG_WINDOW = 100;
 // the ledger refuses to start before this many films, small logs get a nudge
 const LEDGER_MIN = 50;
+// the ledger never shows more rungs than this, it just raises the step size
+const LEDGER_MAX_STEPS = 9;
+// round step sizes in ascending order, the first one that fits wins
+const LEDGER_STEPS = [
+  50, 100, 200, 250, 500,
+  1000, 2000, 2500, 5000, 10000, 25000, 50000, 100000,
+];
 const MIN_YEAR = 1888;
 // every dot plot splits the axis into this many stacking bins
 const DOT_BIN_COUNT = 80;
 // a stack taller than this would run out of chart, so the rest stay hidden
-const DOT_MAX_STACK_SPINE = 24;
-const DOT_MAX_STACK_RULER = 18;
-
-/**
- * Builds the identity key used to match films across sources.
- *
- * Args:
- *   name (string): Film title.
- *   year (number|null): Release year.
- *
- * Returns:
- *   string: Lowercased title plus year fingerprint.
- */
-function filmKey(name, year) {
-  return `${String(name || '').trim().toLowerCase()}::${year ?? ''}`;
-}
+const DOT_MAX_STACK_SPINE = 19;
+const DOT_MAX_STACK_RULER = 14;
 
 /**
  * Indexes every watched film by TMDB id and title fingerprint, plus its rating.
@@ -430,9 +423,10 @@ function buildBookends(rows) {
 /**
  * Picks the milestone step that fits the size of the user log.
  *
- * A 450 film log gets a rung every 50, a 1500 film log every 500, and a huge
- * log scales up again. The point is a readable staircase at any library size,
- * not one fixed list of round numbers that looks empty or unreadable.
+ * Walks up the round step ladder until the rung count lands under the cap, so
+ * a 450 film log gets a rung every 50, an 800 film log every 100 and a 1500
+ * film log every 200. The point is a readable staircase that never needs a
+ * scrollbar, not one fixed list that looks empty or overflows.
  *
  * Args:
  *   total (number): Total logged films.
@@ -442,12 +436,15 @@ function buildBookends(rows) {
  */
 function ledgerStep(total) {
   if (total < LEDGER_MIN) return null;
-  if (total < 500) return 50;
-  if (total < 1000) return 100;
-  if (total < 5000) return 500;
-  if (total < 10000) return 1000;
-  if (total < 20000) return 2000;
-  return 5000;
+
+  for (const step of LEDGER_STEPS) {
+    if (Math.floor(total / step) <= LEDGER_MAX_STEPS) return step;
+  }
+
+  // the ladder tops out at 100k. if someone logs an insane amount of films we
+  // still round up to a bigger step so the rung cap holds instead of exploding
+  const maxStep = LEDGER_STEPS[LEDGER_STEPS.length - 1];
+  return Math.ceil(total / LEDGER_MAX_STEPS / maxStep) * maxStep;
 }
 
 /**

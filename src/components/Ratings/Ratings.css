@@ -26,9 +26,7 @@
   max-width: 44ch;
 }
 
-/* ============================================================
-   CONSENSUS CARD: You vs the consensus (gems + overhyped)
-   ============================================================ */
+/* consensus card: you vs the consensus (gems and overhyped) */
 
 .rt-consensus-wrap {
   display: flex;
@@ -171,9 +169,7 @@
   color: var(--color-text-muted);
 }
 
-/* ============================================================
-   CONTRARIAN METER: radial persona ring
-   ============================================================ */
+/* contrarian meter: radial persona ring */
 
 .rt-contrarian-wrap {
   display: flex;
@@ -375,9 +371,7 @@
   }
 }
 
-/* ============================================================
-   DECADE SHOWCASE: poster walls per decade
-   ============================================================ */
+/* decade showcase: poster walls per decade */
 
 .rt-decades-wrap {
   display: flex;
@@ -515,9 +509,7 @@
   word-break: break-word;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* responsive */
 
 @media (max-width: 768px) {
   .rt-consensus-wrap {

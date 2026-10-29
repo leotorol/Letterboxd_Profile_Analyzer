@@ -106,9 +106,7 @@
   font-size: 1.8rem;
 }
 
-/* ============================================================
-   CAST BOARD: headliner plus ranked unit chart
-   ============================================================ */
+/* cast board: headliner plus ranked unit chart */
 
 .cs-cast {
   display: flex;
@@ -332,9 +330,7 @@
   color: var(--color-accent-3);
 }
 
-/* ============================================================
-   DUO: favourite director and actor pair
-   ============================================================ */
+/* duo: favourite director and actor pair */
 
 .cs-duo {
   display: flex;
@@ -442,9 +438,7 @@
   max-width: 440px;
 }
 
-/* ============================================================
-   STUDIOS: lollipop chart
-   ============================================================ */
+/* studios: lollipop chart */
 
 .cs-studios {
   --cs-studio-meta: 162px;
@@ -567,9 +561,7 @@
   letter-spacing: 0.06em;
 }
 
-/* ============================================================
-   MONEY: budget vs box office quadrant
-   ============================================================ */
+/* money: budget vs box office quadrant */
 
 .cs-money {
   display: flex;
@@ -733,9 +725,7 @@
   }
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* responsive */
 
 @media (max-width: 768px) {
   .cs-studios {

@@ -65,9 +65,7 @@
   border: 0;
 }
 
-/* ============================================================
-   WORD CLOUD: spiral packed words sized by frequency
-   ============================================================ */
+/* word cloud: spiral packed words sized by frequency */
 
 .rv-cloud {
   position: relative;
@@ -181,9 +179,7 @@
   }
 }
 
-/* ============================================================
-   REVIEW LENGTH BARS: average words per year
-   ============================================================ */
+/* review length bars: average words per year */
 
 .rv-bars {
   position: relative;
@@ -363,9 +359,7 @@
   color: var(--color-text);
 }
 
-/* ============================================================
-   FINGERPRINT: numeric portrait of the writer
-   ============================================================ */
+/* fingerprint: numeric portrait of the writer */
 
 .rv-fingerprint {
   display: flex;
@@ -435,9 +429,7 @@
   text-wrap: pretty;
 }
 
-/* ============================================================
-   FEATURED: hero review plus ranked picker
-   ============================================================ */
+/* featured: hero review plus ranked picker */
 
 /* The poster owns the left column, so the review text can never run underneath
    it. Inside the right column the picker floats, so an expanded review flows
@@ -682,9 +674,7 @@
   }
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* responsive */
 
 /* too narrow for the side column, so stack poster, review, then the picker */
 @media (max-width: 1080px) {

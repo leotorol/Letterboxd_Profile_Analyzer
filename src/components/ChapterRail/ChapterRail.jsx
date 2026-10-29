@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useActiveSection } from '../../hooks/useActiveSection';
 import './ChapterRail.css';
 
@@ -11,6 +11,7 @@ const CHAPTERS = [
   { id: 'section-06', number: '06', name: 'Reviews' },
   { id: 'section-07', number: '07', name: 'Watchlist' },
   { id: 'section-08', number: '08', name: 'Deep Cuts' },
+  { id: 'section-09', number: '09', name: 'A to Z' },
 ];
 
 /**
@@ -25,6 +26,45 @@ const CHAPTERS = [
 export default function ChapterRail() {
   const activeId = useActiveSection();
   const listRef = useRef(null);
+  const [pinnedId, setPinnedId] = useState(null);
+  const pinnedRef = useRef(null);
+  const jumpRef = useRef(false);
+  const settleTimer = useRef(0);
+
+  // when you click a chapter we highlight it right away, so the observer does
+  // not light up every number on the way there like a cheap disco
+  const handleJump = (id) => () => {
+    jumpRef.current = true;
+    pinnedRef.current = id;
+    setPinnedId(id);
+    window.clearTimeout(settleTimer.current);
+    settleTimer.current = window.setTimeout(() => {
+      jumpRef.current = false;
+    }, 500);
+  };
+
+  // the pin holds the clicked chapter until the user scrolls again, so the
+  // observer never flashes a middle chapter when the jump lands
+  useEffect(() => {
+    const onScroll = () => {
+      if (jumpRef.current) {
+        window.clearTimeout(settleTimer.current);
+        settleTimer.current = window.setTimeout(() => {
+          jumpRef.current = false;
+        }, 220);
+      } else if (pinnedRef.current) {
+        // the user is scrolling again, so hand control back to the observer
+        pinnedRef.current = null;
+        setPinnedId(null);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.clearTimeout(settleTimer.current);
+    };
+  }, []);
 
   // on the mobile strip the active chapter can sit off screen, so follow it
   useEffect(() => {
@@ -41,20 +81,26 @@ export default function ChapterRail() {
       left: list.scrollLeft + delta,
       behavior: reduceMotion ? 'auto' : 'smooth',
     });
-  }, [activeId]);
+  }, [activeId, pinnedId]);
+
+  const shownActiveId = pinnedId || activeId;
 
   return (
-    <nav className="lb-rail" aria-label="Report chapters">
+    <nav
+      className={`lb-rail${shownActiveId === 'section-09' ? ' is-final' : ''}`}
+      aria-label="Report chapters"
+    >
       <span className="lb-rail-title">Chapters</span>
       <ol className="lb-rail-list" ref={listRef}>
         {CHAPTERS.map((chapter) => {
-          const isActive = chapter.id === activeId;
+          const isActive = chapter.id === shownActiveId;
           return (
             <li key={chapter.id}>
               <a
                 href={`#${chapter.id}`}
                 className={`lb-rail-link${isActive ? ' is-active' : ''}`}
                 aria-current={isActive ? 'location' : undefined}
+                onClick={handleJump(chapter.id)}
               >
                 <span className="lb-rail-num tabular-nums">{chapter.number}</span>
                 <span className="lb-rail-name">{chapter.name}</span>

@@ -730,7 +730,7 @@ export default function Reviews() {
           <LengthBars series={stats.lengthByYear} verdict={stats.lengthVerdict} />
         </section>
 
-        <section className="lb-panel is-flat rv-card lb-col-5" aria-label="Your writing fingerprint">
+        <section className="lb-panel is-sheet rv-card lb-col-5" aria-label="Your writing fingerprint">
           <PanelHead
             icon={<WaveIcon />}
             accent="var(--color-accent-2)"
@@ -739,7 +739,7 @@ export default function Reviews() {
           <WritingFingerprint stats={writing} />
         </section>
 
-        <section className="lb-panel is-sheet rv-card lb-col-12" aria-label="Your longest reviews">
+        <section className="lb-panel is-sheet rv-card is-bare lb-col-12" aria-label="Your longest reviews">
           <PanelHead
             icon={<QuillIcon />}
             accent="var(--color-accent-3)"

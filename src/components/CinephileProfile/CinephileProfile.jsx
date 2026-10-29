@@ -1893,7 +1893,7 @@ export default function CinephileProfile() {
         </section>
 
         {/* 05: Genre reward card */}
-        <section className="lb-panel is-flat cp-card cp-reward-card lb-col-5" aria-label="What you most reward">
+        <section className="lb-panel is-atlas cp-card cp-reward-card lb-col-5" aria-label="What you most reward">
           <PanelHead
             icon={<GenreIcon />}
             accent="var(--color-accent-3)"
@@ -1917,7 +1917,7 @@ export default function CinephileProfile() {
         </section>
 
         {/* 07: Era correlation */}
-        <section className="lb-panel is-atlas cp-card lb-col-6" aria-label="Release year vs your rating">
+        <section className="lb-panel is-bare cp-card lb-col-6" aria-label="Release year vs your rating">
           <PanelHead
             icon={<ClockIconAlt />}
             accent="var(--color-accent-4)"

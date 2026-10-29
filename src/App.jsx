@@ -10,6 +10,7 @@ import Cast from './components/Cast/Cast';
 import Reviews from './components/Reviews/Reviews';
 import Watchlist from './components/Watchlist/Watchlist';
 import Random from './components/Random/Random';
+import Pasapalabra from './components/Pasapalabra/Pasapalabra';
 import ChapterRail from './components/ChapterRail/ChapterRail';
 import CinematicBackground from './components/CinematicBackground/CinematicBackground';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -61,6 +62,7 @@ export default function App() {
             <Reviews />
             <Watchlist />
             <Random />
+            <Pasapalabra />
             {/* Always rendered at the very bottom of the page, horizontally centered */}
             <div className="qf-reset-wrap">
               <button className="qf-reset-btn" onClick={handleReset} aria-label="Upload a different ZIP file">
