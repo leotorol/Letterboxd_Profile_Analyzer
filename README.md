@@ -8,6 +8,8 @@ Turn your Letterboxd account history into a rich, scrollable stats dashboard. Dr
 
 Letterboxd lets you **export your entire account** as a ZIP file containing CSV files like `ratings.csv`, `watched.csv`, `reviews.csv`, and `watchlist.csv`. This app takes that export and turns it into something visual and fun.
 
+<img width="1202" height="821" alt="image" src="https://github.com/user-attachments/assets/38df4fed-34a9-4d64-b595-dc749e88324e" />
+
 ## What this app does
 
 Everything is parsed and computed in your browser. Account data never leaves your machine; only movie titles and years go to TMDB for enrichment. It:
