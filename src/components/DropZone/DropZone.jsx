@@ -1,22 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { useLetterboxdData } from '../../hooks/useLetterboxdData';
+import { UploadIcon } from '../icons/Icons';
 import './DropZone.css';
 
 const ACCEPTED_TYPE = '.zip';
-
-/**
- * Render upload arrow SVG icon.
- *
- * Returns:
- *   JSX.Element: Vector SVG element.
- */
-const UploadIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" />
-    <line x1="12" y1="3" x2="12" y2="15" />
-  </svg>
-);
 
 /**
  * Render folder SVG icon.
@@ -139,7 +126,7 @@ export default function DropZone() {
         />
 
         <span className="dropzone-icon" style={{ color: dragging ? 'var(--color-accent)' : 'var(--color-text-muted)' }}>
-          <UploadIcon />
+          <UploadIcon size={28} />
         </span>
 
         <p className="dropzone-area-title">

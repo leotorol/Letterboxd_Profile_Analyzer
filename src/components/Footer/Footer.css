@@ -1,0 +1,426 @@
+/* Footer: the house lights come back up after the section 09 blackout */
+
+.ft {
+  --ft-surface: #0a0a0d;
+  --ft-surface-raised: #101014;
+  --ft-rule: rgba(255, 255, 255, 0.1);
+  --ft-rule-strong: rgba(255, 255, 255, 0.2);
+  --ft-paper: #f4f0e6;
+  --ft-dim: #a0a0b4;
+  --ft-faint: #7c7c90;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  padding: clamp(56px, 7vw, 104px) clamp(20px, 5vw, 80px) clamp(32px, 4vw, 56px);
+  /* picks up the exact wash where section 09 drops it, then hands the page
+     back to the star field so the credits sit under an open sky */
+  background: linear-gradient(
+    to bottom,
+    rgba(6, 6, 10, 0.34) 0,
+    rgba(5, 5, 9, 0.16) 34%,
+    transparent 72%
+  );
+}
+
+.ft-inner {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* the three tone cable from the game stage, one last time */
+.ft-rule {
+  width: 100%;
+  height: 1px;
+  margin-bottom: clamp(40px, 5vw, 72px);
+  background: linear-gradient(
+    90deg,
+    transparent 0,
+    var(--color-lb-orange) 12%,
+    var(--color-lb-green) 50%,
+    var(--color-lb-blue) 88%,
+    transparent 100%
+  );
+  opacity: 0.5;
+}
+
+/* Head */
+
+.ft-head {
+  max-width: 860px;
+  margin: 0 auto clamp(40px, 5vw, 64px);
+  text-align: center;
+}
+
+.ft-kicker {
+  font-family: var(--font-display);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ft-faint);
+}
+
+.ft-title {
+  margin-top: var(--space-4);
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--ft-paper);
+  text-wrap: balance;
+}
+
+.ft-sub {
+  max-width: 56ch;
+  margin: var(--space-4) auto 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ft-dim);
+  text-wrap: pretty;
+}
+
+/* Exits, asymmetric bento: one tall tip jar, two stacked doors */
+
+.ft-links {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(16px, 2vw, 24px);
+  align-items: stretch;
+}
+
+.ft-support {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid rgba(255, 128, 0, 0.26);
+  border-radius: var(--radius-md);
+  background: #0b0907;
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base);
+}
+
+.ft-support::after {
+  content: '';
+  position: absolute;
+  inset: auto -30% -60% auto;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 128, 0, 0.09), transparent 68%);
+  pointer-events: none;
+}
+
+.ft-support:hover {
+  border-color: rgba(255, 128, 0, 0.55);
+  background: #110d08;
+}
+
+.ft-support:focus-visible,
+.ft-row:focus-visible,
+.ft-mail:focus-visible {
+  outline: 2px solid var(--color-lb-green);
+  outline-offset: 2px;
+}
+
+.ft-support-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  color: var(--ft-faint);
+  transition: color var(--transition-base);
+}
+
+.ft-support:hover .ft-support-top {
+  color: var(--color-lb-orange);
+}
+
+.ft-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--radius-sm);
+  color: var(--ft-paper);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ft-support-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ft-label {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ft-faint);
+}
+
+.ft-support-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ft-paper);
+}
+
+.ft-support-text {
+  max-width: 34ch;
+  margin-top: 2px;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--ft-dim);
+  text-wrap: pretty;
+}
+
+.ft-support-meta {
+  margin-top: var(--space-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-lb-orange);
+}
+
+.ft-rows {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 24px);
+}
+
+.ft-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  flex: 1;
+  padding: clamp(20px, 2.4vw, 28px);
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--radius-md);
+  background: var(--ft-surface);
+  color: var(--ft-faint);
+  text-decoration: none;
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.ft-row:hover {
+  border-color: var(--ft-rule-strong);
+  background: var(--ft-surface-raised);
+  color: var(--ft-paper);
+}
+
+.ft-row .ft-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.ft-row-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ft-row-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--ft-paper);
+}
+
+.ft-row-text {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ft-dim);
+}
+
+/* the Letterboxd three dot mark, the closing signature */
+.ft-lb-mark {
+  display: flex;
+  align-items: center;
+}
+
+.ft-lb-mark span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.ft-lb-mark span + span {
+  margin-left: -3px;
+}
+
+.ft-lb-mark .is-orange { background: var(--color-lb-orange); }
+.ft-lb-mark .is-green { background: var(--color-lb-green); }
+.ft-lb-mark .is-blue { background: var(--color-lb-blue); }
+
+/* Bug report, static card, no hover theatre */
+
+.ft-bug {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) auto;
+  align-items: center;
+  gap: clamp(24px, 4vw, 48px);
+  margin-top: clamp(16px, 2vw, 24px);
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid var(--ft-rule);
+  border-radius: var(--radius-md);
+  background: rgba(8, 8, 11, 0.72);
+}
+
+.ft-bug-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ft-bug-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-lb-green);
+}
+
+.ft-bug-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--ft-paper);
+}
+
+.ft-bug-text {
+  max-width: 62ch;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ft-dim);
+  text-wrap: pretty;
+}
+
+.ft-bug-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.ft-bug-note {
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--ft-faint);
+}
+
+.ft-mail {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 18px;
+  border: 1px solid var(--ft-rule-strong);
+  border-radius: var(--radius-button);
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--ft-paper);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.ft-mail svg {
+  color: var(--color-lb-green);
+}
+
+.ft-mail:hover {
+  border-color: var(--color-lb-green);
+  color: var(--color-lb-green);
+  background: rgba(0, 224, 84, 0.06);
+}
+
+/* Rail clearance */
+
+@media (min-width: 1200px) {
+  .ft {
+    padding-left: calc(162px + clamp(20px, 5vw, 80px));
+  }
+}
+
+@media (max-width: 1199px) {
+  .ft {
+    padding-bottom: calc(52px + clamp(28px, 4vw, 48px));
+  }
+}
+
+@media (max-width: 900px) {
+  .ft-links {
+    grid-template-columns: 1fr;
+  }
+
+  .ft-support {
+    gap: var(--space-6);
+  }
+
+  .ft-bug {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: var(--space-5);
+  }
+
+  .ft-bug-action {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .ft {
+    padding-top: var(--space-12);
+  }
+
+  .ft-rule {
+    margin-bottom: var(--space-10);
+  }
+
+  .ft-title {
+    font-size: clamp(2.2rem, 10vw, 3rem);
+  }
+
+  .ft-sub {
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .ft-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .ft-row > svg {
+    display: none;
+  }
+}

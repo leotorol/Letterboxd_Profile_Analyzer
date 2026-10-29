@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useActiveSection } from '../../hooks/useActiveSection';
+import { UploadIcon } from '../icons/Icons';
 import './ChapterRail.css';
 
 const CHAPTERS = [
@@ -14,19 +15,26 @@ const CHAPTERS = [
   { id: 'section-09', number: '09', name: 'A to Z' },
 ];
 
+const CREDITS = { id: 'credits', number: '10', name: 'Credits' };
+
 /**
  * Fixed chapter index for the long scroll.
  *
  * A vertical spine on desktop and a swipeable strip on small screens. The
- * active chapter follows the viewport middle through useActiveSection.
+ * active chapter follows the viewport middle through useActiveSection. The
+ * foot of the rail holds the way back to the upload screen.
+ *
+ * Args:
+ *   onReset (Function): Resets the app back to the upload screen.
  *
  * Returns:
  *   JSX.Element: The chapter navigation.
  */
-export default function ChapterRail() {
+export default function ChapterRail({ onReset }) {
   const activeId = useActiveSection();
   const listRef = useRef(null);
   const [pinnedId, setPinnedId] = useState(null);
+  const [creditsSeen, setCreditsSeen] = useState(false);
   const pinnedRef = useRef(null);
   const jumpRef = useRef(false);
   const settleTimer = useRef(0);
@@ -47,6 +55,12 @@ export default function ChapterRail() {
   // observer never flashes a middle chapter when the jump lands
   useEffect(() => {
     const onScroll = () => {
+      // the credits are not a chapter you can browse to from the top, they
+      // join the rail only once the footer has been reached
+      const atBottom = window.innerHeight + window.scrollY
+        >= document.documentElement.scrollHeight - 2;
+      if (atBottom) setCreditsSeen(true);
+
       if (jumpRef.current) {
         window.clearTimeout(settleTimer.current);
         settleTimer.current = window.setTimeout(() => {
@@ -81,21 +95,26 @@ export default function ChapterRail() {
       left: list.scrollLeft + delta,
       behavior: reduceMotion ? 'auto' : 'smooth',
     });
-  }, [activeId, pinnedId]);
+  }, [activeId, pinnedId, creditsSeen]);
 
   const shownActiveId = pinnedId || activeId;
+  const isFinal = shownActiveId === 'section-09' || shownActiveId === CREDITS.id;
+  const shownChapters = creditsSeen ? [...CHAPTERS, CREDITS] : CHAPTERS;
 
   return (
     <nav
-      className={`lb-rail${shownActiveId === 'section-09' ? ' is-final' : ''}`}
+      className={`lb-rail${isFinal ? ' is-final' : ''}`}
       aria-label="Report chapters"
     >
       <span className="lb-rail-title">Chapters</span>
       <ol className="lb-rail-list" ref={listRef}>
-        {CHAPTERS.map((chapter) => {
+        {shownChapters.map((chapter) => {
           const isActive = chapter.id === shownActiveId;
           return (
-            <li key={chapter.id}>
+            <li
+              key={chapter.id}
+              className={chapter.id === CREDITS.id ? 'lb-rail-credits' : undefined}
+            >
               <a
                 href={`#${chapter.id}`}
                 className={`lb-rail-link${isActive ? ' is-active' : ''}`}
@@ -109,6 +128,16 @@ export default function ChapterRail() {
           );
         })}
       </ol>
+
+      <button
+        type="button"
+        className="lb-rail-reset"
+        onClick={onReset}
+        aria-label="Upload a different ZIP file"
+      >
+        <UploadIcon size={14} />
+        <span>New export</span>
+      </button>
     </nav>
   );
 }

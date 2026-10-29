@@ -42,6 +42,8 @@ The scroll is built as nine chapters, each with its own editorial format, joined
 - `PanelHead`: the icon, label and micro note used by every panel.
 - A progressive panel surface ramp, from the light hook in `01` to the dark dossier in `08`. Flat panels stay transparent so the page keeps some air and variety.
 
+The rail also holds the way back to the upload screen at its foot (desktop) or pinned at the end of the strip (mobile). A Credits entry joins the rail once the footer has been reached.
+
 ## Tech stack
 
 - **Vite** — build tool and dev server
@@ -144,6 +146,7 @@ letterboxd stats/
 │   │   ├── CinephileProfile/     # Section 03: atlas (spectrum, genres, taste, world map)
 │   │   ├── DropZone/             # Drag-and-drop ZIP upload screen
 │   │   ├── ErrorBoundary.jsx     # Catches render errors so the UI never breaks
+│   │   ├── Footer/               # Closing credits: tip jar, source, profile and bug reports
 │   │   ├── icons/                # Shared inline SVG icons
 │   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
 │   │   ├── Pasapalabra/          # Section 09: black stage, letter rosco and answer card

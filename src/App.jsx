@@ -11,17 +11,10 @@ import Reviews from './components/Reviews/Reviews';
 import Watchlist from './components/Watchlist/Watchlist';
 import Random from './components/Random/Random';
 import Pasapalabra from './components/Pasapalabra/Pasapalabra';
+import Footer from './components/Footer/Footer';
 import ChapterRail from './components/ChapterRail/ChapterRail';
 import CinematicBackground from './components/CinematicBackground/CinematicBackground';
 import ErrorBoundary from './components/ErrorBoundary';
-import './App.css';
-
-const ArrowLeftIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="19" y1="12" x2="5" y2="12" />
-    <polyline points="12 19 5 12 12 5" />
-  </svg>
-);
 
 /**
  * Root App component acting as state router wrapped in an Error Boundary.
@@ -41,6 +34,8 @@ export default function App() {
     setRawData(null);
     setEnrichedData(null);
     setEnrichmentReport(null);
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    window.scrollTo(0, 0);
   }
 
   // switch between upload, loading progress, and stats dashboard screens
@@ -53,7 +48,7 @@ export default function App() {
         {appState === 'loading' && <LoadingScreen />}
         {appState === 'ready'   && (
           <>
-            <ChapterRail />
+            <ChapterRail onReset={handleReset} />
             <QuickFacts />
             <Rhythm />
             <CinephileProfile />
@@ -63,12 +58,7 @@ export default function App() {
             <Watchlist />
             <Random />
             <Pasapalabra />
-            {/* Always rendered at the very bottom of the page, horizontally centered */}
-            <div className="qf-reset-wrap">
-              <button className="qf-reset-btn" onClick={handleReset} aria-label="Upload a different ZIP file">
-                <ArrowLeftIcon /> Upload a different file
-              </button>
-            </div>
+            <Footer />
           </>
         )}
       </main>
