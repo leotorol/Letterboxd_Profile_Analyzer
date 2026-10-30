@@ -102,10 +102,6 @@
   flex: 1 0 auto;
 }
 
-.ft-left .ft-share {
-  flex: 0 0 auto;
-}
-
 .ft-support {
   position: relative;
   display: flex;

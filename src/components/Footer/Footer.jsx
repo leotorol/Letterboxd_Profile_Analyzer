@@ -169,24 +169,6 @@ export default function Footer() {
                 <span className="ft-support-meta">ko-fi.com/leotorol</span>
               </div>
             </a>
-
-            <button
-              type="button"
-              className={`ft-row ft-share${copied ? ' is-copied' : ''}`}
-              onClick={handleShare}
-            >
-              <span className="ft-icon"><ShareIcon /></span>
-              <span className="ft-row-copy">
-                <span className="ft-label">Share</span>
-                <span className="ft-row-title">Pass the app around</span>
-                <span className="ft-row-text">
-                  Copy the link and send it to a friend with a Letterboxd log.
-                </span>
-              </span>
-              <span className="ft-share-state" aria-live="polite">
-                {copied ? 'Copied' : 'Copy link'}
-              </span>
-            </button>
           </div>
 
           <div className="ft-rows">
@@ -207,6 +189,24 @@ export default function Footer() {
                 <ArrowIcon />
               </a>
             ))}
+
+            <button
+              type="button"
+              className={`ft-row ft-share${copied ? ' is-copied' : ''}`}
+              onClick={handleShare}
+            >
+              <span className="ft-icon"><ShareIcon /></span>
+              <span className="ft-row-copy">
+                <span className="ft-label">Share</span>
+                <span className="ft-row-title">Pass the app around</span>
+                <span className="ft-row-text">
+                  Copy the link and send it to a friend with a Letterboxd log.
+                </span>
+              </span>
+              <span className="ft-share-state" aria-live="polite">
+                {copied ? 'Copied' : 'Copy link'}
+              </span>
+            </button>
           </div>
         </div>
 
