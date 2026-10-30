@@ -35,6 +35,7 @@ export default function ChapterRail({ onReset }) {
   const listRef = useRef(null);
   const [pinnedId, setPinnedId] = useState(null);
   const [creditsSeen, setCreditsSeen] = useState(false);
+  const [atCredits, setAtCredits] = useState(false);
   const pinnedRef = useRef(null);
   const jumpRef = useRef(false);
   const settleTimer = useRef(0);
@@ -56,15 +57,23 @@ export default function ChapterRail({ onReset }) {
   useEffect(() => {
     const onScroll = () => {
       // the credits are not a chapter you can browse to from the top, they
-      // join the rail only once the footer has been reached
-      const atBottom = window.innerHeight + window.scrollY
-        >= document.documentElement.scrollHeight - 2;
-      if (atBottom) setCreditsSeen(true);
+      // join the rail once the footer is properly on screen, and the rail
+      // hands them the highlight right there instead of waiting for the
+      // footer to crawl past the exact middle of the viewport
+      const footer = document.getElementById('credits');
+      const footerTop = footer ? footer.getBoundingClientRect().top : Infinity;
+      const footerInView = footerTop < window.innerHeight * 0.8;
+      setAtCredits(footerInView);
+      if (footerInView) setCreditsSeen(true);
 
       if (jumpRef.current) {
         window.clearTimeout(settleTimer.current);
         settleTimer.current = window.setTimeout(() => {
           jumpRef.current = false;
+          // the scroll has settled, so hand control back to the observer even
+          // if the user stopped on the last pixel and never scrolls again
+          pinnedRef.current = null;
+          setPinnedId(null);
         }, 220);
       } else if (pinnedRef.current) {
         // the user is scrolling again, so hand control back to the observer
@@ -95,9 +104,13 @@ export default function ChapterRail({ onReset }) {
       left: list.scrollLeft + delta,
       behavior: reduceMotion ? 'auto' : 'smooth',
     });
-  }, [activeId, pinnedId, creditsSeen]);
+  }, [activeId, pinnedId, creditsSeen, atCredits]);
 
-  const shownActiveId = pinnedId || activeId;
+  // the credits always win once the footer is on screen, so neither a stale
+  // jump pin nor the observer lag can keep A to Z lit while credits are there
+  const shownActiveId = atCredits || activeId === CREDITS.id
+    ? CREDITS.id
+    : (pinnedId || activeId);
   const isFinal = shownActiveId === 'section-09' || shownActiveId === CREDITS.id;
   const shownChapters = creditsSeen ? [...CHAPTERS, CREDITS] : CHAPTERS;
 

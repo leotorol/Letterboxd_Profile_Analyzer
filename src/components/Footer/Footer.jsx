@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSectionMotion from '../../hooks/useSectionMotion';
 import './Footer.css';
 
@@ -47,6 +47,16 @@ const ArrowIcon = () => (
   </svg>
 );
 
+const ShareIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <line x1="8.6" y1="10.5" x2="15.4" y2="6.5" />
+    <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
+  </svg>
+);
+
 const LetterboxdMark = () => (
   <span className="ft-lb-mark" aria-hidden="true">
     <span className="is-orange" />
@@ -83,7 +93,44 @@ const LINK_ROWS = [
  */
 export default function Footer() {
   const footerRef = useRef(null);
+  const copyTimer = useRef(0);
+  const [copied, setCopied] = useState(false);
   useSectionMotion(footerRef);
+
+  // stop the copy feedback timer if the footer unmounts mid celebration
+  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+
+  /**
+   * Copies the current app URL and flashes the copied state.
+   *
+   * Uses the live origin instead of a hardcoded domain so the share card keeps
+   * working on localhost, previews and whatever domain this ends up deployed to.
+   *
+   * Returns:
+   *   Promise<void>: Resolves once the clipboard attempt finishes.
+   */
+  async function handleShare() {
+    const url = `${window.location.origin}${window.location.pathname}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // clipboard API needs a secure context, so fall back to the old trick
+      const field = document.createElement('textarea');
+      field.value = url;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand('copy');
+      field.remove();
+    }
+
+    setCopied(true);
+    window.clearTimeout(copyTimer.current);
+    copyTimer.current = window.setTimeout(() => setCopied(false), 2200);
+  }
 
   return (
     <footer className="ft" id="credits" data-section ref={footerRef}>
@@ -102,25 +149,45 @@ export default function Footer() {
         </header>
 
         <div className="ft-links" data-reveal>
-          <a
-            className="ft-support"
-            href={KO_FI_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className="ft-support-top">
-              <span className="ft-icon"><CoffeeIcon /></span>
-              <ArrowIcon />
-            </div>
-            <div className="ft-support-copy">
-              <span className="ft-label">Support the project</span>
-              <span className="ft-support-title">Buy me a coffee</span>
-              <span className="ft-support-text">
-                If this made your log look good, you can keep the projector running.
+          <div className="ft-left">
+            <a
+              className="ft-support"
+              href={KO_FI_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="ft-support-top">
+                <span className="ft-icon"><CoffeeIcon /></span>
+                <ArrowIcon />
+              </div>
+              <div className="ft-support-copy">
+                <span className="ft-label">Support the project</span>
+                <span className="ft-support-title">Buy me a coffee</span>
+                <span className="ft-support-text">
+                  If this made your log look good, you can keep the projector running.
+                </span>
+                <span className="ft-support-meta">ko-fi.com/leotorol</span>
+              </div>
+            </a>
+
+            <button
+              type="button"
+              className={`ft-row ft-share${copied ? ' is-copied' : ''}`}
+              onClick={handleShare}
+            >
+              <span className="ft-icon"><ShareIcon /></span>
+              <span className="ft-row-copy">
+                <span className="ft-label">Share</span>
+                <span className="ft-row-title">Pass the app around</span>
+                <span className="ft-row-text">
+                  Copy the link and send it to a friend with a Letterboxd log.
+                </span>
               </span>
-              <span className="ft-support-meta">ko-fi.com/leotorol</span>
-            </div>
-          </a>
+              <span className="ft-share-state" aria-live="polite">
+                {copied ? 'Copied' : 'Copy link'}
+              </span>
+            </button>
+          </div>
 
           <div className="ft-rows">
             {LINK_ROWS.map(({ label, title, text, href, icon: Icon }) => (

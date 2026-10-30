@@ -148,7 +148,7 @@ letterboxd stats/
 │   │   ├── CinephileProfile/     # Section 03: atlas (spectrum, genres, taste, world map)
 │   │   ├── DropZone/             # Drag-and-drop ZIP upload screen
 │   │   ├── ErrorBoundary.jsx     # Catches render errors so the UI never breaks
-│   │   ├── Footer/               # Closing credits: tip jar, source, profile and bug reports
+│   │   ├── Footer/               # Closing credits: tip jar, share, source, profile and bug reports
 │   │   ├── icons/                # Shared inline SVG icons
 │   │   ├── LoadingScreen/        # Enrichment progress + live poster strip
 │   │   ├── Pasapalabra/          # Section 09: black stage, letter rosco and answer card

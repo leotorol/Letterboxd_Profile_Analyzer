@@ -93,6 +93,12 @@
   transition: transform var(--transition-fast), border-color var(--transition-fast);
 }
 
+/* zero film days stay barely there so the watched days carry the grid */
+.ry-heat-cell.lv0 {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.03);
+}
+
 .ry-heat-cell.lv1 { background: var(--color-heat-1); border-color: transparent; }
 .ry-heat-cell.lv2 { background: var(--color-heat-2); border-color: transparent; }
 .ry-heat-cell.lv3 { background: var(--color-heat-3); border-color: transparent; }
@@ -125,6 +131,12 @@
   pointer-events: none;
   height: 16px;
   min-width: 16px;
+}
+
+/* the legend still needs a visible zero swatch, even if the grid hides it */
+.ry-heat-legend .ry-heat-cell.lv0 {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.09);
 }
 
 .ry-heat-legend-text {

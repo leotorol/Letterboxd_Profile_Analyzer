@@ -908,7 +908,7 @@ function BookendsBand({ bookends }) {
   return (
     <section className="rd-band" aria-labelledby="rd-bookends-title" data-reveal>
       <div className="rd-band-inner">
-        <BandHead id="rd-bookends-title" number="03" title="The Bookends" note="where you started, where you are, and the calls you stand by" />
+        <BandHead id="rd-bookends-title" number="03" title="The Bookends" note="" />
 
         <div className="rd-bookends-block">
           <div className="rd-subhead-row">
@@ -1011,7 +1011,7 @@ function ExtremesBand({ popularity, era }) {
   return (
     <section className="rd-band" aria-labelledby="rd-extremes-title" data-reveal>
       <div className="rd-band-inner">
-        <BandHead id="rd-extremes-title" number="02" title="The Extremes" note="the shallow end, the deep end, and the edges of your timeline" />
+        <BandHead id="rd-extremes-title" number="02" title="The Extremes" note="" />
 
         <div className="rd-extreme-block">
           <div className="rd-subhead-row">
@@ -1034,7 +1034,7 @@ function ExtremesBand({ popularity, era }) {
           {era.available ? (
             <MeasureRuler
               title="The Timeline"
-              note="The oldest and newest films in your log, with your median release year in the middle."
+              note=""
               lowFilm={era.oldest}
               highFilm={era.newest}
               min={era.min}
@@ -1073,7 +1073,7 @@ function LedgerBand({ milestones }) {
   return (
     <section className="rd-band" aria-labelledby="rd-ledger-title" data-reveal>
       <div className="rd-band-inner">
-        <BandHead id="rd-ledger-title" number="04" title="The Ledger" note="the dates your log hit a round number" />
+        <BandHead id="rd-ledger-title" number="04" title="The Ledger" note="" />
 
         {milestones.reached.length === 0 ? (
           <div className="rd-first-milestone">
