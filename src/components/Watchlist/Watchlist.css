@@ -367,26 +367,116 @@
 
 @media (max-width: 1100px) {
   .wl-graveyard-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 900px) {
+  .wl-graveyard-grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--space-2);
   }
 }
 
 @media (max-width: 768px) {
   .wl-graveyard-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .wl-grave {
+    gap: 4px;
+  }
+
+  .wl-grave-name {
+    font-size: 0.72rem;
+  }
+
+  .wl-grave-meta {
+    font-size: 0.62rem;
+  }
+
+  .wl-grave-age-badge {
+    bottom: 3px;
+    right: 3px;
+    padding: 2px 4px;
+    font-size: 0.6rem;
+  }
+
+  .wl-age-hero {
+    padding: var(--space-4) 0;
+  }
+
+  .wl-age-hero-value {
+    font-size: 3rem;
   }
 }
 
 @media (max-width: 640px) {
   .wl-graveyard-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .wl-grave {
+    gap: 3px;
+  }
+
+  .wl-grave-age-badge {
+    bottom: 2px;
+    right: 2px;
+    padding: 1px 4px;
+    font-size: 0.55rem;
+    border-radius: 3px;
   }
 
   .wl-grave-name {
-    font-size: 0.82rem;
+    font-size: 0.68rem;
+    line-height: 1.15;
   }
 
   .wl-grave-meta {
-    font-size: 0.68rem;
+    font-size: 0.58rem;
+    line-height: 1.1;
+  }
+
+  .wl-age-hero {
+    padding: var(--space-3) 0;
+  }
+
+  .wl-age-hero-value {
+    font-size: 2.6rem;
+  }
+
+  .wl-age-hero-unit {
+    font-size: 0.95rem;
+  }
+
+  .wl-age-row {
+    padding: 8px 0;
+  }
+
+  .wl-age-row-label {
+    font-size: 0.78rem;
+  }
+
+  .wl-age-row-value {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .wl-graveyard-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .wl-grave-name {
+    font-size: 0.64rem;
+  }
+
+  .wl-grave-meta {
+    font-size: 0.54rem;
   }
 }

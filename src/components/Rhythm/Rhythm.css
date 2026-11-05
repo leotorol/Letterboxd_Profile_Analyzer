@@ -555,18 +555,36 @@
   font-weight: 800;
 }
 
-/* Comfort movies: centered stripe of big-poster cards that fill the card width */
+/* Comfort movies: all 5 in one row across the card width */
 .ry-comfort-list {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-5);
+  flex-wrap: nowrap;
+  gap: var(--space-4);
   align-items: flex-start;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-muted-blue) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ry-comfort-list::-webkit-scrollbar {
+  height: 4px;
+}
+
+.ry-comfort-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-full);
+}
+
+.ry-comfort-list::-webkit-scrollbar-thumb {
+  background: var(--color-muted-blue);
+  border-radius: var(--radius-full);
 }
 
 .ry-comfort-item {
   flex: 1 1 0;
-  min-width: 150px;
+  min-width: 0;
   max-width: 250px;
   display: flex;
   flex-direction: column;
@@ -665,12 +683,11 @@
 
 @media (max-width: 768px) {
   .ry-evo {
-    height: 270px;
+    height: 240px;
   }
 
-  /* Let the poster strip scroll sideways instead of crushing four covers into a sliver */
   .ry-streak-film {
-    flex: 0 0 104px;
+    flex: 0 0 90px;
   }
 
   .ry-streak-film-poster {
@@ -678,9 +695,14 @@
     aspect-ratio: 2 / 3;
   }
 
+  .ry-comfort-list {
+    gap: var(--space-3);
+  }
+
   .ry-comfort-item {
-    min-width: 140px;
-    max-width: 210px;
+    flex: 1 1 0;
+    min-width: 76px;
+    max-width: none;
   }
 }
 
@@ -689,20 +711,160 @@
     align-self: flex-start;
   }
 
+  .ry-year-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .ry-year-value {
+    font-size: 1.15rem;
+    min-width: 48px;
+  }
+
   .ry-hero-numbers {
-    gap: var(--space-6);
+    gap: var(--space-4);
+  }
+
+  .ry-hero-number {
+    font-size: clamp(2rem, 6vw, 2.5rem);
+  }
+
+  .ry-streak-number {
+    font-size: clamp(1.8rem, 5.5vw, 2.3rem);
   }
 
   .ry-evo {
-    height: 220px;
+    height: 190px;
+  }
+
+  .ry-comfort-list {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding-bottom: 6px;
+    overflow-x: auto;
   }
 
   .ry-comfort-item {
-    min-width: 120px;
-    max-width: 170px;
+    flex: 1 1 0;
+    min-width: 68px;
+    max-width: none;
+    gap: 3px;
+  }
+
+  .ry-comfort-top {
+    gap: 2px;
+  }
+
+  .ry-comfort-rank {
+    font-size: 0.65rem;
+  }
+
+  .ry-comfort-count {
+    font-size: 0.95rem;
+  }
+
+  .ry-comfort-title {
+    font-size: 0.74rem;
+    line-height: 1.15;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ry-comfort-year {
+    font-size: 0.64rem;
+    margin-left: 2px;
+  }
+
+  .ry-comfort-last {
+    font-size: 0.58rem;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .ry-mini-pair {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .ry-mini-number {
+    font-size: 1.45rem;
+  }
+
+  .ry-mini-label {
+    font-size: 0.72rem;
+  }
+
+  .ry-month-banner-value {
+    font-size: 1.3rem;
+  }
+
+  .ry-month-bars {
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 440px) {
+  .ry-comfort-list {
+    gap: 6px;
+  }
+
+  .ry-comfort-item {
+    min-width: 58px;
+  }
+
+  .ry-comfort-rank {
+    font-size: 0.55rem;
+  }
+
+  .ry-comfort-count {
+    font-size: 0.8rem;
+  }
+
+  .ry-comfort-title {
+    font-size: 0.66rem;
+  }
+
+  .ry-comfort-last {
+    font-size: 0.52rem;
+  }
+
+  .ry-hero-numbers {
+    gap: var(--space-3);
+  }
+
+  .ry-hero-number {
+    font-size: 1.8rem;
+  }
+
+  .ry-hero-unit {
+    font-size: 0.75rem;
+  }
+
+  .ry-hero-subtext {
+    font-size: 0.8rem;
+  }
+
+  .ry-streak-film {
+    flex: 0 0 76px;
+  }
+
+  .ry-streak-film-name {
+    font-size: 0.65rem;
+  }
+
+  .ry-bar-row {
+    grid-template-columns: 36px 1fr 28px;
+    gap: var(--space-2);
+  }
+
+  .ry-bar-label,
+  .ry-bar-value {
+    font-size: 0.74rem;
   }
 }

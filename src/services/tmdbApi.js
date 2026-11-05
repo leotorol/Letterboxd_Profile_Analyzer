@@ -177,7 +177,7 @@ function stripAccents(str) {
  *   string: Lowercased, stripped of accents and punctuation.
  */
 function normalizeForComparison(str) {
-  if (!str) return '';
+  if (!str || typeof str !== 'string') return '';
   return stripAccents(str)
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
@@ -281,7 +281,9 @@ function getResultTitles(result) {
  */
 function getResultYear(result) {
   const date = result.release_date || result.first_air_date;
-  return date ? parseInt(date.substring(0, 4), 10) : null;
+  if (typeof date !== 'string') return null;
+  const year = parseInt(date.substring(0, 4), 10);
+  return Number.isFinite(year) ? year : null;
 }
 
 /**
@@ -434,7 +436,12 @@ async function fetchTmdb(path, params, apiKey) {
     }
 
     if (!res.ok) return null;
-    return res.json();
+    try {
+      return await res.json();
+    } catch {
+      // a proxy or a bad gateway can hand back garbage instead of json
+      return null;
+    }
   }
 
   return null;
@@ -482,7 +489,8 @@ function buildSearchQueries(movie) {
  */
 async function searchMulti(query, apiKey) {
   const data = await fetchTmdb('/search/multi', { query }, apiKey);
-  return (data?.results || []).filter(r => r.media_type === 'movie' || r.media_type === 'tv');
+  const results = Array.isArray(data?.results) ? data.results : [];
+  return results.filter(r => r && (r.media_type === 'movie' || r.media_type === 'tv'));
 }
 
 /**
@@ -503,8 +511,12 @@ async function searchMovieAndTv(query, year, apiKey) {
     fetchTmdb('/search/tv', { query, first_air_date_year: year }, apiKey),
   ]);
 
-  const movies = (movieData?.results || []).map(r => ({ ...r, media_type: 'movie' }));
-  const shows = (tvData?.results || []).map(r => ({ ...r, media_type: 'tv' }));
+  const movies = (Array.isArray(movieData?.results) ? movieData.results : [])
+    .filter(Boolean)
+    .map(r => ({ ...r, media_type: 'movie' }));
+  const shows = (Array.isArray(tvData?.results) ? tvData.results : [])
+    .filter(Boolean)
+    .map(r => ({ ...r, media_type: 'tv' }));
   return [...movies, ...shows];
 }
 
@@ -619,8 +631,9 @@ async function fetchMovieDetails(movie, apiKey) {
 
     // capture the director names AND their tmdb gender code (1 female, 2 male,
     // 0 unknown) so the reveal section can talk about who's actually behind the lens
-    const directorData = (detail.credits?.crew || [])
-      .filter(c => c.job === 'Director')
+    const crew = Array.isArray(detail.credits?.crew) ? detail.credits.crew : [];
+    const directorData = crew
+      .filter(c => c && c.job === 'Director' && typeof c.name === 'string' && c.name.trim())
       .map(c => ({ name: c.name, gender: c.gender ?? 0, profilePath: c.profile_path || null }));
     const directors = directorData.map(d => d.name);
     const directorGenders = directorData.map(d => d.gender);
@@ -630,7 +643,9 @@ async function fetchMovieDetails(movie, apiKey) {
     );
 
     // top billed cast only, so the most-watched ranking has real faces to show
-    const cast = (detail.credits?.cast || [])
+    const castRows = Array.isArray(detail.credits?.cast) ? detail.credits.cast : [];
+    const cast = castRows
+      .filter(c => c && typeof c.name === 'string' && c.name.trim())
       .slice(0, CAST_LIMIT)
       .map(c => ({
         name: c.name,
@@ -639,26 +654,33 @@ async function fetchMovieDetails(movie, apiKey) {
       }));
 
     // studios and their logos, the money section groups by these
-    const productionCompanies = (detail.production_companies || [])
+    const companyRows = Array.isArray(detail.production_companies) ? detail.production_companies : [];
+    const productionCompanies = companyRows
+      .filter(c => c && typeof c.name === 'string' && c.name.trim())
       .map(c => ({ name: c.name, logoPath: c.logo_path || null }));
 
-    const genres = (detail.genres || []).map(g => g.name);
+    const genreRows = Array.isArray(detail.genres) ? detail.genres : [];
+    const genres = genreRows
+      .map(g => g?.name)
+      .filter((name) => typeof name === 'string' && name.trim());
 
     let runtime = null;
     if (mediaType === 'movie') {
-      runtime = detail.runtime || null;
+      runtime = Number.isFinite(detail.runtime) && detail.runtime > 0 ? detail.runtime : null;
     } else if (mediaType === 'tv') {
-      const episodeRunTime = detail.episode_run_time || [];
+      const episodeRunTime = Array.isArray(detail.episode_run_time) ? detail.episode_run_time : [];
       const avgEpisodeRuntime = episodeRunTime.length > 0
         ? episodeRunTime.reduce((a, b) => a + b, 0) / episodeRunTime.length
         : null;
-      const episodeCount = detail.number_of_episodes || null;
+      const episodeCount = Number.isFinite(detail.number_of_episodes) ? detail.number_of_episodes : null;
       runtime = avgEpisodeRuntime && episodeCount
         ? Math.round(avgEpisodeRuntime * episodeCount)
         : avgEpisodeRuntime
           ? Math.round(avgEpisodeRuntime)
           : null;
     }
+
+    const countryRows = Array.isArray(detail.production_countries) ? detail.production_countries : [];
 
     return {
       ...movie,
@@ -671,15 +693,15 @@ async function fetchMovieDetails(movie, apiKey) {
       cast,
       productionCompanies,
       genres,
-      popularity: detail.popularity || null,
-      voteAverage: detail.vote_average || null,
-      voteCount: detail.vote_count || null,
-      overview: detail.overview || '',
+      popularity: Number.isFinite(detail.popularity) ? detail.popularity : null,
+      voteAverage: Number.isFinite(detail.vote_average) ? detail.vote_average : null,
+      voteCount: Number.isFinite(detail.vote_count) ? detail.vote_count : null,
+      overview: typeof detail.overview === 'string' ? detail.overview : '',
       posterPath: detail.poster_path || null,
-      budget: detail.budget || null,
-      revenue: detail.revenue || null,
-      originalLanguage: detail.original_language || null,
-      productionCountries: (detail.production_countries || []).map(c => c.iso_3166_1),
+      budget: Number.isFinite(detail.budget) ? detail.budget : null,
+      revenue: Number.isFinite(detail.revenue) ? detail.revenue : null,
+      originalLanguage: typeof detail.original_language === 'string' ? detail.original_language : null,
+      productionCountries: countryRows.map(c => c?.iso_3166_1).filter((code) => typeof code === 'string'),
       matchStrategy: strategy,
     };
   } catch (err) {
@@ -707,9 +729,16 @@ async function fetchMovieDetails(movie, apiKey) {
  *   Promise<Array<Object>>: Enriched movie objects array.
  */
 export async function enrichMovies(movies, apiKey, onProgress) {
+  const list = Array.isArray(movies) ? movies.filter((movie) => movie && typeof movie === 'object') : [];
+
+  // reset every time, otherwise a cached second import reports the previous
+  // import's counters and failed titles like a lying little shit
+  resetEnrichmentReport();
+  enrichmentReport.total = list.length;
+
   if (!hasTmdbKey(apiKey)) {
-    onProgress?.(movies.length, movies.length);
-    return movies.map(m => ({
+    onProgress?.(list.length, list.length);
+    return list.map(m => ({
       ...m,
       runtime: null,
       directors: [],
@@ -724,22 +753,20 @@ export async function enrichMovies(movies, apiKey, onProgress) {
     }));
   }
 
-  const cacheKey = buildCacheKey(movies);
+  const cacheKey = buildCacheKey(list);
   const cached = getCache(cacheKey);
-  if (cached && cached.length === movies.length) {
-    onProgress?.(movies.length, movies.length);
+  if (Array.isArray(cached) && cached.length === list.length && cached.every(Boolean)) {
+    enrichmentReport.matched = cached.filter(m => m.tmdbId !== null).length;
+    onProgress?.(list.length, list.length);
     return cached;
   }
-
-  resetEnrichmentReport();
-  enrichmentReport.total = movies.length;
 
   const movieKey = m => `${m.name}::${m.year}`;
 
   const uniqueMovies = [];
   const seenKeys = new Set();
   const rowCountByKey = new Map();
-  for (const movie of movies) {
+  for (const movie of list) {
     const key = movieKey(movie);
     rowCountByKey.set(key, (rowCountByKey.get(key) || 0) + 1);
     if (!seenKeys.has(key)) {
@@ -761,16 +788,16 @@ export async function enrichMovies(movies, apiKey, onProgress) {
       enrichedByKey.set(key, result);
       coveredRows += rowCountByKey.get(key) || 0;
     });
-    onProgress?.(coveredRows, movies.length, results);
+    onProgress?.(coveredRows, list.length, results);
 
     if (i + BATCH_SIZE < uniqueMovies.length) {
       await sleep(BATCH_DELAY_MS);
     }
   }
 
-  const enriched = movies.map(m => enrichedByKey.get(movieKey(m)));
+  const enriched = list.map(m => enrichedByKey.get(movieKey(m)));
 
-  enrichmentReport.matched = enriched.filter(m => m.tmdbId !== null).length;
+  enrichmentReport.matched = enriched.filter(m => m && m.tmdbId !== null).length;
 
   setCache(cacheKey, enriched);
   return enriched;
@@ -829,17 +856,18 @@ function writeCatalogCache(key, items) {
  *   Object: Normalised catalog item with tmdbId, name, year, votes and poster.
  */
 function normalizeCatalogItem(result) {
-  const year = result.release_date
+  const year = typeof result.release_date === 'string'
     ? parseInt(result.release_date.substring(0, 4), 10)
     : null;
+  const name = result.title || result.original_title || '';
 
   return {
     tmdbId: result.id,
-    name: result.title || result.original_title || '',
+    name: typeof name === 'string' ? name : '',
     year: Number.isFinite(year) ? year : null,
-    voteAverage: result.vote_average || null,
-    voteCount: result.vote_count || null,
-    popularity: result.popularity || null,
+    voteAverage: Number.isFinite(result.vote_average) ? result.vote_average : null,
+    voteCount: Number.isFinite(result.vote_count) ? result.vote_count : null,
+    popularity: Number.isFinite(result.popularity) ? result.popularity : null,
     posterPath: result.poster_path || null,
   };
 }

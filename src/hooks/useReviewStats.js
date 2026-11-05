@@ -89,7 +89,7 @@ const FEATURED_LIMIT = 5;
  *   number: Word count, 0 for empty text.
  */
 function wordCount(text) {
-  if (!text) return 0;
+  if (typeof text !== 'string' || !text.trim()) return 0;
   const matches = text.trim().match(/[\p{L}\p{N}']+/gu);
   return matches ? matches.length : 0;
 }
@@ -107,7 +107,7 @@ function wordCount(text) {
  *   Array<string>: Tokenised words.
  */
 function tokenize(text) {
-  if (!text) return [];
+  if (typeof text !== 'string' || !text) return [];
   const lower = text.toLowerCase();
   const raw = lower.match(/[\p{L}']+/gu) || [];
   const words = [];
@@ -133,7 +133,7 @@ function tokenize(text) {
 function buildFilmIndex(enrichedData) {
   const byKey = new Map();
   const byName = new Map();
-  for (const movie of enrichedData || []) {
+  for (const movie of Array.isArray(enrichedData) ? enrichedData : []) {
     if (!movie?.name) continue;
     const nameKey = String(movie.name).trim().toLowerCase();
     byKey.set(`${nameKey}::${movie.year ?? ''}`, movie);
@@ -210,7 +210,7 @@ function buildLengthByYear(reviews) {
 
   for (const review of reviews) {
     const year = review.date ? parseInt(String(review.date).slice(0, 4), 10) : NaN;
-    if (!Number.isFinite(year)) continue;
+    if (!Number.isFinite(year) || year < 1870 || year > 2100) continue;
     if (!byYear.has(year)) byYear.set(year, []);
     byYear.get(year).push(review.words);
   }
@@ -312,7 +312,7 @@ const EMPTY_STATS = {
 export function useReviewStats(rawData = null, enrichedData = null) {
   return useMemo(() => {
     const index = buildFilmIndex(enrichedData);
-    const rawReviews = rawData?.reviews || [];
+    const rawReviews = Array.isArray(rawData?.reviews) ? rawData.reviews : [];
 
     const reviews = rawReviews.map((review) => {
       const film = matchFilm(review, index);

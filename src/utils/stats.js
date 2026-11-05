@@ -1,29 +1,41 @@
 /**
- * Averages an array of numbers.
+ * Averages an array of numbers, ignoring anything that is not finite.
  *
  * Args:
- *   values (number[]): Numbers to average.
+ *   values (Array<number>): Numbers to average.
  *
  * Returns:
- *   number: Arithmetic mean, or 0 for an empty array.
+ *   number: Arithmetic mean, or 0 when there is nothing usable.
  */
 export function mean(values) {
-  if (!values.length) return 0;
-  return values.reduce((a, b) => a + b, 0) / values.length;
+  if (!Array.isArray(values)) return 0;
+
+  let sum = 0;
+  let count = 0;
+  for (const value of values) {
+    if (!Number.isFinite(value)) continue;
+    sum += value;
+    count++;
+  }
+  return count ? sum / count : 0;
 }
 
 /**
- * Finds the median of an array of numbers.
+ * Finds the median of an array of numbers, ignoring non finite values.
  *
  * Args:
- *   values (number[]): Numbers to inspect.
+ *   values (Array<number>): Numbers to inspect.
  *
  * Returns:
- *   number|null: Median value, or null for an empty array.
+ *   number|null: Median value, or null when there is nothing usable.
  */
 export function median(values) {
-  if (!values.length) return null;
-  const sorted = [...values].sort((a, b) => a - b);
+  if (!Array.isArray(values)) return null;
+
+  const clean = values.filter(Number.isFinite);
+  if (!clean.length) return null;
+
+  const sorted = [...clean].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
@@ -31,24 +43,36 @@ export function median(values) {
 /**
  * Pearson product-moment correlation coefficient between two number arrays.
  *
+ * Pairs where either side is not a finite number are dropped so one broken
+ * cell cannot poison the whole coefficient.
+ *
  * Args:
- *   xs (number[]): First series.
- *   ys (number[]): Second series.
+ *   xs (Array<number>): First series.
+ *   ys (Array<number>): Second series.
  *
  * Returns:
- *   number: Correlation in the range -1 to 1.
+ *   number: Correlation in the range -1 to 1, or 0 when it cannot be computed.
  */
 export function pearson(xs, ys) {
-  const n = xs.length;
-  if (n < 2) return 0;
-  const mx = mean(xs);
-  const my = mean(ys);
+  if (!Array.isArray(xs) || !Array.isArray(ys)) return 0;
+
+  const pairs = [];
+  const n = Math.min(xs.length, ys.length);
+  for (let i = 0; i < n; i++) {
+    if (Number.isFinite(xs[i]) && Number.isFinite(ys[i])) {
+      pairs.push([xs[i], ys[i]]);
+    }
+  }
+  if (pairs.length < 2) return 0;
+
+  const mx = mean(pairs.map(([x]) => x));
+  const my = mean(pairs.map(([, y]) => y));
   let num = 0;
   let dx = 0;
   let dy = 0;
-  for (let i = 0; i < n; i++) {
-    const a = xs[i] - mx;
-    const b = ys[i] - my;
+  for (const [x, y] of pairs) {
+    const a = x - mx;
+    const b = y - my;
     num += a * b;
     dx += a * a;
     dy += b * b;

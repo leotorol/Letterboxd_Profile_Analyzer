@@ -734,8 +734,21 @@
   }
 
   .cs-head-face {
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .cs-portrait-duo {
+    width: 80px;
+    height: 80px;
+  }
+
+  .cs-portrait-duo .cs-portrait-initials {
+    font-size: 1.3rem;
+  }
+
+  .cs-duo-count-num {
+    font-size: 1.8rem;
   }
 }
 
@@ -745,25 +758,93 @@
   }
 
   .cs-cast-hero {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-4);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .cs-portrait-hero {
+    width: 68px;
+    height: 68px;
+  }
+
+  .cs-portrait-hero .cs-portrait-initials {
+    font-size: 1.4rem;
+  }
+
+  .cs-cast-hero-name {
+    font-size: 1.3rem;
+  }
+
+  .cs-cast-hero-count {
+    font-size: 1.3rem;
   }
 
   .cs-cast-hero-line {
     max-width: none;
+    font-size: 0.82rem;
   }
 
   .cs-cast-strip {
+    gap: 5px;
+  }
+
+  .cs-cast-row {
+    grid-template-columns: 18px 32px 1fr auto;
+    gap: var(--space-2);
+    padding: 7px 0;
+  }
+
+  .cs-portrait-row {
+    width: 32px;
+    height: 32px;
+  }
+
+  .cs-cast-row-name {
+    font-size: 0.85rem;
+  }
+
+  .cs-duo-pair {
+    gap: var(--space-2);
+  }
+
+  .cs-portrait-duo {
+    width: 64px;
+    height: 64px;
+  }
+
+  .cs-portrait-duo .cs-portrait-initials {
+    font-size: 1.1rem;
+  }
+
+  .cs-duo-name {
+    font-size: 0.82rem;
+  }
+
+  .cs-duo-link {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cs-duo-count-num {
+    font-size: 1.6rem;
+  }
+
+  .cs-duo-films {
     gap: 6px;
+    max-width: 320px;
   }
 
   .cs-money-stat {
-    padding: 0 var(--space-3);
+    padding: 0 var(--space-2);
   }
 
   .cs-money-stat-val {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
+  }
+
+  .cs-money-stat-lbl {
+    font-size: 0.62rem;
   }
 
   /* the quadrant viewBox scales down hard, so labels grow to stay legible */
@@ -777,7 +858,7 @@
     grid-template-areas:
       "meta rating"
       "track track";
-    row-gap: 7px;
+    row-gap: 5px;
   }
 
   .cs-studio-meta {
@@ -787,12 +868,17 @@
     gap: var(--space-2);
   }
 
+  .cs-studio-name {
+    font-size: 0.82rem;
+  }
+
   .cs-studio-track {
     grid-area: track;
   }
 
   .cs-studio-rating {
     grid-area: rating;
+    font-size: 0.85rem;
   }
 
   .cs-studio-scale,
@@ -801,8 +887,35 @@
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 440px) {
+  .cs-portrait-duo {
+    width: 54px;
+    height: 54px;
+  }
+
+  .cs-portrait-duo .cs-portrait-initials {
+    font-size: 0.95rem;
+  }
+
+  .cs-duo-link {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cs-cast-hero {
+    gap: var(--space-2);
+  }
+
+  .cs-portrait-hero {
+    width: 56px;
+    height: 56px;
+  }
+
+  .cs-cast-hero-name {
+    font-size: 1.15rem;
+  }
+
   .cs-quad-axis {
-    font-size: 19px;
+    font-size: 18px;
   }
 }

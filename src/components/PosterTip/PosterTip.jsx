@@ -33,7 +33,7 @@ export default function PosterTip({ film, sub, stackCount = 0, style }) {
           <span className="poster-tip-title">{film.name}</span>
           {sub && <span className="poster-tip-sub">{sub}</span>}
           <span className="poster-tip-rating">
-            {film.rating != null ? `★ ${film.rating.toFixed(1)} / 5` : 'unrated'}
+            {Number.isFinite(film.rating) ? `★ ${film.rating.toFixed(1)} / 5` : 'unrated'}
           </span>
           {stackCount > 1 && (
             <span className="poster-tip-stack-tag">+{stackCount - 1} more at this point</span>

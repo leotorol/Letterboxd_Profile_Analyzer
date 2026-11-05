@@ -29,11 +29,13 @@ export function filmKey(name, year) {
  *   Array<Object>: Rows with a single entry per film.
  */
 export function dedupeFilms(rows) {
+  if (!Array.isArray(rows)) return [];
+
   const seen = new Set();
   const unique = [];
 
   for (const movie of rows) {
-    if (!movie) continue;
+    if (!movie || typeof movie !== 'object') continue;
     const key = filmKey(movie.name, movie.year);
     if (seen.has(key)) continue;
     seen.add(key);

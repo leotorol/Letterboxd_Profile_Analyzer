@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { dedupeFilms } from '../utils/films';
+import { asArray } from '../utils/coerce';
 import { mean, median, pearson } from '../utils/stats';
 
 // how many faces and studios the section actually renders
@@ -29,7 +30,7 @@ const MIN_REVENUE_RATIO = 0.01;
  */
 function bumpTally(entry, rating) {
   entry.count++;
-  if (rating != null) {
+  if (Number.isFinite(rating)) {
     entry.ratingSum += rating;
     entry.ratedCount++;
   }
@@ -65,7 +66,7 @@ function buildTopActors(rows) {
   const byActor = new Map();
 
   for (const movie of rows) {
-    for (const person of movie.cast || []) {
+    for (const person of asArray(movie.cast)) {
       if (!person?.name) continue;
       let entry = byActor.get(person.name);
       if (!entry) {
@@ -93,7 +94,7 @@ function buildTopActors(rows) {
   const topNames = new Set(ranked.map((a) => a.name));
   const filmsByName = new Map();
   for (const movie of rows) {
-    for (const person of movie.cast || []) {
+    for (const person of asArray(movie.cast)) {
       if (!person?.name || !topNames.has(person.name)) continue;
       const list = filmsByName.get(person.name) || [];
       list.push({
@@ -129,11 +130,12 @@ function buildDuo(rows) {
   const pairs = new Map();
 
   for (const movie of rows) {
-    const directors = movie.directors || [];
-    const cast = movie.cast || [];
+    const directors = asArray(movie.directors);
+    const cast = asArray(movie.cast);
     if (!directors.length || !cast.length) continue;
 
     for (const director of directors) {
+      if (!director) continue;
       for (const person of cast) {
         if (!person?.name) continue;
         const key = `${director}||${person.name}`;
@@ -152,7 +154,7 @@ function buildDuo(rows) {
           entry.director.profilePath = movie.directorProfiles[director];
         }
         entry.count++;
-        if (movie.rating != null) entry.ratingSum += movie.rating;
+        if (Number.isFinite(movie.rating)) entry.ratingSum += movie.rating;
         entry.films.push({
           name: movie.name,
           year: movie.year,
@@ -186,7 +188,7 @@ function buildStudios(rows) {
   const byStudio = new Map();
 
   for (const movie of rows) {
-    for (const company of movie.productionCompanies || []) {
+    for (const company of asArray(movie.productionCompanies)) {
       if (!company?.name) continue;
       let entry = byStudio.get(company.name);
       if (!entry) {
@@ -220,20 +222,20 @@ function buildStudios(rows) {
  *   Object: points, medianBudget, blockbuster/indie counts and averages, correlation, verdict.
  */
 function buildBudget(rows) {
-  const withBudget = rows.filter((m) => m.budget != null && m.budget > 0);
+  const withBudget = rows.filter((m) => Number.isFinite(m.budget) && m.budget > 0);
 
   const points = withBudget
-    .filter((m) => m.revenue != null && m.revenue > 0 && m.revenue >= m.budget * MIN_REVENUE_RATIO)
+    .filter((m) => Number.isFinite(m.revenue) && m.revenue > 0 && m.revenue >= m.budget * MIN_REVENUE_RATIO)
     .map((m) => ({
       name: m.name,
       year: m.year,
       budget: m.budget,
       revenue: m.revenue,
-      rating: m.rating ?? null,
+      rating: Number.isFinite(m.rating) ? m.rating : null,
       posterPath: m.posterPath || null,
     }));
 
-  const rated = withBudget.filter((m) => m.rating != null);
+  const rated = withBudget.filter((m) => Number.isFinite(m.rating));
   const blockbusters = rated.filter((m) => m.budget >= BLOCKBUSTER_BUDGET);
   const indies = rated.filter((m) => m.budget <= INDIE_BUDGET);
 

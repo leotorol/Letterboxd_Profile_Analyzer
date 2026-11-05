@@ -123,7 +123,7 @@ const RECORDS = [
     eligible: (film) => Number.isFinite(film.voteCount) && film.voteCount > 0,
     rank: (a, b) => (b.voteCount - a.voteCount)
       || ((b.voteAverage || 0) - (a.voteAverage || 0))
-      || a.name.localeCompare(b.name),
+      || String(a.name || '').localeCompare(String(b.name || '')),
     stat: (film) => `${COUNT_FORMAT.format(film.voteCount)} votes`,
     empty: 'No votes',
   },
@@ -134,7 +134,7 @@ const RECORDS = [
     eligible: (film) => Number.isFinite(film.voteCount) && film.voteCount > 0,
     rank: (a, b) => (a.voteCount - b.voteCount)
       || ((a.voteAverage || 0) - (b.voteAverage || 0))
-      || a.name.localeCompare(b.name),
+      || String(a.name || '').localeCompare(String(b.name || '')),
     stat: (film) => `${COUNT_FORMAT.format(film.voteCount)} votes`,
     empty: 'No votes',
   },
@@ -149,7 +149,7 @@ const RECORDS = [
     ),
     rank: (a, b) => (b.runtime - a.runtime)
       || ((b.voteCount || 0) - (a.voteCount || 0))
-      || a.name.localeCompare(b.name),
+      || String(a.name || '').localeCompare(String(b.name || '')),
     stat: (film) => formatRuntime(film.runtime),
     empty: 'No runtime',
   },
@@ -160,7 +160,7 @@ const RECORDS = [
     eligible: (film) => Number.isFinite(film.rating) && film.rating > 0,
     rank: (a, b) => (b.rating - a.rating)
       || ((b.voteAverage || 0) - (a.voteAverage || 0))
-      || a.name.localeCompare(b.name),
+      || String(a.name || '').localeCompare(String(b.name || '')),
     stat: (film) => `${film.rating.toFixed(1)} / 5`,
     empty: 'Not rated',
   },
@@ -169,7 +169,7 @@ const RECORDS = [
     name: 'Oldest',
     tone: 'blue',
     eligible: (film) => Number.isFinite(film.year) && film.year >= 1888,
-    rank: (a, b) => (a.year - b.year) || a.name.localeCompare(b.name),
+    rank: (a, b) => (a.year - b.year) || String(a.name || '').localeCompare(String(b.name || '')),
     stat: (film) => String(film.year),
     empty: 'No year',
   },

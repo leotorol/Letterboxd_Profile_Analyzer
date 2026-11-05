@@ -6,11 +6,12 @@
  *   accent (string, optional): CSS colour for the icon.
  *   label (string): Panel title.
  *   note (string, optional): Micro note on the right.
+ *   noteUnderline (boolean, optional): Draws an underline under the note.
  *
  * Returns:
  *   JSX.Element: The panel header row.
  */
-export default function PanelHead({ icon, accent, label, note }) {
+export default function PanelHead({ icon, accent, label, note, noteUnderline = false }) {
   return (
     <div className="lb-panel-head">
       <div className="lb-panel-title">
@@ -21,7 +22,9 @@ export default function PanelHead({ icon, accent, label, note }) {
         )}
         <div className="lb-panel-label">{label}</div>
       </div>
-      {note && <div className="lb-panel-note">{note}</div>}
+      {note && (
+        <div className={`lb-panel-note${noteUnderline ? ' is-underlined' : ''}`}>{note}</div>
+      )}
     </div>
   );
 }

@@ -23,7 +23,14 @@ import ErrorBoundary from './components/ErrorBoundary';
  *   JSX.Element: Rendered active screen component based on appState.
  */
 export default function App() {
-  const { appState, setAppState, setRawData, setEnrichedData, setEnrichmentReport } = useData();
+  const {
+    appState,
+    setAppState,
+    setRawData,
+    setEnrichedData,
+    setEnrichedWatchlist,
+    setEnrichmentReport,
+  } = useData();
 
   useEffect(() => {
     if (appState === 'ready') window.scrollTo(0, 0);
@@ -33,6 +40,7 @@ export default function App() {
     setAppState('idle');
     setRawData(null);
     setEnrichedData(null);
+    setEnrichedWatchlist(null);
     setEnrichmentReport(null);
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
     window.scrollTo(0, 0);
@@ -49,16 +57,16 @@ export default function App() {
         {appState === 'ready'   && (
           <>
             <ChapterRail onReset={handleReset} />
-            <QuickFacts />
-            <Rhythm />
-            <CinephileProfile />
-            <Ratings />
-            <Cast />
-            <Reviews />
-            <Watchlist />
-            <Random />
-            <Pasapalabra />
-            <Footer />
+            <ErrorBoundary compact onReset={handleReset}><QuickFacts /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Rhythm /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><CinephileProfile /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Ratings /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Cast /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Reviews /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Watchlist /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Random /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Pasapalabra /></ErrorBoundary>
+            <ErrorBoundary compact onReset={handleReset}><Footer /></ErrorBoundary>
           </>
         )}
       </main>

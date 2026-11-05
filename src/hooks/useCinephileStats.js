@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { mean, median, pearson } from '../utils/stats';
 import { dedupeFilms } from '../utils/films';
+import { asArray } from '../utils/coerce';
 
 // how many dots max we render per genre column in the dotplot
 const GENRE_DOTPLOT_MAX_DOTS = 80;
@@ -22,7 +23,8 @@ const MAX_FILM_RUNTIME_MIN = 300;
 function genreEntropy(rows) {
   const map = new Map();
   for (const movie of rows) {
-    for (const genre of (movie.genres || [])) {
+    for (const genre of asArray(movie.genres)) {
+      if (!genre) continue;
       map.set(genre, (map.get(genre) || 0) + 1);
     }
   }
@@ -51,10 +53,10 @@ function genreEntropy(rows) {
  *   Array<Object>: Axis descriptors with labels, values, explanations and availability.
  */
 function buildSpectrum(rows) {
-  const withVotes = rows.filter((m) => m.voteCount != null && m.voteCount > 0);
-  const withGenres = rows.filter((m) => (m.genres || []).length > 0);
+  const withVotes = rows.filter((m) => Number.isFinite(m.voteCount) && m.voteCount > 0);
+  const withGenres = rows.filter((m) => asArray(m.genres).length > 0);
   const withLang = rows.filter((m) => m.originalLanguage);
-  const years = rows.filter((m) => m.year).map((m) => m.year);
+  const years = rows.filter((m) => Number.isFinite(m.year)).map((m) => m.year);
 
   // threshold on the mean, not the median: a median split is always ~50% by definition
   const avgVotes = withVotes.length ? mean(withVotes.map((m) => m.voteCount)) : null;
@@ -67,11 +69,16 @@ function buildSpectrum(rows) {
   let modernCount = 0;
   let medianYr = null;
   if (years.length) {
-    const minYear = Math.min(...years);
-    const maxYear = Math.max(...years);
+    // a spread over a huge library can blow the call stack, so walk the years
+    let minYear = Infinity;
+    let maxYear = -Infinity;
+    for (const year of years) {
+      if (year < minYear) minYear = year;
+      if (year > maxYear) maxYear = year;
+    }
     medianYr = Math.round(median(years));
     modern = minYear === maxYear ? 0.5 : (medianYr - minYear) / (maxYear - minYear);
-    modernCount = rows.filter((m) => m.year && m.year >= 2000).length;
+    modernCount = rows.filter((m) => Number.isFinite(m.year) && m.year >= 2000).length;
   }
 
   const intlCount = withLang.length
@@ -79,7 +86,7 @@ function buildSpectrum(rows) {
     : 0;
   const international = withLang.length ? intlCount / withLang.length : null;
 
-  const distinctGenres = new Set(rows.flatMap((m) => m.genres || [])).size;
+  const distinctGenres = new Set(rows.flatMap((m) => asArray(m.genres))).size;
   const diverse = withGenres.length ? genreEntropy(rows) : null;
 
   const makeAxis = (key, leftLabel, rightLabel, value, pctLabel, explanation) => ({
@@ -154,8 +161,9 @@ function buildSpectrum(rows) {
 function buildGenreDistribution(rows) {
   const byGenre = new Map();
   for (const movie of rows) {
-    const genres = movie.genres || [];
+    const genres = asArray(movie.genres);
     for (const genre of genres) {
+      if (!genre) continue;
       let entry = byGenre.get(genre);
       if (!entry) {
         entry = { genre, count: 0, films: [] };
@@ -208,7 +216,7 @@ function buildGenreDistribution(rows) {
 function buildGenreReward(list) {
   const withAvg = list
     .map((row) => {
-      const rated = row.films.filter((f) => f.rating != null);
+      const rated = row.films.filter((f) => Number.isFinite(f.rating));
       const avg = rated.length ? rated.reduce((s, f) => s + f.rating, 0) / rated.length : null;
       return { ...row, avg, ratedCount: rated.length };
     })
@@ -232,16 +240,16 @@ function buildGenreReward(list) {
  */
 function buildTasteEvolution(rows) {
   // check date, watchedDate, or fallback to year so no logs get lost
-  const rated = rows.filter((m) => m.rating != null && (m.date || m.watchedDate || m.year));
+  const rated = rows.filter((m) => Number.isFinite(m.rating) && (m.date || m.watchedDate || Number.isFinite(m.year)));
   const byYear = new Map();
 
   for (const movie of rated) {
     const rawDate = movie.date || movie.watchedDate;
     let watchYear = rawDate ? parseInt(String(rawDate).substring(0, 4), 10) : null;
-    if (!watchYear || isNaN(watchYear) || watchYear < 1900 || watchYear > 2100) {
-      watchYear = movie.year;
+    if (!Number.isFinite(watchYear) || watchYear < 1900 || watchYear > 2100) {
+      watchYear = Number.isFinite(movie.year) ? movie.year : null;
     }
-    if (!watchYear) continue;
+    if (!Number.isFinite(watchYear)) continue;
 
     let entry = byYear.get(watchYear);
     if (!entry) {
@@ -292,13 +300,13 @@ function buildTasteEvolution(rows) {
 function buildCorrelation(rows, axis) {
   const points = [];
   for (const movie of rows) {
-    if (movie.rating == null) continue;
+    if (!Number.isFinite(movie.rating)) continue;
     let x;
     if (axis === 'runtime') {
-      if (!movie.runtime || movie.runtime <= 0 || movie.runtime > MAX_FILM_RUNTIME_MIN) continue;
+      if (!Number.isFinite(movie.runtime) || movie.runtime <= 0 || movie.runtime > MAX_FILM_RUNTIME_MIN) continue;
       x = movie.runtime;
     } else {
-      if (!movie.year) continue;
+      if (!Number.isFinite(movie.year)) continue;
       x = movie.year;
     }
     points.push({
@@ -351,15 +359,16 @@ function buildDiversity(rows) {
       if (genders.some((g) => g === 1)) femaleFilms++;
     }
 
-    const directors = movie.directors || [];
+    const directors = asArray(movie.directors);
     for (const name of directors) {
+      if (!name) continue;
       let dEntry = directorStats.get(name);
       if (!dEntry) {
         dEntry = { name, count: 0, ratingSum: 0, ratedCount: 0 };
         directorStats.set(name, dEntry);
       }
       dEntry.count++;
-      if (movie.rating != null) {
+      if (Number.isFinite(movie.rating)) {
         dEntry.ratingSum += movie.rating;
         dEntry.ratedCount++;
       }
@@ -377,7 +386,7 @@ function buildDiversity(rows) {
   let repeatFilms = 0;
   let totalWithDirectors = 0;
   for (const movie of rows) {
-    const directors = movie.directors || [];
+    const directors = asArray(movie.directors);
     if (directors.length > 0) {
       totalWithDirectors++;
       if (directors.some((name) => (directorStats.get(name)?.count || 0) >= 2)) {
@@ -412,8 +421,8 @@ function buildDiversity(rows) {
 function buildWorldMap(rows) {
   const byCountry = new Map();
   for (const movie of rows) {
-    const countries = movie.productionCountries || [];
-    for (const code of countries) {
+    for (const code of asArray(movie.productionCountries)) {
+      if (!code || typeof code !== 'string') continue;
       byCountry.set(code, (byCountry.get(code) || 0) + 1);
     }
   }

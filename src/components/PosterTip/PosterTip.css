@@ -69,3 +69,27 @@
   font-weight: 700;
   color: var(--color-accent-2);
 }
+
+@media (max-width: 640px) {
+  .poster-tip-card {
+    max-width: 220px;
+    gap: var(--space-2);
+  }
+
+  .poster-tip-poster {
+    width: 48px;
+    height: 72px;
+  }
+
+  .poster-tip-title {
+    font-size: 0.85rem;
+  }
+
+  .poster-tip-sub {
+    font-size: 0.68rem;
+  }
+
+  .poster-tip-rating {
+    font-size: 0.74rem;
+  }
+}

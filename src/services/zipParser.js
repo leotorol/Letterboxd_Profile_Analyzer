@@ -1,5 +1,6 @@
 import JSZip from 'jszip';
 import Papa from 'papaparse';
+import { toIsoDate, toName, toRating, toYear } from '../utils/coerce';
 
 /**
  * Parses raw CSV text string using PapaParse under the hood.
@@ -11,12 +12,50 @@ import Papa from 'papaparse';
  *   Array<Object>: Parsed row objects with column headers as key names.
  */
 function parseCSV(csvText) {
-  const result = Papa.parse(csvText, {
+  if (typeof csvText !== 'string') return [];
+
+  // some exports come with a UTF-8 BOM glued to the first header, Papa keeps it
+  const cleanText = csvText.replace(/^\uFEFF/, '');
+  const result = Papa.parse(cleanText, {
     header: true,
     skipEmptyLines: true,
     dynamicTyping: false,
   });
-  return result.data;
+  // a malformed export can still yield null rows or junk entries, drop them
+  return (result.data || []).filter((row) => row && typeof row === 'object');
+}
+
+/**
+ * Drops duplicate film rows, keeping the earliest dated copy when there is one.
+ *
+ * Real exports occasionally repeat the same film dozens of times after a
+ * reimport or a sync hiccup. Every stats section already dedupes on title plus
+ * year, so cleaning it here keeps the raw counts honest too. Rewatches still
+ * live in diary.csv, which is never touched by this.
+ *
+ * Args:
+ *   rows (Array<Object>): Normalised rows with name, year and date.
+ *
+ * Returns:
+ *   Array<Object>: One row per film.
+ */
+function keepUniqueByFilm(rows) {
+  const byFilm = new Map();
+
+  for (const row of rows) {
+    if (!row) continue;
+    const key = `${row.name}::${row.year ?? ''}`;
+    const existing = byFilm.get(key);
+    if (!existing) {
+      byFilm.set(key, row);
+      continue;
+    }
+    if (row.date && (!existing.date || row.date < existing.date)) {
+      byFilm.set(key, row);
+    }
+  }
+
+  return [...byFilm.values()];
 }
 
 /**
@@ -141,77 +180,115 @@ export async function parseLetterboxdZip(file) {
   // map out ratings by URI or Name+Year so we can pair them with watched.csv
   const ratingsMap = new Map();
   ratings.forEach(r => {
-    const uri = r['Letterboxd URI'];
-    const nameYear = `${r['Name']}::${r['Year']}`;
-    const ratingVal = r['Rating'] ? parseFloat(r['Rating']) : null;
+    const uri = typeof r['Letterboxd URI'] === 'string' ? r['Letterboxd URI'] : null;
+    const name = toName(r['Name']);
+    const year = toYear(r['Year']);
+    const ratingVal = toRating(r['Rating']);
     if (uri) ratingsMap.set(uri, ratingVal);
-    ratingsMap.set(nameYear, ratingVal);
+    if (name) ratingsMap.set(`${name}::${year ?? ''}`, ratingVal);
   });
 
   // watched.csv is the main truth, fallback to ratings if watched is somehow empty
   const primaryWatched = watched.length > 0 ? watched : ratings;
 
   const normalisedWatched = primaryWatched.map(w => {
-    const uri = w['Letterboxd URI'];
-    const nameYear = `${w['Name']}::${w['Year']}`;
+    const name = toName(w['Name']);
+    if (!name) return null;
+
+    const uri = typeof w['Letterboxd URI'] === 'string' ? w['Letterboxd URI'] : null;
+    const year = toYear(w['Year']);
+    const nameYear = `${name}::${year ?? ''}`;
     let rating = uri ? ratingsMap.get(uri) : undefined;
     if (rating === undefined) {
       rating = ratingsMap.get(nameYear);
     }
-    if (rating === undefined && w['Rating']) {
-      rating = parseFloat(w['Rating']);
+    if (rating === undefined) {
+      rating = toRating(w['Rating']);
     }
 
     return {
-      date: w['Date'],
-      name: w['Name'],
-      year: w['Year'] ? parseInt(w['Year'], 10) : null,
-      uri: w['Letterboxd URI'],
-      rating: rating !== undefined ? rating : null,
-      normalizedTitle: normalizeTitle(w['Name']),
+      date: toIsoDate(w['Date']),
+      name,
+      year,
+      uri,
+      rating: rating ?? null,
+      normalizedTitle: normalizeTitle(name),
     };
-  });
+  }).filter(Boolean);
 
-  const normalisedWatchlist = watchlist.map(w => ({
-    date: w['Date'],
-    name: w['Name'],
-    year: w['Year'] ? parseInt(w['Year'], 10) : null,
-    uri: w['Letterboxd URI'],
-    normalizedTitle: normalizeTitle(w['Name']),
-  }));
+  // every row was malformed, so there is nothing honest to analyse
+  if (normalisedWatched.length === 0) {
+    throw new Error(
+      'Your Letterboxd export has no usable watched or rated films. Log a few movies first and export again.'
+    );
+  }
+
+  const uniqueWatched = keepUniqueByFilm(normalisedWatched);
+
+  const normalisedWatchlist = keepUniqueByFilm(watchlist.map(w => {
+    const name = toName(w['Name']);
+    if (!name) return null;
+
+    return {
+      date: toIsoDate(w['Date']),
+      name,
+      year: toYear(w['Year']),
+      uri: typeof w['Letterboxd URI'] === 'string' ? w['Letterboxd URI'] : null,
+      normalizedTitle: normalizeTitle(name),
+    };
+  }).filter(Boolean));
 
   // diary.csv has one row per watch event (rewatches are separate entries),
   // unlike watched.csv which is one row per film. That's the source of truth
   // for rewatch detection, so normalise it to the same shape as the rest.
-  const normalisedDiary = diary.map(d => ({
-    date: d['Watched Date'] || d['Date'] || null,
-    name: d['Name'],
-    year: d['Year'] ? parseInt(d['Year'], 10) : null,
-  }));
+  // Exact duplicate events are dropped because a reimport can repeat the same
+  // watch dozens of times and that would fake a comfort movie obsession.
+  const seenDiaryEvents = new Set();
+  const normalisedDiary = diary.map(d => {
+    const name = toName(d['Name']);
+    if (!name) return null;
+
+    const date = toIsoDate(d['Watched Date'] || d['Date']);
+    const year = toYear(d['Year']);
+    const key = `${name}::${year ?? ''}::${date ?? ''}`;
+    if (seenDiaryEvents.has(key)) return null;
+    seenDiaryEvents.add(key);
+
+    return {
+      date,
+      name,
+      year,
+    };
+  }).filter(Boolean);
 
   // reviews.csv is one row per written review. The Review field can be empty
   // for spoiler only or rating only entries, so those get dropped: there is
   // nothing to analyse in an empty review. Only the fields the reviews section
   // actually reads are kept, the rest is dead weight.
   const normalisedReviews = reviews
-    .map((r) => ({
-      date: r['Date'] || r['Watched Date'] || null,
-      name: r['Name'],
-      year: r['Year'] ? parseInt(r['Year'], 10) : null,
-      rating: r['Rating'] ? parseFloat(r['Rating']) : null,
-      review: (r['Review'] || '').trim(),
-    }))
-    .filter((r) => r.review.length > 0);
+    .map((r) => {
+      const name = toName(r['Name']);
+      if (!name) return null;
+
+      return {
+        date: toIsoDate(r['Date'] || r['Watched Date']),
+        name,
+        year: toYear(r['Year']),
+        rating: toRating(r['Rating']),
+        review: (r['Review'] || '').trim(),
+      };
+    })
+    .filter((r) => r && r.review.length > 0);
 
   const profileData = profile[0] || {};
 
   return {
-    watched: normalisedWatched,
+    watched: uniqueWatched,
     watchlist: normalisedWatchlist,
     diary: normalisedDiary,
     reviews: normalisedReviews,
     profile: {
-      username: profileData['Username'] || '',
+      username: toName(profileData['Username']) || '',
     },
   };
 }

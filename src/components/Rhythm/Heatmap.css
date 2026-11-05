@@ -16,6 +16,25 @@
   padding: var(--space-1) 0 var(--space-2);
   scrollbar-width: thin;
   scrollbar-color: var(--color-muted-blue) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ry-heat-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ry-heat-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-full);
+}
+
+.ry-heat-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-muted-blue);
+  border-radius: var(--radius-full);
+}
+
+.ry-heat-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scrollbar-hover);
 }
 
 .ry-heat-row {
@@ -245,6 +264,24 @@
   scrollbar-color: var(--color-muted-blue) transparent;
 }
 
+.ry-heat-tooltip-films::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ry-heat-tooltip-films::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-full);
+}
+
+.ry-heat-tooltip-films::-webkit-scrollbar-thumb {
+  background: var(--color-muted-blue);
+  border-radius: var(--radius-full);
+}
+
+.ry-heat-tooltip-films::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scrollbar-hover);
+}
+
 .ry-heat-film {
   display: flex;
   align-items: center;
@@ -310,31 +347,63 @@
 
 @media (max-width: 640px) {
   .ry-heat {
-    --cell-h: 28px;
-    --cell-min: 20px;
+    --cell-h: 20px;
+    --cell-min: 14px;
+    --gap: 3px;
   }
   .ry-heat-weekdays {
-    width: 34px;
+    width: 28px;
+  }
+  .ry-heat-weekday-label {
+    font-size: 0.62rem;
+  }
+  .ry-heat-month-label {
+    font-size: 0.6rem;
+  }
+  .ry-heat-legend {
+    margin-top: var(--space-3);
+    gap: 6px;
+  }
+  .ry-heat-legend .ry-heat-cell {
+    height: 12px;
+    min-width: 12px;
+  }
+  .ry-heat-legend-text {
+    font-size: 0.65rem;
   }
 
   /* Keep the pinned film list inside the phone viewport and shorter than the screen */
   .ry-heat-tooltip {
     min-width: 0;
-    width: min(80vw, 260px);
+    width: min(85vw, 270px);
     max-width: none;
     padding: var(--space-3);
   }
 
   .ry-heat-tooltip-films {
-    max-height: 46vh;
+    max-height: 42vh;
   }
 
   .ry-heat-film-poster {
-    width: 56px;
-    height: 84px;
+    width: 50px;
+    height: 75px;
   }
 
   .ry-heat-film-name {
-    font-size: 0.95rem;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .ry-heat {
+    --cell-h: 17px;
+    --cell-min: 12px;
+    --gap: 2px;
+  }
+  .ry-heat-weekdays {
+    width: 24px;
+  }
+  .ry-heat-weekday-label {
+    font-size: 0.55rem;
   }
 }

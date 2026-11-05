@@ -710,7 +710,11 @@
 
 @media (max-width: 768px) {
   .rv-cloud {
-    height: clamp(300px, 52vh, 380px);
+    height: clamp(220px, 36vh, 280px);
+  }
+
+  .rv-feature-poster {
+    width: 120px;
   }
 }
 
@@ -719,9 +723,18 @@
     display: none;
   }
 
+  .rv-cloud {
+    height: 210px;
+  }
+
   .rv-cloud-foot {
     flex-wrap: wrap;
     gap: var(--space-2);
+    padding-top: var(--space-2);
+  }
+
+  .rv-cloud-foot-word {
+    font-size: 1.25rem;
   }
 
   .rv-cloud-foot-label {
@@ -730,11 +743,63 @@
 
   .rv-feature-hero {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .rv-feature-poster {
-    max-width: 150px;
+    width: 84px;
+    max-width: 84px;
+  }
+
+  .rv-feature-name {
+    font-size: 1.15rem;
+  }
+
+  .rv-feature-text {
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .rv-fingerprint-row {
+    padding: 8px 0;
+  }
+
+  .rv-fingerprint-label {
+    font-size: 0.8rem;
+  }
+
+  .rv-fingerprint-value {
+    font-size: 1.05rem;
+  }
+
+  .rv-bars-axis {
+    font-size: 15px;
+  }
+
+  .rv-bars-year {
+    font-size: 15px;
+  }
+
+  .rv-bars-count {
+    font-size: 12px;
+  }
+
+  .rv-bars-value {
+    font-size: 16px;
+  }
+
+  .rv-rank-row {
+    padding: 4px 6px;
+  }
+
+  .rv-rank-name {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .rv-cloud {
+    height: 190px;
   }
 
   .rv-bars-axis {
@@ -751,23 +816,5 @@
 
   .rv-bars-value {
     font-size: 18px;
-  }
-}
-
-@media (max-width: 420px) {
-  .rv-bars-axis {
-    font-size: 21px;
-  }
-
-  .rv-bars-year {
-    font-size: 21px;
-  }
-
-  .rv-bars-count {
-    font-size: 15px;
-  }
-
-  .rv-bars-value {
-    font-size: 21px;
   }
 }

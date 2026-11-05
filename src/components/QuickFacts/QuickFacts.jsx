@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { useCountUp } from '../../hooks/useCountUp';
+import { dedupeFilms } from '../../utils/films';
 import { ClockIcon } from '../icons/Icons';
 import ChapterHeading from '../shared/ChapterHeading';
 import PanelHead from '../shared/PanelHead';
@@ -54,10 +55,11 @@ const ListIcon = () => (
  *   Object: Formatted hours string, minutes integer, and days string.
  */
 function formatTime(totalMinutes) {
-  if (!totalMinutes) return { hours: '0', mins: 0, days: '0.0' };
-  const hours = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
-  const days = (totalMinutes / (60 * 24)).toFixed(1);
+  const safeMinutes = Number.isFinite(totalMinutes) && totalMinutes > 0 ? totalMinutes : 0;
+  if (!safeMinutes) return { hours: '0', mins: 0, days: '0.0' };
+  const hours = Math.floor(safeMinutes / 60);
+  const mins = Math.floor(safeMinutes % 60);
+  const days = (safeMinutes / (60 * 24)).toFixed(1);
   return { hours: hours.toLocaleString(), mins, days };
 }
 
@@ -75,6 +77,8 @@ function formatTime(totalMinutes) {
  *   string|null: Impactful anecdote or null if nothing applies.
  */
 function buildWatchTimeNote(totalMinutes) {
+  if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) return null;
+
   if (totalMinutes >= 21000) {
     const totalHours = totalMinutes / 60;
     const months = totalHours / (40 * 4.5);
@@ -103,7 +107,8 @@ function buildWatchTimeNote(totalMinutes) {
  */
 function calcSleeplessNights(totalMinutes) {
   const NIGHT_MINUTES = 8 * 60;
-  return Math.ceil(totalMinutes / NIGHT_MINUTES).toLocaleString();
+  const safeMinutes = Number.isFinite(totalMinutes) && totalMinutes > 0 ? totalMinutes : 0;
+  return Math.ceil(safeMinutes / NIGHT_MINUTES).toLocaleString();
 }
 
 /**
@@ -118,19 +123,25 @@ function calcSleeplessNights(totalMinutes) {
  */
 function calcStats(enriched, rawData) {
   // los muertos suyos que facil es calcular las stats cuando el data esta limpio
-  const totalWatched = enriched.length;
-  const totalMinutes = enriched.reduce((sum, m) => sum + (m.runtime || 0), 0);
+  const rows = dedupeFilms(Array.isArray(enriched) ? enriched.filter(Boolean) : []);
+  const totalWatched = rows.length;
+  const totalMinutes = rows.reduce(
+    (sum, m) => sum + (Number.isFinite(m.runtime) && m.runtime > 0 ? m.runtime : 0),
+    0
+  );
 
   const directorSet = new Set();
-  enriched.forEach(m => (m.directors || []).forEach(d => directorSet.add(d)));
+  rows.forEach(m => (Array.isArray(m.directors) ? m.directors : []).forEach(d => {
+    if (d) directorSet.add(d);
+  }));
   const uniqueDirectors = directorSet.size;
 
-  const rated = enriched.filter(m => m.rating != null);
+  const rated = rows.filter(m => Number.isFinite(m.rating));
   const avgRating = rated.length
     ? (rated.reduce((s, m) => s + m.rating, 0) / rated.length)
     : 0;
 
-  const watchlistCount = rawData?.watchlist?.length || 0;
+  const watchlistCount = Array.isArray(rawData?.watchlist) ? rawData.watchlist.length : 0;
   const watchlistEstimatedMinutes = watchlistCount * 110;
 
   return {

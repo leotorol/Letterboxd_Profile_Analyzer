@@ -494,7 +494,9 @@ function buildRewatches(watchedRows, diaryRows = [], enriched = null) {
  */
 export function useRhythmStats(rawData, enrichedData = null) {
   return useMemo(() => {
-    const rows = rawData?.watched || [];
+    const rows = Array.isArray(rawData?.watched) ? rawData.watched : [];
+    const diaryRows = Array.isArray(rawData?.diary) ? rawData.diary : [];
+    const watchlistCount = Array.isArray(rawData?.watchlist) ? rawData.watchlist.length : 0;
     const byDate = countByDate(rows);
     const byDateMovies = buildByDateMovies(rows, enrichedData);
     const activeDays = [...byDate.keys()].sort();
@@ -505,7 +507,7 @@ export function useRhythmStats(rawData, enrichedData = null) {
     for (const iso of byDate.keys()) {
       yearSet.add(Number(iso.slice(0, 4)));
     }
-    const years = [...yearSet].sort((a, b) => a - b);
+    const years = [...yearSet].filter(Number.isFinite).sort((a, b) => a - b);
 
     const patterns = empty
       ? null
@@ -513,10 +515,10 @@ export function useRhythmStats(rawData, enrichedData = null) {
     const evolution = empty ? [] : buildEvolution(rows);
     const projection = empty
       ? { avgPerWeek: 0, filmsByYearEnd: 0, watchlistWeeks: null }
-      : buildProjection(rows, rawData?.watchlist?.length || 0);
+      : buildProjection(rows, watchlistCount);
     // watched.csv gives every distinct title ever watched, diary.csv gives the
     // rewatch events. both together make the comfort-movie numbers honest.
-    const rewatch = buildRewatches(rows, rawData?.diary || [], enrichedData);
+    const rewatch = buildRewatches(rows, diaryRows, enrichedData);
 
     // longest active streak plus the films watched during it, flattened in
     // chronological order, so the Streaks card can show a poster strip.

@@ -4,6 +4,7 @@ import { useData } from '../../context/DataContext';
 import { useCinephileStats } from '../../hooks/useCinephileStats';
 import { polarToCartesian } from '../../utils/geometry';
 import { ratingColor } from '../../utils/ratingColor';
+import { asArray } from '../../utils/coerce';
 import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
 import { tipPosition } from '../../utils/positionTip';
 import { ClockIcon, ClockIconAlt, TrendIcon } from '../icons/Icons';
@@ -523,7 +524,7 @@ function GenreDotplot({ genre }) {
                 <div className="cp-dotplot-dots cp-dotplot-scatter">
                   {dotsToShow.map((film, i) => {
                     // deterministic horizontal jitter based on film title & index
-                    const seed = (film.name.charCodeAt(0) || i) * 31 + i * 17;
+                    const seed = (String(film.name || '').charCodeAt(0) || i) * 31 + i * 17;
                     const leftPct = 12 + Math.abs(Math.sin(seed) * 76);
                     const topPct = dotsToShow.length > 1 ? (i / (dotsToShow.length - 1)) * 90 + 5 : 50;
 
@@ -535,7 +536,7 @@ function GenreDotplot({ genre }) {
                         data-film={film.name}
                         data-genre={row.genre}
                         className="cp-dotplot-dot"
-                        aria-label={`${film.name}${film.rating != null ? `, rated ${film.rating.toFixed(1)} out of 5` : ', unrated'}`}
+                        aria-label={`${film.name}${Number.isFinite(film.rating) ? `, rated ${film.rating.toFixed(1)} out of 5` : ', unrated'}`}
                         style={{
                           background: ratingColor(film.rating),
                           left: `${leftPct}%`,
@@ -948,7 +949,7 @@ function TickDensityChart({ data, xLabel, accent }) {
  * Returns:
  *   JSX.Element: Arc gauge component.
  */
-function ArcGauge({ value, label, accent, subtext, size, colorOverride }) {
+function ArcGauge({ value, label, accent, subtext, size, colorOverride, centerLabel }) {
   const R = 38;
   const cx = 54;
   const cy = 54;
@@ -983,7 +984,7 @@ function ArcGauge({ value, label, accent, subtext, size, colorOverride }) {
           textAnchor="middle"
           dominantBaseline="middle"
         >
-          {value != null ? `${Math.round(value * 100)}%` : '?'}
+          {centerLabel ?? (value != null ? `${Math.round(value * 100)}%` : '?')}
         </text>
         {subtext && (
           <text
@@ -1022,7 +1023,7 @@ function GenreRewardCard({ reward }) {
       <div className="cp-reward-block">
         <ArcGauge
           value={top.avg / 5}
-          subtext={`★ ${top.avg.toFixed(1)}`}
+          centerLabel={`★ ${top.avg.toFixed(1)}`}
           accent="--color-accent-3"
           size={170}
         />
@@ -1038,7 +1039,7 @@ function GenreRewardCard({ reward }) {
         <div className="cp-reward-block">
           <ArcGauge
             value={bottom.avg / 5}
-            subtext={`★ ${bottom.avg.toFixed(1)}`}
+            centerLabel={`★ ${bottom.avg.toFixed(1)}`}
             accent="--color-accent-warm"
             size={170}
           />
@@ -1345,6 +1346,7 @@ function clampMapView(view) {
  */
 function WorldMapChart({ worldMap }) {
   const [geoData, setGeoData] = useState(null);
+  const [geoFailed, setGeoFailed] = useState(false);
   const [hover, setHover] = useState(null);
   const [pinned, setPinned] = useState(null);
   const [view, setView] = useState({ scale: 1, x: 0, y: 0 });
@@ -1367,6 +1369,7 @@ function WorldMapChart({ worldMap }) {
       setGeoData(countries);
     }).catch((err) => {
       // swallow it in prod, devs get the yelling
+      setGeoFailed(true);
       if (import.meta.env.DEV) console.warn('WorldMapChart: failed to load world-atlas data', err);
     });
   }, []);
@@ -1554,6 +1557,14 @@ function WorldMapChart({ worldMap }) {
     zoomAt(e.clientX - rect.left, e.clientY - rect.top, 1.6);
   }, [zoomAt]);
 
+  if (geoFailed) {
+    return (
+      <p className="cp-chart-empty">
+        The world map geometry could not load, but your country counts are still in the report.
+      </p>
+    );
+  }
+
   if (!geoData) {
     return <div className="cp-map-loading">Loading map...</div>;
   }
@@ -1704,8 +1715,9 @@ export default function CinephileProfile() {
 
   // poster accents: 7 top genres (1 row)
   const topGenreFilms = useMemo(() => {
-    if (!stats.genre.list.length || !enrichedData) return [];
-    const enrichedByName = new Map(enrichedData.map((e) => [e.name, e]));
+    if (!stats.genre.list.length) return [];
+    const enrichedRows = asArray(enrichedData);
+    const enrichedByName = new Map(enrichedRows.map((e) => [e.name, e]));
     const results = [];
     const top7Genres = stats.genre.list.slice(0, 7);
 
@@ -1729,13 +1741,14 @@ export default function CinephileProfile() {
 
   // poster accents: 7 top-rated international films from distinct countries (1 row)
   const internationalFilms = useMemo(() => {
-    if (!enrichedData) return [];
+    const enrichedRows = asArray(enrichedData);
 
-    const candidates = enrichedData
+    const candidates = enrichedRows
       .filter((m) => {
-        if (!m.posterPath || m.rating == null) return false;
+        if (!m.posterPath || !Number.isFinite(m.rating)) return false;
         const isNonEnglish = m.originalLanguage && m.originalLanguage !== 'en';
-        const isNonUSGB = m.productionCountries && !m.productionCountries.includes('US') && !m.productionCountries.includes('GB');
+        const countries = asArray(m.productionCountries);
+        const isNonUSGB = countries.length > 0 && !countries.includes('US') && !countries.includes('GB');
         return isNonEnglish || isNonUSGB;
       })
       .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
@@ -1745,7 +1758,7 @@ export default function CinephileProfile() {
 
     // Pass 1: Prioritize 1 film per distinct country
     for (const m of candidates) {
-      const countryCode = m.productionCountries?.[0] || (m.originalLanguage ? m.originalLanguage.toUpperCase() : 'INT');
+      const countryCode = asArray(m.productionCountries)[0] || (m.originalLanguage ? m.originalLanguage.toUpperCase() : 'INT');
       if (!usedCountries.has(countryCode)) {
         usedCountries.add(countryCode);
         selected.push({ film: m, countryCode });
@@ -1757,7 +1770,7 @@ export default function CinephileProfile() {
     if (selected.length < 7) {
       for (const m of candidates) {
         if (!selected.some((s) => s.film.name === m.name)) {
-          const countryCode = m.productionCountries?.[0] || (m.originalLanguage ? m.originalLanguage.toUpperCase() : 'INT');
+          const countryCode = asArray(m.productionCountries)[0] || (m.originalLanguage ? m.originalLanguage.toUpperCase() : 'INT');
           selected.push({ film: m, countryCode });
         }
         if (selected.length >= 7) break;

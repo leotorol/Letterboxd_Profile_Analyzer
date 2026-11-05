@@ -207,6 +207,7 @@ function WordCloud({ words }) {
   const layout = useMemo(() => {
     if (!size.width || !size.height || !words.length) return [];
     const ctx = getMeasureContext();
+    if (!ctx) return [];
     const fontFamily = fontsReady ? FONT_FAMILY : 'Inter, sans-serif';
     const measureText = (text, font) => {
       ctx.font = font;
@@ -576,7 +577,7 @@ function FeaturedReviews({ featured }) {
         {active.posterPath ? (
           <img src={TMDB_POSTER_MEDIUM + active.posterPath} alt={`Poster of ${active.name}`} loading="lazy" decoding="async" />
         ) : (
-          <span className="rv-poster-missing" aria-hidden="true">{active.name.slice(0, 1)}</span>
+          <span className="rv-poster-missing" aria-hidden="true">{String(active.name || '?').slice(0, 1)}</span>
         )}
       </div>
 
@@ -596,12 +597,12 @@ function FeaturedReviews({ featured }) {
                 {review.posterPath ? (
                   <img src={TMDB_POSTER_SMALL + review.posterPath} alt="" loading="lazy" decoding="async" />
                 ) : (
-                  <span className="rv-poster-missing" aria-hidden="true">{review.name.slice(0, 1)}</span>
+                  <span className="rv-poster-missing" aria-hidden="true">{String(review.name || '?').slice(0, 1)}</span>
                 )}
               </span>
               <span className="rv-rank-main">
                 <span className="rv-rank-name">{review.name}</span>
-                <span className="rv-rank-meta">{review.year}{review.rating != null ? ` · ★ ${review.rating.toFixed(1)}` : ''}</span>
+                <span className="rv-rank-meta">{review.year}{Number.isFinite(review.rating) ? ` · ★ ${review.rating.toFixed(1)}` : ''}</span>
               </span>
               <span className="rv-rank-words tabular-nums">{review.words}</span>
             </button>
@@ -616,7 +617,7 @@ function FeaturedReviews({ featured }) {
                 <span className="rv-feature-year">{active.year}</span>
               </div>
               <div className="rv-feature-metrics">
-                {active.rating != null && <span className="rv-feature-rating tabular-nums">★ {active.rating.toFixed(1)}</span>}
+                {Number.isFinite(active.rating) && <span className="rv-feature-rating tabular-nums">★ {active.rating.toFixed(1)}</span>}
                 <span className="rv-feature-words tabular-nums">{active.words.toLocaleString()} words</span>
               </div>
             </div>
@@ -711,13 +712,7 @@ export default function Reviews() {
 
           <WordCloud words={stats.wordCloud} />
 
-          {writing.topWord && (
-            <div className="rv-cloud-foot">
-              <span className="rv-cloud-foot-label">Your most used word</span>
-              <span className="rv-cloud-foot-word">{writing.topWord.word}</span>
-              <span className="rv-cloud-foot-count tabular-nums">{writing.topWord.count} times</span>
-            </div>
-          )}
+
         </section>
 
         <section className="lb-panel is-flat rv-card lb-col-7" aria-label="Review length over time">
@@ -726,6 +721,7 @@ export default function Reviews() {
             accent="var(--color-lb-orange)"
             label="How Long Your Takes Run"
             note="words per review, by year"
+            noteUnderline
           />
           <LengthBars series={stats.lengthByYear} verdict={stats.lengthVerdict} />
         </section>

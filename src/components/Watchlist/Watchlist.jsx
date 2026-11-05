@@ -275,7 +275,7 @@ function GraveyardBoard({ graveyard }) {
                   />
                 ) : (
                   <span className="wl-grave-poster-missing" aria-hidden="true">
-                    {film.name}
+                    {film.name || 'Untitled'}
                   </span>
                 )}
                 <span className="wl-grave-age-badge tabular-nums">

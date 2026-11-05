@@ -53,7 +53,7 @@ function tmdbTo5(tmdbAvg) {
  */
 function buildScoredRows(rows) {
   return rows
-    .filter((m) => m.rating != null && m.voteAverage != null && m.voteAverage > 0)
+    .filter((m) => Number.isFinite(m.rating) && Number.isFinite(m.voteAverage) && m.voteAverage > 0)
     .map((m) => {
       const tmdbAvg5 = tmdbTo5(m.voteAverage);
       return {
@@ -81,12 +81,14 @@ function buildScoredRows(rows) {
  */
 function buildConsensus(scored) {
   // hidden gems: user rates way ABOVE consensus. hostia puta
-  const gems = [...scored]
+  const gems = scored
+    .filter((film) => film.delta > 0)
     .sort((a, b) => b.delta - a.delta)
     .slice(0, 4);
 
   // overhyped: user rates way BELOW consensus. mierda
-  const overhyped = [...scored]
+  const overhyped = scored
+    .filter((film) => film.delta < 0)
     .sort((a, b) => a.delta - b.delta)
     .slice(0, 4);
 
@@ -162,7 +164,7 @@ function buildDecades(rows) {
   const byDecade = new Map();
 
   for (const movie of rows) {
-    if (movie.year == null) continue;
+    if (!Number.isFinite(movie.year)) continue;
 
     const startYear = Math.floor(movie.year / 10) * 10;
     const label = `${startYear}s`;
@@ -176,7 +178,7 @@ function buildDecades(rows) {
     // logged counts every watched film, rated or not
     entry.loggedCount++;
 
-    if (movie.rating != null) {
+    if (Number.isFinite(movie.rating)) {
       entry.ratingSum += movie.rating;
       entry.ratedCount++;
       entry.films.push({

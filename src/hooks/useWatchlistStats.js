@@ -43,6 +43,7 @@ function buildGraveyard(watchlist, enrichedWatchlist, today) {
  *   Object: { value, unit } for display.
  */
 export function formatAge(days) {
+  if (!Number.isFinite(days) || days < 0) return { value: 0, unit: 'days' };
   if (days >= 365) {
     const years = Math.round((days / 365) * 10) / 10;
     return { value: years, unit: years === 1 ? 'year' : 'years' };
@@ -202,8 +203,8 @@ function buildEnrichedLookup(enrichedWatchlist) {
  */
 export function useWatchlistStats(rawData, enrichedWatchlist = null) {
   return useMemo(() => {
-    const watchlist = rawData?.watchlist || [];
-    const watched = rawData?.watched || [];
+    const watchlist = Array.isArray(rawData?.watchlist) ? rawData.watchlist : [];
+    const watched = Array.isArray(rawData?.watched) ? rawData.watched : [];
 
     if (watchlist.length === 0) {
       return {

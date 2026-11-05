@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * Custom hook to animate a numerical value from 0 to target using requestAnimationFrame.
  *
  * Employs ease-out-cubic easing for smooth deceleration. Respects prefers-reduced-motion.
+ * Broken targets (NaN or Infinity) are treated as 0 and a target of 0 resets the
+ * value instead of leaving the previous number frozen on screen.
  *
  * Args:
  *   target (number): Destination integer value to animate towards.
@@ -14,17 +16,19 @@ import { useState, useEffect, useRef } from 'react';
  *   number: Current animated integer value during frame updates.
  */
 export function useCountUp(target, duration = 1600, delay = 0) {
+  const safeTarget = Number.isFinite(target) ? target : 0;
   const prefersReducedMotion = typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const [value, setValue] = useState(0);
   const frameRef = useRef(null);
 
   useEffect(() => {
-    if (target === 0 || target == null) return;
+    cancelAnimationFrame(frameRef.current);
 
-    // if reduced motion is preferred, jump straight to the target
-    if (prefersReducedMotion) return;
+    // reduced motion and zero targets are handled during render, no state sync
+    if (prefersReducedMotion || safeTarget === 0) return undefined;
 
     const startTime = performance.now() + delay;
 
@@ -43,7 +47,7 @@ export function useCountUp(target, duration = 1600, delay = 0) {
 
       // cubic ease-out curve to make numbers pop
       const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(eased * target));
+      setValue(Math.round(eased * safeTarget));
 
       if (progress < 1) {
         frameRef.current = requestAnimationFrame(tick);
@@ -52,10 +56,10 @@ export function useCountUp(target, duration = 1600, delay = 0) {
 
     frameRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameRef.current);
-  }, [target, duration, delay, prefersReducedMotion]);
+  }, [safeTarget, duration, delay, prefersReducedMotion]);
 
-  // when reduced motion is preferred, skip animation entirely
-  if (prefersReducedMotion) return target ?? 0;
+  // a zero target should actually render zero, not the previous number
+  if (prefersReducedMotion || safeTarget === 0) return safeTarget;
 
   return value;
 }

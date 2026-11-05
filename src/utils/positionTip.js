@@ -13,7 +13,7 @@
  *   Object: Clamped { x, y } coordinates relative to the wrapper.
  */
 export function tipPosition(wrap, node, margin = 90) {
-  if (!wrap) return { x: 0, y: 0 };
+  if (!wrap || !node) return { x: 0, y: 0 };
   const wrapRect = wrap.getBoundingClientRect();
   const rect = node.getBoundingClientRect();
   const x = rect.left - wrapRect.left + rect.width / 2;

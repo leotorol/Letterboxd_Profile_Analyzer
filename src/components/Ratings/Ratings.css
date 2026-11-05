@@ -514,6 +514,7 @@
 @media (max-width: 768px) {
   .rt-consensus-wrap {
     flex-direction: column;
+    gap: var(--space-4);
   }
 
   .rt-consensus-divider {
@@ -523,25 +524,85 @@
 
   .rt-decade-row {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
   }
 
   .rt-decade-meta {
     flex-direction: row;
     align-items: baseline;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .rt-decade-label {
+    font-size: 1.5rem;
   }
 
   .rt-decade-posters {
-    grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
     gap: 8px;
+  }
+
+  .rt-rebel-ring {
+    width: 168px;
+  }
+
+  .rt-rebel-persona-label {
+    font-size: 1.25rem;
   }
 }
 
 @media (max-width: 640px) {
+  .rt-rebel-ring {
+    width: 150px;
+  }
+
+  .rt-rebel-persona-label {
+    font-size: 1.15rem;
+  }
+
+  .rt-rebel-blurb {
+    font-size: 0.76rem;
+    max-width: 220px;
+  }
+
+  .rt-consensus-item {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: var(--space-2);
+    padding: 6px 0;
+  }
+
+  .rt-consensus-poster-wrap {
+    width: 42px;
+  }
+
+  .rt-consensus-name {
+    font-size: 0.8rem;
+  }
+
+  .rt-consensus-ratings {
+    gap: var(--space-2);
+    font-size: 0.68rem;
+  }
+
+  .rt-decade-row {
+    padding: var(--space-3) 0;
+  }
+
+  .rt-decade-label {
+    font-size: 1.3rem;
+  }
+
   .rt-decade-posters {
-    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
-    gap: 7px;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 6px;
+  }
+}
+
+@media (max-width: 440px) {
+  .rt-decade-posters {
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    gap: 5px;
   }
 }

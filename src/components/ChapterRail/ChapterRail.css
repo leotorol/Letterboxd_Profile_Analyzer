@@ -202,14 +202,16 @@
     top: auto;
     bottom: 0;
     width: 100%;
-    height: 52px;
+    height: calc(48px + env(safe-area-inset-bottom, 0px));
     flex-direction: row;
     align-items: center;
-    gap: var(--space-3);
-    padding: 0 var(--space-4);
+    gap: var(--space-2);
+    padding: 0 var(--space-3) env(safe-area-inset-bottom, 0px);
     border-right: 0;
     border-top: 1px solid var(--color-rule);
     background: #0a0a15;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .lb-rail.is-final {
@@ -224,18 +226,19 @@
   .lb-rail-list {
     flex-direction: row;
     flex: 1;
-    gap: var(--space-2);
+    gap: 4px;
     width: auto;
     min-width: 0;
     overflow-x: auto;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   .lb-rail-reset {
     margin-top: 0;
     width: auto;
     flex-shrink: 0;
-    padding: 7px 10px;
+    padding: 6px 9px;
   }
 
   .lb-rail-reset span {
@@ -260,11 +263,12 @@
 
   .lb-rail-link {
     grid-template-columns: auto auto;
-    gap: 6px;
-    padding: 6px 10px;
+    gap: 5px;
+    padding: 5px 8px;
     background: transparent;
     border: 1px solid transparent;
     white-space: nowrap;
+    border-radius: var(--radius-sm);
   }
 
   .lb-rail-link.is-active {
@@ -277,6 +281,6 @@
   }
 
   .lb-rail-link:last-child {
-    margin-right: var(--space-4);
+    margin-right: var(--space-2);
   }
 }

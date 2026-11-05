@@ -45,6 +45,10 @@ const MoneyIcon = () => (
   </svg>
 );
 
+// one square per appearance, but an actor in 400 films should not render 400
+// DOM nodes just to brag, so the unit chart is capped and the count stays real
+const MAX_UNIT_SQUARES = 40;
+
 /**
  * Builds a short monogram from a person's name.
  *
@@ -93,7 +97,7 @@ function personRole(gender, fallback) {
  *   string: Short human label such as $12M, $1.4B or n/a when unknown.
  */
 function formatMoney(value) {
-  if (value == null) return 'n/a';
+  if (value == null || !Number.isFinite(value)) return 'n/a';
   if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(value % 1_000_000_000 === 0 ? 0 : 1)}B`;
   if (value >= 1_000_000) return `$${Math.round(value / 1_000_000)}M`;
   if (value >= 1_000) return `$${Math.round(value / 1_000)}K`;
@@ -223,7 +227,7 @@ function CastBoard({ topActors }) {
             <div className="cs-cast-row-main">
               <span className="cs-cast-row-name" title={actor.name}>{actor.name}</span>
               <div className="cs-cast-units" aria-hidden="true">
-                {Array.from({ length: actor.count }).map((_, unit) => (
+                {Array.from({ length: Math.min(actor.count, MAX_UNIT_SQUARES) }).map((_, unit) => (
                   <span
                     className="cs-cast-unit"
                     key={unit}
@@ -266,7 +270,7 @@ function DuoCard({ duo }) {
 
   const actorRole = personRole(duo.actor.gender, 'performer');
   const films = duo.films.filter((film) => film.posterPath).slice(0, 6);
-  const rated = duo.films.filter((film) => film.rating != null);
+  const rated = duo.films.filter((film) => Number.isFinite(film.rating));
   const duoAvg = rated.length ? rated.reduce((sum, film) => sum + film.rating, 0) / rated.length : null;
 
   return (
@@ -580,24 +584,27 @@ function MoneyBoard({ budget }) {
   const indieShare = budget.ratedCount ? budget.indieCount / budget.ratedCount : 0;
 
   let preference = null;
-  if (budget.blockbusterAvg != null && budget.indieAvg != null) {
+  if (Number.isFinite(budget.blockbusterAvg) && Number.isFinite(budget.indieAvg)) {
     const gap = budget.indieAvg - budget.blockbusterAvg;
     if (gap >= 0.2) preference = 'indie';
     else if (gap <= -0.2) preference = 'blockbuster';
     else preference = 'balanced';
   }
 
-  const preferenceText = {
-    indie: `Micro budget indies win with you: ★${budget.indieAvg.toFixed(1)} against ★${budget.blockbusterAvg.toFixed(1)} for the blockbusters.`,
-    blockbuster: `You are a blockbuster person: ★${budget.blockbusterAvg.toFixed(1)} against ★${budget.indieAvg.toFixed(1)} for the micro indies.`,
-    balanced: `Blockbusters and micro indies score about the same with you (★${budget.blockbusterAvg.toFixed(1)} and ★${budget.indieAvg.toFixed(1)}).`,
-  }[preference];
+  let preferenceText = null;
+  if (preference === 'indie') {
+    preferenceText = `Micro budget indies win with you: ★${budget.indieAvg.toFixed(1)} against ★${budget.blockbusterAvg.toFixed(1)} for the blockbusters.`;
+  } else if (preference === 'blockbuster') {
+    preferenceText = `You are a blockbuster person: ★${budget.blockbusterAvg.toFixed(1)} against ★${budget.indieAvg.toFixed(1)} for the micro indies.`;
+  } else if (preference === 'balanced') {
+    preferenceText = `Blockbusters and micro indies score about the same with you (★${budget.blockbusterAvg.toFixed(1)} and ★${budget.indieAvg.toFixed(1)}).`;
+  }
 
-  const correlationText = budget.verdict === 'up'
+  const correlationText = budget.verdict === 'up' && Number.isFinite(budget.correlation)
     ? `The bigger the budget, the higher you score it (r = ${budget.correlation.toFixed(2)}).`
-    : budget.verdict === 'down'
+    : budget.verdict === 'down' && Number.isFinite(budget.correlation)
       ? `The bigger the budget, the lower you score it (r = ${budget.correlation.toFixed(2)}).`
-      : budget.verdict === 'flat'
+      : budget.verdict === 'flat' && Number.isFinite(budget.correlation)
         ? `Budget barely moves your score (r = ${budget.correlation.toFixed(2)}).`
         : null;
 
@@ -722,6 +729,7 @@ export default function Cast() {
             accent="var(--color-accent-4)"
             label="The Money Behind It"
             note="budget vs box office"
+            noteUnderline
           />
           <MoneyBoard budget={stats.budget} />
         </section>

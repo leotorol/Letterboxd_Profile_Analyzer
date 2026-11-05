@@ -463,6 +463,7 @@ export default function Rhythm() {
               accent="var(--color-accent)"
               label="Year at a Glance"
               note="scroll the year, tap a day"
+              noteUnderline
             />
 
             <div className="ry-hero-numbers">
@@ -576,6 +577,7 @@ export default function Rhythm() {
               accent="var(--color-accent-4)"
               label="Your Pace Over Time"
               note="watched per month"
+              noteUnderline
             />
             <TrendChart series={stats.evolution} />
           </section>

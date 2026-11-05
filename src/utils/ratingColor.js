@@ -11,6 +11,7 @@
  *   string: CSS colour string.
  */
 export function ratingColor(rating) {
-  if (rating == null) return 'rgba(255, 255, 255, 0.18)';
-  return `rgba(0, 232, 122, ${(0.35 + (rating / 5) * 0.65).toFixed(2)})`;
+  if (rating == null || !Number.isFinite(rating)) return 'rgba(255, 255, 255, 0.18)';
+  const clamped = Math.min(5, Math.max(0, rating));
+  return `rgba(0, 232, 122, ${(0.35 + (clamped / 5) * 0.65).toFixed(2)})`;
 }

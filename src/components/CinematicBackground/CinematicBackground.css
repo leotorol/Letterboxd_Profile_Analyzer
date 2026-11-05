@@ -212,6 +212,25 @@
   75% { transform: rotate(-12deg) translate(-4px, 3px); }
 }
 
+@media (max-width: 640px) {
+  .camera-constellation {
+    width: 100px;
+    height: 100px;
+    opacity: 0.08;
+  }
+
+  .lbx-logo-constellation {
+    width: 95px;
+    height: 95px;
+    opacity: 0.08;
+  }
+
+  .projector-beam {
+    width: 160px;
+    opacity: 0.08;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .orbital-film-strip,
   .projector-beam,

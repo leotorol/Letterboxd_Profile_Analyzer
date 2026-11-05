@@ -8,6 +8,22 @@
   text-align: center;
 }
 
+.error-boundary-wrap.is-compact {
+  min-height: 0;
+  margin: var(--space-6) auto;
+  max-width: 560px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  background: rgba(17, 17, 29, 0.8);
+}
+
+.error-boundary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
 .error-boundary-title {
   font-size: 2rem;
   margin-bottom: var(--space-4);
@@ -33,6 +49,12 @@
 
 .error-boundary-btn:hover {
   transform: scale(0.98);
+}
+
+.error-boundary-btn.is-secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .error-boundary-btn:focus-visible {

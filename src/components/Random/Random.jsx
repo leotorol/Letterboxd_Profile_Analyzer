@@ -848,7 +848,7 @@ function RatingCall({ tone, label, film }) {
         <div>
           <h5 className="rd-rating-call-film">{film.name}</h5>
           <div className="rd-rating-call-value tabular-nums">
-            {film.rating.toFixed(1)}<span> / 5</span>
+            {Number.isFinite(film.rating) ? film.rating.toFixed(1) : '?'}<span> / 5</span>
           </div>
           <div className="rd-meta-row">
             {film.year && <span>{film.year}</span>}

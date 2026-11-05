@@ -308,7 +308,7 @@ function buildEraMeasure(rows) {
 function sortByWatchDate(rows) {
   return [...rows].sort((a, b) => {
     if (a.date && b.date) {
-      return a.date.localeCompare(b.date)
+      return String(a.date).localeCompare(String(b.date))
         || String(a.name || '').localeCompare(String(b.name || ''));
     }
     if (a.date) return -1;
@@ -383,7 +383,7 @@ function buildBookends(rows) {
   const ordered = sortByWatchDate(rows);
   const first = ordered[0];
   const last = ordered[ordered.length - 1];
-  const rated = rows.filter((movie) => movie.rating != null);
+  const rated = rows.filter((movie) => Number.isFinite(movie.rating));
   const byRatingDesc = [...rated].sort((a, b) => (
     b.rating - a.rating
     || String(b.date || '').localeCompare(String(a.date || ''))
@@ -520,10 +520,12 @@ function buildMilestones(rows) {
  */
 function buildRandomStats(rows, catalog) {
   const seen = buildSeenIndex(rows);
+  const popular = Array.isArray(catalog?.popular) ? catalog.popular : [];
+  const topRated = Array.isArray(catalog?.topRated) ? catalog.topRated : [];
 
   return {
     hasData: rows.length > 0,
-    gap: buildGap(catalog.popular, catalog.topRated, seen),
+    gap: buildGap(popular, topRated, seen),
     popularity: buildPopularity(rows),
     era: buildEraMeasure(rows),
     bookends: buildBookends(rows),

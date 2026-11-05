@@ -22,9 +22,12 @@ export const FULL_DAYS = {
  */
 export function formatIsoDate(iso) {
   if (!iso) return '';
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  if (!match) return iso;
-  return `${Number(match[3])} ${MONTH_LABELS[Number(match[2]) - 1]} ${match[1]}`;
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso));
+  if (!match) return String(iso);
+
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return String(iso);
+  return `${Number(match[3])} ${MONTH_LABELS[month - 1]} ${match[1]}`;
 }
 
 /**
@@ -44,7 +47,14 @@ export function parseLbDate(value) {
   if (!value) return null;
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value));
   if (!match) return null;
-  const d = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (year < 1870 || year > 2100) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+  const d = new Date(year, month - 1, day);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
@@ -59,7 +69,9 @@ export function parseLbDate(value) {
  *   number: Days from a to b.
  */
 export function diffDays(a, b) {
-  return Math.round((b.getTime() - a.getTime()) / 86400000);
+  if (!(a instanceof Date) || !(b instanceof Date)) return 0;
+  const diff = (b.getTime() - a.getTime()) / 86400000;
+  return Number.isFinite(diff) ? Math.round(diff) : 0;
 }
 
 /**

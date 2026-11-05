@@ -107,7 +107,13 @@ function ConsensusHalf({ label, labelClass, films, isPositive }) {
     <div className="rt-consensus-half">
       <div className={`rt-consensus-label ${labelClass}`}>{label}</div>
       <div className="rt-consensus-list">
-        {films.map((film, i) => (
+        {films.length === 0 ? (
+          <p className="rt-chart-empty is-small">
+            {isPositive
+              ? 'No film you rate above the crowd yet.'
+              : 'No film you rate below the crowd yet.'}
+          </p>
+        ) : films.map((film, i) => (
           <ConsensusItem key={`${keyPrefix}-${i}-${film.name}-${film.year}`} film={film} isPositive={isPositive} />
         ))}
       </div>
@@ -130,6 +136,15 @@ function ConsensusCard({ consensus }) {
     return (
       <p className="rt-chart-empty">
         Not enough rated films with TMDB data to compute consensus gaps. Add a TMDB key and reimport your ZIP.
+      </p>
+    );
+  }
+
+  const hasGaps = consensus.gems.length > 0 || consensus.overhyped.length > 0;
+  if (!hasGaps) {
+    return (
+      <p className="rt-chart-empty">
+        You agree with the crowd on every rated film so far. Rate a few more and a spicy disagreement will show up.
       </p>
     );
   }

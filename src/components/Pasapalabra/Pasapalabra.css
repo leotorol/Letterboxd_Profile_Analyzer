@@ -1033,53 +1033,53 @@ button.pz-letter:active {
 
 @media (max-width: 760px) {
   .pz-section {
-    padding-top: 40px;
-    padding-bottom: calc(52px + var(--space-10));
+    padding-top: 24px;
+    padding-bottom: calc(52px + var(--space-6));
   }
 
   .pz-section::before {
-    height: 200px;
+    height: 160px;
   }
 
   .pz-inner {
-    padding: 0 24px;
+    padding: 0 16px;
   }
 
   .pz-title {
-    font-size: clamp(2.4rem, 11vw, 3.4rem);
+    font-size: clamp(2rem, 9vw, 2.8rem);
   }
 
   .pz-sub {
-    margin-top: 6px;
-    font-size: 0.92rem;
-    line-height: 1.5;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    line-height: 1.45;
   }
 
   .pz-stage-line {
-    margin-top: 14px;
+    margin-top: 10px;
   }
 
   .pz-instruction {
     margin-top: 2px;
-    text-align: left;
-    margin-inline: 0;
+    text-align: center;
+    margin-inline: auto;
     max-width: none;
-    font-size: 0.66rem;
+    font-size: 0.64rem;
   }
 
   .pz-stage {
-    margin-top: 8px;
-    gap: 12px;
+    margin-top: 6px;
+    gap: 10px;
   }
 
   .pz-rosco {
-    width: min(100%, 290px);
+    width: min(100%, 255px);
   }
 
   .pz-letter {
-    width: clamp(29px, 8vw, 32px);
-    height: clamp(29px, 8vw, 32px);
-    font-size: 0.72rem;
+    width: 27px;
+    height: 27px;
+    font-size: 0.68rem;
   }
 
   .pz-core {
@@ -1088,74 +1088,74 @@ button.pz-letter:active {
   }
 
   .pz-core-letter {
-    font-size: 2.9rem;
-    margin: 4px 0 2px;
+    font-size: 2.3rem;
+    margin: 2px 0 1px;
   }
 
   .pz-core-round {
-    font-size: 0.54rem;
-    letter-spacing: 0.12em;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
   }
 
   .pz-core-count {
-    font-size: 0.58rem;
+    font-size: 0.55rem;
   }
 
   .pz-core-total {
-    font-size: 0.52rem;
+    font-size: 0.5rem;
   }
 
   .pz-answer {
     max-width: none;
-    padding: 10px;
+    padding: 8px 10px;
   }
 
   .pz-answer-ghost {
-    font-size: clamp(6rem, 20vw, 9rem);
+    font-size: clamp(5rem, 18vw, 7.5rem);
   }
 
   .pz-slots {
     --pz-slot-gap: var(--space-2);
     column-gap: var(--pz-slot-gap);
-    row-gap: 6px;
+    row-gap: 4px;
   }
 
   .pz-slot {
-    padding: 6px 0;
+    padding: 4px 0;
   }
 
   .pz-slot-labels {
-    gap: 4px 9px;
-    margin-bottom: 4px;
+    gap: 3px 8px;
+    margin-bottom: 3px;
   }
 
   .pz-slot-label {
-    font-size: 0.6rem;
-    letter-spacing: 0.09em;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
   }
 
   .pz-slot-body {
-    gap: 8px;
+    gap: 6px;
   }
 
   .pz-slot-title {
-    font-size: 0.8rem;
-    line-height: 1.16;
+    font-size: 0.78rem;
+    line-height: 1.15;
   }
 
   .pz-slot-stats {
-    gap: 2px 9px;
+    gap: 2px 8px;
     margin-top: 2px;
-    font-size: 0.64rem;
+    font-size: 0.62rem;
   }
 
   .pz-poster-tile,
   .pz-slot-poster-empty {
-    width: 46px;
+    width: 42px;
   }
 
   .pz-slot-missing {
-    font-size: 0.64rem;
+    font-size: 0.62rem;
   }
 
   .pz-result {
@@ -1164,12 +1164,13 @@ button.pz-letter:active {
       'copy'
       'meter';
     align-items: start;
-    gap: var(--space-4);
-    margin-top: var(--space-8);
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+    padding-top: var(--space-3);
   }
 
   .pz-result-score {
-    font-size: 3rem;
+    font-size: 2.4rem;
   }
 
   .pz-meter {
@@ -1177,20 +1178,38 @@ button.pz-letter:active {
   }
 
   .pz-empty-state {
-    margin-top: var(--space-8);
-    padding: var(--space-5);
+    margin-top: var(--space-5);
+    padding: var(--space-4);
   }
 }
 
 @media (max-width: 420px) {
+  .pz-inner {
+    padding: 0 12px;
+  }
+
+  .pz-rosco {
+    width: min(100%, 235px);
+  }
+
+  .pz-letter {
+    width: 25px;
+    height: 25px;
+    font-size: 0.64rem;
+  }
+
+  .pz-core-letter {
+    font-size: 2rem;
+  }
+
   .pz-slots {
-    --pz-slot-gap: 8px;
+    --pz-slot-gap: 6px;
     column-gap: var(--pz-slot-gap);
   }
 
   .pz-poster-tile,
   .pz-slot-poster-empty {
-    width: 42px;
+    width: 38px;
   }
 }
 
