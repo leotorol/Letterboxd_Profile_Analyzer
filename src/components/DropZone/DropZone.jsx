@@ -235,7 +235,7 @@ export default function DropZone() {
 
       {/* Privacy note */}
       <p className="dropzone-privacy">
-        <ShieldIcon /> Your export is parsed in your browser. Only film titles and years reach TMDB for metadata; your account data never leaves this device.
+        <ShieldIcon /> Your export is parsed in your browser. Only film titles and years reach TMDB for metadata, your account data never leaves this device.
       </p>
     </div>
   );
