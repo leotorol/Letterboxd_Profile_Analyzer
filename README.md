@@ -53,6 +53,8 @@ The rail also holds the way back to the upload screen at its foot (desktop) or p
 - **JSZip** — reading the ZIP export
 - **PapaParse** — parsing the CSVs
 - **TMDB API** — movie metadata enrichment
+- **Vercel Functions** — server-side TMDB proxy and optional shared queue
+- **Upstash Redis** — global enrichment queue
 - **topojson-client** + **world-atlas** — country geometry for the world map
 - **Oxlint** — linting
 
@@ -106,16 +108,23 @@ The rail also holds the way back to the upload screen at its foot (desktop) or p
 
 ```
 letterboxd stats/
-├── index.html                 # Vite entry point
-├── vite.config.js             # Vite + React plugin config
+├── index.html                 # Vite entry point + SEO tags
+├── vite.config.js             # Vite + React config + SEO file generation
+├── vercel.json                # Vercel build, rewrites, headers and caching
 ├── package.json               # Scripts and dependencies
 ├── .env                       # Local env vars (VITE_TMDB_API_KEY)
+├── api/
+│   ├── queue.js               # Optional global enrichment queue
+│   ├── _lib/redis.js          # Minimal Upstash REST client
+│   └── tmdb/[...path].js      # Server side TMDB proxy with CDN cache
+├── public/                    # Logo, OG image, manifest and demo ZIP
 ├── src/
 │   ├── main.jsx               # React root: mounts <App/> inside DataProvider
 │   ├── App.jsx                # Top-level state router (upload / loading / stats)
 │   ├── App.css
 │   ├── context/
-│   │   └── DataContext.jsx    # Global app state + parsed/enriched data store
+│   │   ├── DataContext.js     # Context object and useData hook
+│   │   └── DataProvider.jsx   # Global app state + parsed/enriched data store
 │   ├── hooks/
 │   │   ├── useActiveSection.js # Tracks the chapter crossing the viewport middle
 │   │   ├── useCastStats.js    # Derives all stats for the Cast & Money section
@@ -131,6 +140,7 @@ letterboxd stats/
 │   │   └── useWatchlistStats.js # Derives stats for the Watchlist section
 │   ├── services/
 │   │   ├── zipParser.js       # Unzips export and parses the CSVs
+│   │   ├── enrichmentQueue.js # Client side shared queue controller
 │   │   └── tmdbApi.js         # TMDB search/enrichment, all-time catalogs, scored matching + cache
 │   ├── utils/
 │   │   ├── dateFormat.js      # Date formatting + shared month/day labels
@@ -168,4 +178,4 @@ letterboxd stats/
 
 ## Data privacy
 
-Your Letterboxd export is parsed and enriched entirely in the browser. Raw movie metadata (title + year) is sent to TMDB to fetch extra details, but no personal account data is transmitted or stored anywhere. Enrichment results are cached in your browser's `localStorage` only. The section 08 all-time lists are public TMDB catalog data, cached separately for seven days.
+Your Letterboxd export is parsed and enriched entirely in the browser. Raw movie metadata (title + year) is sent to TMDB through our serverless proxy to fetch extra details, but no personal account data is transmitted or stored anywhere. Enrichment results are cached in your browser's `localStorage` only. The section 08 all-time lists are public TMDB catalog data, cached separately for seven days. The proxy only forwards film titles and years, never your ratings, reviews or account details.

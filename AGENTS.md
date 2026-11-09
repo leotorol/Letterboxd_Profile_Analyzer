@@ -3,7 +3,8 @@
 Letterboxd Stats Analyser: a client-side React 19 + Vite app. User drops their
 official Letterboxd export `.zip`, everything is parsed and rendered in-browser
 (zip parsing via `jszip`, CSV via `papaparse`, maps via `topojson-client` +
-`world-atlas`). No backend.
+`world-atlas`). User data has no backend; two serverless functions handle the
+TMDB proxy and the optional shared enrichment queue.
 
 ## Commands
 
@@ -40,6 +41,24 @@ zips live outside the workspace, so copy one in first.
 Note: port 5173 may already be served by a dev server another agent/session
 started; navigating there is fine and Vite reflects the current files.
 
+## Deployment and serverless API
+
+- `api/tmdb/[...path].js` proxies the TMDB read endpoints used by the app and
+  keeps `TMDB_API_KEY` on the server. It sets long CDN cache headers so repeat
+  lookups are shared between users.
+- `api/queue.js` is the optional global enrichment queue. It uses Upstash Redis
+  through REST when `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
+  (or the Vercel KV equivalents) exist, and degrades to no queue otherwise.
+- `vercel.json` holds the Vite build settings, SPA rewrite, security headers and
+  asset caching.
+- In Vercel use `TMDB_API_KEY`. Never set `VITE_TMDB_API_KEY` there because the
+  frontend intentionally ignores it in production builds.
+- `npm run dev` talks to TMDB directly using `VITE_TMDB_API_KEY`. To exercise
+  the proxy and queue locally use `vercel dev` or set `VITE_TMDB_PROXY=true`.
+- SEO files (`robots.txt`, `sitemap.xml`) and canonical URLs are generated at
+  build time by `vite.config.js`. Full deploy checklist is in
+  `DESPLIEGUE_VERCEL.md`.
+
 ## Example data (reference `ejemplos_lbx`)
 
 Path: `C:\Users\usuario\Downloads\ejemplos zip lbx`
@@ -59,7 +78,8 @@ Path: `C:\Users\usuario\Downloads\ejemplos zip lbx`
 - `src/components/shared/` — `ChapterHeading` and `PanelHead` primitives.
 - `src/hooks/` — stats derivation (e.g. `useWatchlistStats.js`) and
   `useActiveSection.js` for the rail.
-- `src/context/DataContext.jsx` — parsed data + TMDB enriched lookup.
+- `src/context/DataProvider.jsx` — parsed data + TMDB enriched lookup;
+  `src/context/DataContext.js` holds the context object and `useData` hook.
 - `src/styles/global.css` — design tokens and shared helpers (`lb-hl-green`,
   `lb-hl-orange`, etc.).
 - `src/styles/sections.css` — shared chapter layout, panel shells, heading

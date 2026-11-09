@@ -6,20 +6,6 @@ import ChapterHeading from '../shared/ChapterHeading';
 import PanelHead from '../shared/PanelHead';
 import './Watchlist.css';
 
-/*
- * Section 07 contract
- * THESIS: the watchlist is the shadow side of everything before it. Those
- *   sections read your past; this one reads what you still owe yourself.
- * OWN-WORLD: the vault. Near black panels on the darkest step of the chapter
- *   ramp, Letterboxd orange accent, graveyard posters desaturated, area chart
- *   in warm red vs green.
- * STORY: user sees the oldest neglected films, whether they are gaining or
- *   losing ground, and how long a movie waits on average.
- * FIRST VIEWPORT: full width graveyard panel with faded posters and age badges.
- * FORM: last lit chapter before the section 08 dossier, so it sits closest to
- *   the dossier ground without matching it.
- */
-
 // SVG icons owned by this section
 
 /**

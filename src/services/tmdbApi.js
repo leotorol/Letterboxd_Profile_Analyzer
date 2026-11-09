@@ -1,12 +1,16 @@
 const TMDB_BASE = 'https://api.themoviedb.org/3';
+const TMDB_PROXY_PATH = '/api/tmdb';
 const CACHE_KEY_PREFIX = 'lbxd_tmdb_cache_';
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const CATALOG_CACHE_PREFIX = 'lbxd_tmdb_catalog_';
 const CATALOG_CACHE_VERSION = 'v3';
 const CATALOG_PAGES = 10;
 const CATALOG_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const CATALOG_KINDS = ['popular', 'top_rated'];
 const BATCH_SIZE = 20;
+// the shared proxy queue admits a couple of people at once, so each session
+// keeps its burst smaller to stay under the TMDB limit with room to spare
+const PROXY_BATCH_SIZE = 10;
 const BATCH_DELAY_MS = 300;
 // how many top billed cast members we keep per film, enough for the "most
 // watched actor" ranking without blowing up localStorage with every extra
@@ -15,10 +19,13 @@ const CAST_LIMIT = 8;
 // the placeholder people leave in .env, treat it as "no key" like an empty one
 const PLACEHOLDER_KEY = 'your_tmdb_api_key_here';
 
-export const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '';
+export const TMDB_VIA_PROXY = import.meta.env.PROD || import.meta.env.VITE_TMDB_PROXY === 'true';
+// never ship a direct key in a production bundle, even if someone sets the
+// VITE_ var by mistake. the proxy keeps it on the server where it belongs
+export const TMDB_API_KEY = TMDB_VIA_PROXY ? '' : (import.meta.env.VITE_TMDB_API_KEY || '');
 
 /**
- * Tells whether a usable TMDB API key is configured.
+ * Tells whether a usable direct TMDB key is configured in the browser.
  *
  * Args:
  *   apiKey (string, optional): Key to check. Defaults to the env key.
@@ -26,8 +33,24 @@ export const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '';
  * Returns:
  *   boolean: True when the key is present and not the placeholder.
  */
-export function hasTmdbKey(apiKey = TMDB_API_KEY) {
+export function hasDirectTmdbKey(apiKey = TMDB_API_KEY) {
   return Boolean(apiKey) && apiKey !== PLACEHOLDER_KEY;
+}
+
+/**
+ * Tells whether TMDB enrichment can run at all.
+ *
+ * In production the key lives on the server and requests go through the
+ * Vercel proxy, so the browser does not need its own key anymore.
+ *
+ * Args:
+ *   apiKey (string, optional): Direct key to check. Defaults to the env key.
+ *
+ * Returns:
+ *   boolean: True when a direct key or the server proxy is available.
+ */
+export function hasTmdbKey(apiKey = TMDB_API_KEY) {
+  return TMDB_VIA_PROXY || hasDirectTmdbKey(apiKey);
 }
 
 // fuzzy ratio needed to accept a title, 0.6 was letting some nasty almost-titles through
@@ -405,8 +428,11 @@ function pickBestCandidate(candidates) {
  *   Promise<Object|null>: Parsed JSON response or null on unrecoverable failure.
  */
 async function fetchTmdb(path, params, apiKey) {
-  const url = new URL(TMDB_BASE + path);
-  url.searchParams.set('api_key', apiKey);
+  const url = TMDB_VIA_PROXY
+    ? new URL(TMDB_PROXY_PATH + path, window.location.origin)
+    : new URL(TMDB_BASE + path);
+
+  if (!TMDB_VIA_PROXY) url.searchParams.set('api_key', apiKey);
   url.searchParams.set('language', 'en-US');
   for (const [key, value] of Object.entries(params)) {
     if (value !== null && value !== undefined && value !== '') {
@@ -417,7 +443,7 @@ async function fetchTmdb(path, params, apiKey) {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     let res;
     try {
-      res = await fetch(url.toString());
+      res = await fetch(url.toString(), { signal: AbortSignal.timeout(15000) });
     } catch (err) {
       // network hiccup, give it another shot with backoff
       if (attempt === MAX_RETRIES) throw err;
@@ -712,6 +738,28 @@ async function fetchMovieDetails(movie, apiKey) {
 }
 
 /**
+ * Tells whether a movie list already has a trustworthy enrichment cache.
+ *
+ * Used to skip the shared queue for people who re-import the same export.
+ * A cache full of failed lookups does not count, same rule as the enrichment
+ * path, otherwise a rate limit scar would keep punishing the user forever.
+ *
+ * Args:
+ *   movies (Array<Object>): Parsed movie objects.
+ *
+ * Returns:
+ *   boolean: True when the cached list is complete and has real matches.
+ */
+export function hasCachedEnrichment(movies) {
+  const list = Array.isArray(movies) ? movies.filter((movie) => movie && typeof movie === 'object') : [];
+  if (list.length === 0) return false;
+
+  const cached = getCache(buildCacheKey(list));
+  if (!Array.isArray(cached) || cached.length !== list.length || !cached.every(Boolean)) return false;
+  return cached.some(m => m && m.tmdbId !== null);
+}
+
+/**
  * Enriches an array of movies with runtime, directors and genres from the
  * TMDB API in batches.
  *
@@ -724,11 +772,12 @@ async function fetchMovieDetails(movie, apiKey) {
  *   movies (Array<Object>): Array of parsed movie objects.
  *   apiKey (string): TMDB API key.
  *   onProgress (Function): Callback invoked after each batch (processed, total, batchResults).
+ *   options (Object, optional): Extra flags. `disabled` forces the fallback path.
  *
  * Returns:
  *   Promise<Array<Object>>: Enriched movie objects array.
  */
-export async function enrichMovies(movies, apiKey, onProgress) {
+export async function enrichMovies(movies, apiKey, onProgress, options = {}) {
   const list = Array.isArray(movies) ? movies.filter((movie) => movie && typeof movie === 'object') : [];
 
   // reset every time, otherwise a cached second import reports the previous
@@ -736,7 +785,7 @@ export async function enrichMovies(movies, apiKey, onProgress) {
   resetEnrichmentReport();
   enrichmentReport.total = list.length;
 
-  if (!hasTmdbKey(apiKey)) {
+  if (options.disabled || !hasTmdbKey(apiKey)) {
     onProgress?.(list.length, list.length);
     return list.map(m => ({
       ...m,
@@ -755,8 +804,16 @@ export async function enrichMovies(movies, apiKey, onProgress) {
 
   const cacheKey = buildCacheKey(list);
   const cached = getCache(cacheKey);
-  if (Array.isArray(cached) && cached.length === list.length && cached.every(Boolean)) {
-    enrichmentReport.matched = cached.filter(m => m.tmdbId !== null).length;
+  const cachedMatches = Array.isArray(cached) ? cached.filter(m => m && m.tmdbId !== null).length : 0;
+  const cacheLooksGood = Array.isArray(cached)
+    && cached.length === list.length
+    && cached.every(Boolean)
+    && (cachedMatches > 0 || list.length === 0);
+
+  // never trust a cache where every single lookup failed, those are almost
+  // always rate limit scars and they would poison the app forever
+  if (cacheLooksGood) {
+    enrichmentReport.matched = cachedMatches;
     onProgress?.(list.length, list.length);
     return cached;
   }
@@ -776,10 +833,11 @@ export async function enrichMovies(movies, apiKey, onProgress) {
   }
 
   const enrichedByKey = new Map();
+  const batchSize = TMDB_VIA_PROXY ? PROXY_BATCH_SIZE : BATCH_SIZE;
   let coveredRows = 0;
 
-  for (let i = 0; i < uniqueMovies.length; i += BATCH_SIZE) {
-    const batch = uniqueMovies.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < uniqueMovies.length; i += batchSize) {
+    const batch = uniqueMovies.slice(i, i + batchSize);
     const results = await Promise.all(
       batch.map(movie => fetchMovieDetails(movie, apiKey))
     );
@@ -790,7 +848,7 @@ export async function enrichMovies(movies, apiKey, onProgress) {
     });
     onProgress?.(coveredRows, list.length, results);
 
-    if (i + BATCH_SIZE < uniqueMovies.length) {
+    if (i + batchSize < uniqueMovies.length) {
       await sleep(BATCH_DELAY_MS);
     }
   }

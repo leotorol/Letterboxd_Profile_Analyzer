@@ -22,11 +22,13 @@ Thumbs.db
 *.ntvs*
 .playwright-mcp
 *.png
+!public/*.png
 *.njsproj
 *.sln
 *.sw?
 .env
 .env.example
+!.env.example
 .env.local
 .env.*.local
 coverage/
@@ -35,5 +37,6 @@ CODE_QUALITY_GUIDELINES.md
 PRODUCT.md
 Esctructura pagina.md
 *.zip
+!public/mock-data/letterboxd-leotorol-2026-11-09-17-41-utc.zip
 *.csv
 plan_de_despliegue_y_seo.md

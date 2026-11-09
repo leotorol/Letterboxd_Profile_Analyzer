@@ -8,19 +8,6 @@ import useSectionMotion from '../../hooks/useSectionMotion';
 import { TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
 import './Pasapalabra.css';
 
-/*
- * Section 09 contract
- * THESIS: the closing chapter is a game show, not another report. The page goes
- *   black and the letter ring becomes the last thing the user plays with.
- * OWN WORLD: true black stage, circular geometry, Letterboxd orange, green and
- *   blue living together for the first time, one overhead light.
- * STORY: the user picks a letter and gets that letter's record holders in one
- *   card: most watched, least watched, longest, best rated and oldest.
- * FIRST VIEWPORT: a huge A to Z title, the letter ring and its record card.
- * FORM: deliberate break from the section 08 dossier. Circle instead of ruler,
- *   center instead of margin, stage instead of archive.
- */
-
 const TONES = [
   { hex: '#ff8000', rgb: '255, 128, 0' },
   { hex: '#00e054', rgb: '0, 224, 84' },

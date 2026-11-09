@@ -259,7 +259,7 @@ export default function QuickFacts() {
             <div className="qf-sub">
               {stats.totalMinutes > 0
                 ? (buildWatchTimeNote(stats.totalMinutes) ?? `${watchedTime.days} full days in the dark.`)
-                : 'Configure VITE_TMDB_API_KEY in .env to calculate exact runtimes.'}
+                : 'Runtime data is unavailable right now, so watch time cannot be calculated.'}
             </div>
           </div>
         </div>

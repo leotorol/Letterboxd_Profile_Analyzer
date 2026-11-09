@@ -8,20 +8,6 @@ import { TMDB_POSTER_LARGE, TMDB_POSTER_SMALL } from '../../utils/tmdbImages';
 import PosterTip from '../PosterTip/PosterTip';
 import './Random.css';
 
-/*
- * Section 08 contract
- * THESIS: the closing chapter is an archive dossier, not another bento. Each
- *   fact becomes a measuring instrument: a film strip, a log spine, a ruler,
- *   a bookend spread and a ledger of milestones.
- * OWN-WORLD: the established dark cinematic surface, Letterboxd orange as the
- *   section signal, hairline rules, stamps, perforations and oversized numerals.
- * STORY: the user sees the films they missed, where their taste sits at both
- *   extremes, what the crowd agrees on, and when their log crossed the round numbers.
- * FIRST VIEWPORT: an editorial header with a ghost 08 and a chapter index,
- *   then the missing blockbuster as a full poster with a NOT SEEN stamp.
- * FORM: local extension of the established world, no new identity.
- */
-
 const DOT_STEP = 8;
 const COUNT_FORMAT = new Intl.NumberFormat('en-US');
 
@@ -437,7 +423,7 @@ function GapBand({ gap, catalogState, retryCatalog }) {
         {catalogState === 'no-key' && (
           <PanelState
             title="The global gap needs a TMDB key"
-            body="Add VITE_TMDB_API_KEY to your .env and upload the ZIP again. The rest of the archive still works without it."
+            body="TMDB enrichment is unavailable right now. The rest of the archive still works without it."
           />
         )}
 

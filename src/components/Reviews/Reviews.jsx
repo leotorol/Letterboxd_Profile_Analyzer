@@ -6,20 +6,6 @@ import ChapterHeading from '../shared/ChapterHeading';
 import PanelHead from '../shared/PanelHead';
 import './Reviews.css';
 
-/*
- * Section 06 contract
- * THESIS: every other section reads what you watch; this one reads how you
- *   write. One packed word cloud is the thesis, refusing the stock tag list.
- * OWN-WORLD: the manuscript. Letterboxd blue as the section accent, a warmer
- *   sheet surface for the cover and the featured review, flat ruled panels for
- *   the charts, and a word cloud painted in the Letterboxd tri colour.
- * STORY: the writer sees the words they lean on, how their takes got longer or
- *   shorter, and the reviews they went hardest on, then picks one to reread.
- * FIRST VIEWPORT: full width word cloud sheet, sizes by frequency, hover for the
- *   count and the film it came from.
- * FORM: the quiet text chapter between the credits sheet and the vault.
- */
-
 const FONT_FAMILY = "'Plus Jakarta Sans', 'Inter', sans-serif";
 
 // one offscreen canvas reused for every text measurement, created lazily

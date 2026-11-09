@@ -1,0 +1,26 @@
+{
+  "name": "Letterboxd Stats Analyser",
+  "short_name": "LB Stats",
+  "description": "Turn your Letterboxd export into a cinematic stats dashboard.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090912",
+  "theme_color": "#090912",
+  "lang": "en",
+  "categories": ["entertainment", "utilities"],
+  "icons": [
+    {
+      "src": "/letterboxd-unwrapped-mini-icon.png",
+      "sizes": "400x400",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/letterboxd-unwrapped-mini-icon.png",
+      "sizes": "400x400",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

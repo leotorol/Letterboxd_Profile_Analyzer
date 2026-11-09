@@ -9,16 +9,6 @@ const EMAIL = 'leotorolr2@gmail.com';
 const BUG_SUBJECT = 'Letterboxd Stats bug report';
 const GMAIL_COMPOSE_URL = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=${encodeURIComponent(BUG_SUBJECT)}`;
 
-/*
- * Footer contract
- * THESIS: the house lights come back up after the section 09 blackout. The
- *   report ends, the credits roll and the page hands you the exits.
- * OWN WORLD: same star field as the rest of the page, one warm card for the
- *   tip jar and the Letterboxd three dot mark as the closing signature.
- * STORY: thanks for scrolling, here is the source, here is the profile, here
- *   is where to complain when your ZIP behaves weird.
- */
-
 const CoffeeIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z" />

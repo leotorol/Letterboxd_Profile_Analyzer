@@ -1,6 +1,7 @@
 import { useData } from '../context/DataContext';
 import { parseLetterboxdZip } from '../services/zipParser';
-import { enrichMovies, getEnrichmentReport, TMDB_API_KEY } from '../services/tmdbApi';
+import { enrichMovies, getEnrichmentReport, hasCachedEnrichment, TMDB_API_KEY } from '../services/tmdbApi';
+import { joinEnrichmentQueue } from '../services/enrichmentQueue';
 import { TMDB_POSTER_SMALL } from '../utils/tmdbImages';
 import { GRAVEYARD_LIMIT, selectOldestWatchlist } from '../utils/watchlist';
 
@@ -11,7 +12,15 @@ import { GRAVEYARD_LIMIT, selectOldestWatchlist } from '../utils/watchlist';
  *   Object: Function object containing processZip method.
  */
 export function useLetterboxdData() {
-  const { setAppState, setProgress, setRawData, setEnrichedData, setEnrichedWatchlist, setEnrichmentReport } = useData();
+  const {
+    setAppState,
+    setProgress,
+    setRawData,
+    setEnrichedData,
+    setEnrichedWatchlist,
+    setEnrichmentReport,
+    setTmdbReady,
+  } = useData();
 
   /**
    * Processes uploaded Letterboxd export ZIP file.
@@ -33,11 +42,50 @@ export function useLetterboxdData() {
     setRawData(parsed);
 
     setAppState('loading');
-    setProgress({ processed: 0, total: 0 });
+    setProgress({ processed: 0, total: 0, currentMovies: [], queue: null });
+
+    const queue = await joinEnrichmentQueue(parsed.watched.length, {
+      skip: hasCachedEnrichment(parsed.watched),
+    });
+    const queueInfo = queue.snapshot();
+    const tmdbAvailable = queueInfo.tmdbReady !== false;
+    setTmdbReady(tmdbAvailable);
 
     try {
       let recentMovies = []; // keep a rolling window of found posters for the loading strip
-      setProgress({ processed: 0, total: parsed.watched.length, currentMovies: [] });
+      setProgress({ processed: 0, total: parsed.watched.length, currentMovies: [], queue: null });
+
+      // the queue only kicks in when the server has Redis configured, but if
+      // it does we wait our turn before hammering the shared TMDB key
+      if (tmdbAvailable && queueInfo.enabled && !queueInfo.admitted) {
+        setProgress(prev => ({
+          ...prev,
+          queue: {
+            enabled: true,
+            admitted: false,
+            position: queueInfo.position,
+            waiting: queueInfo.waiting,
+            active: queueInfo.active,
+            maxActive: queueInfo.maxActive,
+          },
+        }));
+
+        await queue.waitForTurn((snapshot) => {
+          setProgress(prev => ({
+            ...prev,
+            queue: snapshot.enabled
+              ? {
+                enabled: true,
+                admitted: snapshot.admitted,
+                position: snapshot.position,
+                waiting: snapshot.waiting,
+                active: snapshot.active,
+                maxActive: snapshot.maxActive,
+              }
+              : null,
+          }));
+        });
+      }
 
       const enriched = await enrichMovies(
         parsed.watched,
@@ -51,28 +99,38 @@ export function useLetterboxdData() {
             }));
             recentMovies = [...recentMovies, ...entries].slice(-7);
           }
-          setProgress({ processed, total, currentMovies: recentMovies });
-        }
+          setProgress({ processed, total, currentMovies: recentMovies, queue: null });
+        },
+        { disabled: !tmdbAvailable },
       );
 
       setEnrichedData(enriched);
+      // grab the watched report before the watchlist run resets the counters
+      const mainReport = getEnrichmentReport();
 
       // Enrich the oldest watchlist movies so the graveyard has posters
       const oldestWatchlist = selectOldestWatchlist(parsed.watchlist, GRAVEYARD_LIMIT);
 
       if (oldestWatchlist.length > 0) {
-        const enrichedWatchlist = await enrichMovies(oldestWatchlist, TMDB_API_KEY, () => {});
+        const enrichedWatchlist = await enrichMovies(
+          oldestWatchlist,
+          TMDB_API_KEY,
+          () => {},
+          { disabled: !tmdbAvailable },
+        );
         setEnrichedWatchlist(enrichedWatchlist);
       } else {
         setEnrichedWatchlist([]);
       }
 
-      setEnrichmentReport(getEnrichmentReport());
+      setEnrichmentReport(mainReport);
       setAppState('ready');
     } catch (err) {
       console.error('Failed during TMDB enrichment:', err);
       setAppState('idle');
       throw err;
+    } finally {
+      await queue.leave();
     }
   }
 

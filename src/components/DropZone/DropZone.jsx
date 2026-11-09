@@ -4,6 +4,8 @@ import { UploadIcon } from '../icons/Icons';
 import './DropZone.css';
 
 const ACCEPTED_TYPE = '.zip';
+const MOCK_ZIP_NAME = 'letterboxd-leotorol-2026-11-09-17-41-utc.zip';
+const MOCK_ZIP_URL = `${import.meta.env.BASE_URL}mock-data/${MOCK_ZIP_NAME}`;
 
 /**
  * Render folder SVG icon.
@@ -30,6 +32,19 @@ const ShieldIcon = () => (
 );
 
 /**
+ * Render sparkles SVG icon for the mock data shortcut.
+ *
+ * Returns:
+ *   JSX.Element: Vector SVG element.
+ */
+const SparkIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
+    <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+  </svg>
+);
+
+/**
  * DropZone upload screen component allowing drag-and-drop or file pick of Letterboxd ZIP export.
  *
  * Returns:
@@ -38,6 +53,7 @@ const ShieldIcon = () => (
 export default function DropZone() {
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState('');
+  const [loadingMock, setLoadingMock] = useState(false);
   const inputRef = useRef(null);
   const { processZip } = useLetterboxdData();
 
@@ -86,12 +102,56 @@ export default function DropZone() {
     handleFile(file);
   }, [handleFile]);
 
+  /**
+   * Fetches the bundled demo export and feeds it through the normal upload flow.
+   *
+   * Lets anyone explore the app without exporting their own Letterboxd account.
+   *
+   * Returns:
+   *   Promise<void>
+   */
+  const handleMockData = useCallback(async () => {
+    if (loadingMock) return;
+    setError('');
+    setLoadingMock(true);
+    try {
+      const response = await fetch(MOCK_ZIP_URL);
+      if (!response.ok) throw new Error('Could not load the demo export. Please try again.');
+      const blob = await response.blob();
+      const file = new File([blob], MOCK_ZIP_NAME, { type: 'application/zip' });
+      await processZip(file);
+    } catch (err) {
+      setLoadingMock(false);
+      setError(err?.message || 'Could not load the demo export. Please try again.');
+    }
+  }, [loadingMock, processZip]);
+
   return (
     <div className="dropzone-wrapper">
+      <button
+        type="button"
+        className="dropzone-mock-btn"
+        onClick={handleMockData}
+        disabled={loadingMock}
+        aria-busy={loadingMock}
+      >
+        {loadingMock ? <span className="dropzone-mock-spinner" aria-hidden="true" /> : <SparkIcon />}
+        {loadingMock ? 'Loading demo' : 'Use mock data'}
+      </button>
+
       {/* Header — Letterboxd Stats Analyser */}
       <div className="dropzone-header">
         <div className="dropzone-logo">
-          <img src="/logo.png" alt="Letterboxd Stats Analyser Logo" className="dropzone-logo-img" />
+          <img
+            src="/logo.png"
+            alt="Letterboxd Stats Analyser logo"
+            className="dropzone-logo-img"
+            width="400"
+            height="400"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
           <span className="dropzone-logo-text">Letterboxd Stats Analyser</span>
         </div>
         <h1 className="dropzone-title">

@@ -1,6 +1,5 @@
-import { createContext, useContext, useState } from 'react';
-
-const DataContext = createContext(null);
+import { useState } from 'react';
+import { DataContext } from './DataContext';
 
 /**
  * Context provider component for sharing parsed Letterboxd data and app state across components.
@@ -18,6 +17,7 @@ export function DataProvider({ children }) {
   const [enrichedData, setEnrichedData] = useState(null);
   const [enrichedWatchlist, setEnrichedWatchlist] = useState(null);
   const [enrichmentReport, setEnrichmentReport] = useState(null);
+  const [tmdbReady, setTmdbReady] = useState(null);
 
   return (
     <DataContext.Provider value={{
@@ -27,26 +27,9 @@ export function DataProvider({ children }) {
       enrichedData, setEnrichedData,
       enrichedWatchlist, setEnrichedWatchlist,
       enrichmentReport, setEnrichmentReport,
+      tmdbReady, setTmdbReady,
     }}>
       {children}
     </DataContext.Provider>
   );
-}
-
-/**
- * Custom hook to access global Letterboxd data context.
- *
- * Returns:
- *   Object: Data context values and state setters.
- *
- * Throws:
- *   Error: If invoked outside of a DataProvider tree.
- */
-export function useData() {
-  const ctx = useContext(DataContext);
-  if (!ctx) {
-    // deadass forgot to wrap the app in DataProvider
-    throw new Error('useData must be used inside a DataProvider or shit breaks');
-  }
-  return ctx;
 }

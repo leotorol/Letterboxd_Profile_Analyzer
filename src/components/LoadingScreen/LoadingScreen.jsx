@@ -2,8 +2,6 @@ import { useData } from '../../context/DataContext';
 import { hasTmdbKey } from '../../services/tmdbApi';
 import './LoadingScreen.css';
 
-const HAS_API_KEY = hasTmdbKey();
-
 /**
  * LoadingScreen component displaying TMDB enrichment progress bar and an
  * animated film strip that fills up with the movie titles as they're found.
@@ -12,9 +10,14 @@ const HAS_API_KEY = hasTmdbKey();
  *   JSX.Element: Animated loading progress screen.
  */
 export default function LoadingScreen() {
-  const { progress, rawData } = useData();
-  const { processed, total, currentMovies } = progress;
+  const { progress, rawData, tmdbReady } = useData();
+  const { processed, total, currentMovies, queue } = progress;
   const pct = total > 0 ? Math.round((processed / total) * 100) : 0;
+  const HAS_API_KEY = tmdbReady ?? hasTmdbKey();
+  const inQueue = Boolean(queue?.enabled && !queue?.admitted);
+  const ahead = Number(queue?.position) || 0;
+  const waiting = Number(queue?.waiting) || 0;
+  const maxActive = Number(queue?.maxActive) || 0;
 
   const username = rawData?.profile?.username || 'your collection';
   const foundMovies = Array.isArray(currentMovies) ? currentMovies : [];
@@ -43,34 +46,60 @@ export default function LoadingScreen() {
       <div className="loading-content">
         <h1 className="loading-title">Analysing {username}…</h1>
         <p className="loading-subtitle">
-          {HAS_API_KEY
-            ? 'Enriching your movies with TMDB data'
-            : 'Crunching your CSV data'}
+          {inQueue
+            ? 'Waiting for a free spot in the shared TMDB queue'
+            : HAS_API_KEY
+              ? 'Enriching your movies with TMDB data'
+              : 'Crunching your CSV data'}
         </p>
 
-        {/* Progress bar */}
-        <div className="loading-progress-wrap" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-          <div className="loading-progress-bar-bg">
-            <div
-              className="loading-progress-bar-fill"
-              style={{ width: `${pct}%` }}
-            />
+        {inQueue ? (
+          <div className="loading-queue" role="status" aria-live="polite">
+            <span className="loading-queue-kicker">Shared TMDB queue</span>
+            <p className="loading-queue-count">
+              {ahead > 0
+                ? `${ahead} ${ahead === 1 ? 'person' : 'people'} ahead of you`
+                : 'You are next'}
+            </p>
+            <div className="loading-queue-dots" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+            <p className="loading-queue-note">
+              We let {maxActive} {maxActive === 1 ? 'person' : 'people'} enrich at a time so the
+              free API key does not get rate limited.
+              {waiting > 0
+                ? ` ${waiting} ${waiting === 1 ? 'person is' : 'people are'} waiting with you.`
+                : ''}
+              {' '}Keep this tab open.
+            </p>
           </div>
-          <div className="loading-progress-label">
-            <span>
-              {HAS_API_KEY
-                ? `${processed} of ${total} movies enriched`
-                : 'Processing…'}
-            </span>
-            <span className="loading-progress-count">{pct}%</span>
+        ) : (
+          <div className="loading-progress-wrap" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+            <div className="loading-progress-bar-bg">
+              <div
+                className="loading-progress-bar-fill"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <div className="loading-progress-label">
+              <span>
+                {HAS_API_KEY
+                  ? `${processed} of ${total} movies enriched`
+                  : 'Processing…'}
+              </span>
+              <span className="loading-progress-count">{pct}%</span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* No API key notice */}
-        {!HAS_API_KEY && (
+        {!HAS_API_KEY && !inQueue && (
           <div className="loading-nokey">
-            No TMDB API key detected — runtime & director data will be unavailable.
-            Add <code>VITE_TMDB_API_KEY</code> to your <code>.env</code> file.
+            No TMDB API key detected, runtime and director data will be unavailable.
+            Add <code>VITE_TMDB_API_KEY</code> to your local <code>.env</code> or
+            <code>TMDB_API_KEY</code> to the server environment.
           </div>
         )}
 
