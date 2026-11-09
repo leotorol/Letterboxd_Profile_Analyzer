@@ -58,7 +58,7 @@ const LetterboxdMark = () => (
 const LINK_ROWS = [
   {
     label: 'Source',
-    title: 'Letterboxd Profile Analyzer',
+    title: 'Letterboxd Stats Analyser',
     text: 'The whole thing is open source on GitHub.',
     href: REPO_URL,
     icon: GithubIcon,
@@ -66,7 +66,7 @@ const LINK_ROWS = [
   {
     label: 'Follow',
     title: 'leotorol on Letterboxd',
-    text: 'See what I am watching and what I rate way too high. (Reviews are in spanish tho)',
+    text: 'See what I am watching and what I rate far too highly.',
     href: LETTERBOXD_URL,
     icon: LetterboxdMark,
   },
@@ -227,6 +227,12 @@ export default function Footer() {
             <span className="ft-bug-note">Opens Gmail in a new tab.</span>
           </div>
         </div>
+
+        <p className="ft-legal">
+          This product uses the{' '}
+          <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB API</a>{' '}
+          but is not endorsed or certified by TMDB. Not affiliated with Letterboxd.
+        </p>
       </div>
     </footer>
   );

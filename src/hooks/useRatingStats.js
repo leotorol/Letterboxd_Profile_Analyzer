@@ -10,7 +10,7 @@ import { dedupeFilms } from '../utils/films';
 export const CONTRARIAN_BANDS = [
   { max: 15, label: 'Sheep', blurb: 'You and the crowd are basically the same person.' },
   { max: 30, label: 'Mild rebel', blurb: 'You mostly agree, but you have your moments.' },
-  { max: 50, label: 'Contrarian', blurb: 'You call it like you see it, crowd be damned.' },
+  { max: 50, label: 'Contrarian', blurb: 'You trust your own take over the crowd.' },
   { max: 75, label: 'Film anarchist', blurb: 'The consensus is basically your nemesis.' },
   { max: Infinity, label: 'Cinematic anarchist', blurb: 'Do you even like the movies everyone else loves?' },
 ];
@@ -69,9 +69,9 @@ function buildScoredRows(rows) {
 
 /**
  * Builds the You vs the consensus data: the films where the user's rating
- * diverges the most from the TMDB average. Fucking crucial for the UI.
+ * diverges the most from the TMDB average.
  *
- * Returns the top 4 hidden gems and the top 4 overhyped shit.
+ * Returns the top 4 hidden gems and the top 4 overhyped films.
  *
  * Args:
  *   scored (Array<Object>): Output of buildScoredRows.
@@ -80,13 +80,13 @@ function buildScoredRows(rows) {
  *   Object: gems Array, overhyped Array each with up to 4 entries, and total.
  */
 function buildConsensus(scored) {
-  // hidden gems: user rates way ABOVE consensus. hostia puta
+  // hidden gems: the user rates them well above the consensus
   const gems = scored
     .filter((film) => film.delta > 0)
     .sort((a, b) => b.delta - a.delta)
     .slice(0, 4);
 
-  // overhyped: user rates way BELOW consensus. mierda
+  // overhyped: the user rates them well below the consensus
   const overhyped = scored
     .filter((film) => film.delta < 0)
     .sort((a, b) => a.delta - b.delta)
@@ -100,7 +100,7 @@ function buildConsensus(scored) {
  * with the general consensus.
  *
  * The score is the mean absolute delta mapped to 0 to 100.
- * A 2.5 star average discrepancy is max contrarian. Deadass simple math.
+ * A 2.5 star average discrepancy is the maximum.
  *
  * Args:
  *   scored (Array<Object>): Output of buildScoredRows.
@@ -212,7 +212,7 @@ function buildDecades(rows) {
  * Custom hook that derives every stat for the Section 04 Ratings section.
  *
  * Pure and memoised on the enriched rows. Returns a ready to render shape so
- * the component only worries about layout and micro interactions. Fuck yeah.
+ * the component only worries about layout and micro interactions.
  *
  * Args:
  *   enrichedData (Array<Object>|null): Enriched rows from TMDB.

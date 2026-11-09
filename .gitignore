@@ -12,10 +12,6 @@ dist-ssr
 *.local
 .vscode/*
 !.vscode/extensions.json
-.claude/
-.gemini/
-.impeccable/
-.llm_skills/
 .DS_Store
 Thumbs.db
 *.suo

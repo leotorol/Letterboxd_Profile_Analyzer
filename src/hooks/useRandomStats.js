@@ -441,7 +441,7 @@ function ledgerStep(total) {
     if (Math.floor(total / step) <= LEDGER_MAX_STEPS) return step;
   }
 
-  // the ladder tops out at 100k. if someone logs an insane amount of films we
+  // The ladder tops out at 100k. For an unusually large log we
   // still round up to a bigger step so the rung cap holds instead of exploding
   const maxStep = LEDGER_STEPS[LEDGER_STEPS.length - 1];
   return Math.ceil(total / LEDGER_MAX_STEPS / maxStep) * maxStep;
@@ -553,9 +553,32 @@ export function useRandomStats(enrichedData = null) {
   const [catalog, setCatalog] = useState({ popular: [], topRated: [] });
   const [catalogState, setCatalogState] = useState('idle');
   const [catalogAttempt, setCatalogAttempt] = useState(0);
+  const [catalogInView, setCatalogInView] = useState(false);
+  const canObserve = typeof window !== 'undefined' && typeof window.IntersectionObserver === 'function';
+
+  // Section 08 lives far below the fold. Waiting until it is close to the
+  // viewport keeps twenty TMDB requests off the critical path on first load.
+  useEffect(() => {
+    if (!catalogEnabled || rowCount === 0 || catalogInView || !canObserve) return undefined;
+
+    const section = document.getElementById('section-08');
+    if (!section) return undefined;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        setCatalogInView(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '600px 0px' });
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [catalogEnabled, rowCount, catalogInView, canObserve]);
 
   useEffect(() => {
     if (!catalogEnabled || rowCount === 0) return undefined;
+    // Without an observer there is no way to wait, so load straight away.
+    if (canObserve && !catalogInView && document.getElementById('section-08')) return undefined;
 
     let cancelled = false;
 
@@ -574,7 +597,6 @@ export function useRandomStats(enrichedData = null) {
       })
       .catch((err) => {
         if (cancelled) return;
-        // joder tmdb, not now
         console.warn('useRandomStats: the global catalog request failed', err);
         setCatalogState('error');
       });
@@ -582,7 +604,7 @@ export function useRandomStats(enrichedData = null) {
     return () => {
       cancelled = true;
     };
-  }, [catalogEnabled, rowCount, catalogAttempt]);
+  }, [catalogEnabled, rowCount, catalogAttempt, catalogInView, canObserve]);
 
   const stats = useMemo(() => buildRandomStats(rows, catalog), [rows, catalog]);
 

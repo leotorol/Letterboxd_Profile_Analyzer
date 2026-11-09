@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { useData } from '../../context/DataContext';
 import { useLetterboxdData } from '../../hooks/useLetterboxdData';
 import { UploadIcon } from '../icons/Icons';
 import './DropZone.css';
@@ -56,6 +57,8 @@ export default function DropZone() {
   const [loadingMock, setLoadingMock] = useState(false);
   const inputRef = useRef(null);
   const { processZip } = useLetterboxdData();
+  const { importError, setImportError } = useData();
+  const shownError = error || importError;
 
   /**
    * Validates and triggers parsing of selected file.
@@ -68,6 +71,7 @@ export default function DropZone() {
    */
   const handleFile = useCallback(async (file) => {
     setError('');
+    setImportError('');
     if (!file) return;
     if (!file.name.toLowerCase().endsWith('.zip')) {
       setError('Invalid file format. Please upload a .zip file exported from Letterboxd.');
@@ -79,7 +83,7 @@ export default function DropZone() {
       // display exact custom error message thrown by zipParser
       setError(err?.message || 'Failed to read the ZIP file. Make sure it is a valid Letterboxd export.');
     }
-  }, [processZip]);
+  }, [processZip, setImportError]);
 
   const onDragOver = useCallback((e) => {
     e.preventDefault();
@@ -113,6 +117,7 @@ export default function DropZone() {
   const handleMockData = useCallback(async () => {
     if (loadingMock) return;
     setError('');
+    setImportError('');
     setLoadingMock(true);
     try {
       const response = await fetch(MOCK_ZIP_URL);
@@ -124,7 +129,7 @@ export default function DropZone() {
       setLoadingMock(false);
       setError(err?.message || 'Could not load the demo export. Please try again.');
     }
-  }, [loadingMock, processZip]);
+  }, [loadingMock, processZip, setImportError]);
 
   return (
     <div className="dropzone-wrapper">
@@ -136,7 +141,7 @@ export default function DropZone() {
         aria-busy={loadingMock}
       >
         {loadingMock ? <span className="dropzone-mock-spinner" aria-hidden="true" /> : <SparkIcon />}
-        {loadingMock ? 'Loading demo' : 'Use mock data'}
+        {loadingMock ? 'Loading demo' : 'Try the demo'}
       </button>
 
       {/* Header — Letterboxd Stats Analyser */}
@@ -159,13 +164,13 @@ export default function DropZone() {
           <span className="unwrapped-highlight">Unwrapped</span>
         </h1>
         <p className="dropzone-subtitle">
-          Drop your Letterboxd export ZIP here and let's dive into your film life.
+          Drop your Letterboxd export ZIP and explore your film history.
         </p>
       </div>
 
       {/* Drop area */}
       <div
-        className={`dropzone-area${dragging ? ' dragging' : ''}${error ? ' error' : ''}`}
+        className={`dropzone-area${dragging ? ' dragging' : ''}${shownError ? ' error' : ''}`}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
@@ -202,9 +207,9 @@ export default function DropZone() {
           <FolderIcon /> Select file from computer
         </div>
 
-        {error && (
+        {shownError && (
           <div className="dropzone-error-msg" role="alert">
-            {error}
+            {shownError}
           </div>
         )}
       </div>
@@ -230,7 +235,7 @@ export default function DropZone() {
 
       {/* Privacy note */}
       <p className="dropzone-privacy">
-        <ShieldIcon /> Your data stays 100% in your browser. No servers, no tracking. Why would I want your letterboxd history lol?
+        <ShieldIcon /> Your export is parsed in your browser. Only film titles and years reach TMDB for metadata; your account data never leaves this device.
       </p>
     </div>
   );

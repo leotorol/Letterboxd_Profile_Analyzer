@@ -90,14 +90,18 @@ funcionando.
 ## Despues del primer deploy
 
 1. Abre la URL que te da Vercel y comprueba que carga la pantalla de subida.
-2. Prueba el proxy de TMDB:
+2. Prueba el proxy de TMDB. En produccion el endpoint exige que la peticion
+   venga de la propia app, asi que anade la cabecera de same origin:
    ```powershell
-   Invoke-RestMethod -Uri "https://TU-DOMINIO/api/tmdb/search/multi?query=Inception"
+   Invoke-RestMethod -Uri "https://TU-DOMINIO/api/tmdb/search/multi?query=Inception" `
+     -Headers @{ "Sec-Fetch-Site" = "same-origin" }
    ```
    Debe devolver JSON con resultados. Si devuelve 503, falta `TMDB_API_KEY`.
+   Si devuelve 403, la cabecera no ha llegado.
 3. Prueba la cola:
    ```powershell
    Invoke-RestMethod -Method Post -Uri "https://TU-DOMINIO/api/queue" `
+     -Headers @{ "Sec-Fetch-Site" = "same-origin" } `
      -ContentType "application/json" -Body '{"action":"probe"}'
    ```
    Debe devolver `enabled:true` si Upstash esta conectado y `tmdbReady:true` si
@@ -166,6 +170,7 @@ enlaces y tiempo. Lo que ya esta hecho es toda la parte tecnica.
 
 ## Checklist rapido
 
+- [ ] `npm run lint`, `npm test` y `npm run build` pasan en local
 - [ ] Repositorio en GitHub
 - [ ] Proyecto importado en Vercel
 - [ ] `TMDB_API_KEY` configurada en Vercel

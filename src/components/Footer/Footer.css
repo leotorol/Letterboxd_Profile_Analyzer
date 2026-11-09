@@ -528,3 +528,23 @@
     font-size: 0.74rem;
   }
 }
+
+.ft-legal {
+  margin: var(--space-4) 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-rule);
+  color: var(--color-text-faint);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.ft-legal a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ft-legal a:hover {
+  color: var(--color-text);
+}

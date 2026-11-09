@@ -122,7 +122,6 @@ function calcSleeplessNights(totalMinutes) {
  *   Object: Calculated metrics.
  */
 function calcStats(enriched, rawData) {
-  // los muertos suyos que facil es calcular las stats cuando el data esta limpio
   const rows = dedupeFilms(Array.isArray(enriched) ? enriched.filter(Boolean) : []);
   const totalWatched = rows.length;
   const totalMinutes = rows.reduce(

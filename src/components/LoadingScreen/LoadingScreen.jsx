@@ -97,16 +97,14 @@ export default function LoadingScreen() {
         {/* No API key notice */}
         {!HAS_API_KEY && !inQueue && (
           <div className="loading-nokey">
-            No TMDB API key detected, runtime and director data will be unavailable.
-            Add <code>VITE_TMDB_API_KEY</code> to your local <code>.env</code> or
-            <code>TMDB_API_KEY</code> to the server environment.
+            Metadata enrichment is unavailable right now, so runtime, director
+            and poster data may be missing. The rest of your stats still work.
           </div>
         )}
 
-        {/* Friendly wait message */}
         <p className="loading-note">
-          This may take a while after you upload, remember it's a free project
-          running on your own machine :):):)
+          Enrichment can take a few minutes for large libraries. Keep this tab
+          open while it finishes.
         </p>
       </div>
     </div>

@@ -1,9 +1,11 @@
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const TMDB_PROXY_PATH = '/api/tmdb';
 const CACHE_KEY_PREFIX = 'lbxd_tmdb_cache_';
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const CATALOG_CACHE_PREFIX = 'lbxd_tmdb_catalog_';
 const CATALOG_CACHE_VERSION = 'v3';
+const MAX_ENRICHMENT_CACHES = 4;
+const MAX_CATALOG_CACHES = 4;
 const CATALOG_PAGES = 10;
 const CATALOG_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const CATALOG_KINDS = ['popular', 'top_rated'];
@@ -53,9 +55,9 @@ export function hasTmdbKey(apiKey = TMDB_API_KEY) {
   return TMDB_VIA_PROXY || hasDirectTmdbKey(apiKey);
 }
 
-// fuzzy ratio needed to accept a title, 0.6 was letting some nasty almost-titles through
+// fuzzy ratio needed to accept a title, 0.6 was letting weak matches through
 const FUZZY_ACCEPT = 0.85;
-// letterboxd and tmdb sometimes disagree by a year (festival premiere vs wide release shit)
+// Letterboxd and TMDB sometimes disagree by a year (festival premiere vs wide release)
 const YEAR_MAX_DIFF = 1;
 // min chars for the prefix rule so we don't match garbage like "M" or "Up"
 const AFFIX_MIN_LEN = 8;
@@ -142,9 +144,90 @@ function buildCacheKey(movies) {
 function getCache(key) {
   try {
     const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Older entries were stored as a bare array. Read both shapes so an
+    // upgrade never throws away a perfectly good cache.
+    return Array.isArray(parsed) ? parsed : parsed?.data ?? null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Reads the saved timestamp of one cache entry in a safe way.
+ *
+ * Args:
+ *   key (string): localStorage key.
+ *
+ * Returns:
+ *   number: Milliseconds timestamp, or 0 when the entry is unreadable.
+ */
+function readCacheTimestamp(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key));
+    return Number.isFinite(parsed?.savedAt) ? parsed.savedAt : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Deletes the oldest entries once a namespace grows past its limit.
+ *
+ * Args:
+ *   entries (Array<Object>): `{ key, savedAt }` pairs.
+ *   max (number): Maximum entries to keep.
+ *
+ * Returns:
+ *   void
+ */
+function trimOldest(entries, max) {
+  if (entries.length <= max) return;
+  entries.sort((a, b) => a.savedAt - b.savedAt);
+  const excess = entries.length - max;
+  for (let i = 0; i < excess; i++) {
+    localStorage.removeItem(entries[i].key);
+  }
+}
+
+/**
+ * Removes caches from old versions and trims the current ones.
+ *
+ * The fingerprint key changes whenever the imported film list changes, so a
+ * user who reimports updated exports would accumulate one full cache per
+ * import. localStorage is only a few megabytes, so never let it grow forever.
+ *
+ * Returns:
+ *   void
+ */
+function pruneCaches() {
+  try {
+    if (typeof localStorage === 'undefined') return;
+
+    const enrichment = [];
+    const catalogs = [];
+    const keys = [];
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) keys.push(key);
+    }
+
+    for (const key of keys) {
+      if (key.startsWith(CACHE_KEY_PREFIX + CACHE_VERSION)) {
+        enrichment.push({ key, savedAt: readCacheTimestamp(key) });
+      } else if (key.startsWith(CATALOG_CACHE_PREFIX + CATALOG_CACHE_VERSION)) {
+        catalogs.push({ key, savedAt: readCacheTimestamp(key) });
+      } else if (key.startsWith(CACHE_KEY_PREFIX) || key.startsWith(CATALOG_CACHE_PREFIX)) {
+        localStorage.removeItem(key);
+      }
+    }
+
+    trimOldest(enrichment, MAX_ENRICHMENT_CACHES);
+    trimOldest(catalogs, MAX_CATALOG_CACHES);
+  } catch (e) {
+    console.warn('tmdbApi: could not prune the local cache', e);
   }
 }
 
@@ -160,11 +243,15 @@ function getCache(key) {
  */
 function setCache(key, data) {
   try {
-    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), data }));
+    pruneCaches();
   } catch (e) {
     console.warn('tmdbApi: storage full or failed to save cache', e);
   }
 }
+
+// Clean any stale version left behind by earlier releases.
+pruneCaches();
 
 /**
  * Pauses execution for batch pacing and retry backoff.
@@ -211,11 +298,10 @@ function normalizeForComparison(str) {
 /**
  * Computes Levenshtein distance between two strings.
  *
- * pufff is the classic dynamic programming edit distance algorithm.
- * it builds a matrix where each cell [i][j] holds the minimum number of
- * single-character edits needed to transform the first i chars of string a
- * into the first j chars of string b. the final answer lives in the bottom-right
- * corner. don't touch the matrix indexing or shit breaks.
+ * Classic dynamic programming edit distance. The matrix cell [i][j] holds the
+ * minimum number of single-character edits needed to transform the first i
+ * chars of string a into the first j chars of string b. The final answer lives
+ * in the bottom-right corner.
  *
  * Args:
  *   a (string): First string.
@@ -312,9 +398,9 @@ function getResultYear(result) {
 /**
  * Checks whether one normalized title is a word-boundary prefix of the other.
  *
- * Saves our ass when letterboxd logs the full ass-long title but tmdb only
- * knows the short one, like "the french dispatch of the liberty kansas
- * evening sun" vs "the french dispatch".
+ * Handles cases where Letterboxd logs the full title but TMDB only knows the
+ * short one, like "the french dispatch of the liberty kansas evening sun"
+ * versus "the french dispatch".
  *
  * Args:
  *   normA (string): Already normalized first title.
@@ -336,16 +422,14 @@ function isAffixMatch(normA, normB) {
 /**
  * Scores one TMDB candidate against the expected titles of a letterboxd entry.
  *
- * NO TOQUES ESTO POR TU PUTA VIDA
- * 
- * this function is the brain of the whole matching system. it runs
- * a fuzzy title comparison AND a word-boundary prefix check, then rejects anything
- * with a year diff bigger than YEAR_MAX_DIFF because that's a different film deadass.
+ * Core of the matching system. It runs a fuzzy title comparison and a
+ * word-boundary prefix check, then rejects anything with a year difference
+ * bigger than YEAR_MAX_DIFF.
  *
  * A candidate is accepted when the fuzzy title score clears FUZZY_ACCEPT, or
- * when it's a word-boundary prefix match AND the year lines up exactly. Year
- * differences beyond YEAR_MAX_DIFF are an instant hard reject because that's
- * a different film with the same name, deadass.
+ * when it is a word-boundary prefix match and the year lines up exactly. Year
+ * differences beyond YEAR_MAX_DIFF are rejected because that is a different
+ * film with the same name.
  *
  * Args:
  *   result (Object): TMDB search result with a valid media_type.
@@ -415,9 +499,8 @@ function pickBestCandidate(candidates) {
 /**
  * Fetches a TMDB endpoint with retries on rate limits and server errors.
  *
- * The old code silently skipped failed responses, so every 429 just made
- * movies vanish into the failed list for no damn reason. now we back off
- * and retry, honoring the retry-after header when tmdb bothers to send one.
+ * Failed responses are retried with backoff instead of being skipped, honoring
+ * the retry-after header when TMDB sends one.
  *
  * Args:
  *   path (string): Endpoint path like '/search/multi'.
@@ -551,10 +634,10 @@ async function searchMovieAndTv(query, year, apiKey) {
  * candidate across cascading search strategies instead of grabbing the
  * first decent-looking result.
  *
- * this cascading strategy is a fucking maze but it works. it tries
- * four different approaches in order: multi search with normalized title,
- * multi search with subtitle after colon, movie+tv endpoints with year filter,
- * and finally movie+tv endpoints without year as a last resort.
+ * Four approaches are tried in order: multi search with the normalized title,
+ * multi search with the subtitle after the colon, movie and tv endpoints with a
+ * year filter, and finally movie and tv endpoints without a year as a last
+ * resort.
  *
  * Strategy order:
  * 1. multi search with the normalized title (movies and tv in one request)
@@ -763,10 +846,10 @@ export function hasCachedEnrichment(movies) {
  * Enriches an array of movies with runtime, directors and genres from the
  * TMDB API in batches.
  *
- * Rewatched movies get deduped before hitting the api because watched.csv
- * has one row per watch and hammering tmdb five times for the same film is
- * pure stupidity. results are mapped back so the output keeps the original
- * row order, rewatches included.
+ * Rewatched movies are deduped before hitting the API because watched.csv can
+ * contain one row per watch, and repeating the same lookup five times wastes
+ * quota. Results are mapped back so the output keeps the original row order,
+ * rewatches included.
  *
  * Args:
  *   movies (Array<Object>): Array of parsed movie objects.
@@ -780,8 +863,8 @@ export function hasCachedEnrichment(movies) {
 export async function enrichMovies(movies, apiKey, onProgress, options = {}) {
   const list = Array.isArray(movies) ? movies.filter((movie) => movie && typeof movie === 'object') : [];
 
-  // reset every time, otherwise a cached second import reports the previous
-  // import's counters and failed titles like a lying little shit
+  // Reset every time, otherwise a cached second import reports the previous
+  // import's counters and failed titles.
   resetEnrichmentReport();
   enrichmentReport.total = list.length;
 

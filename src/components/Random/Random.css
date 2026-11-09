@@ -392,8 +392,8 @@
   min-width: 0;
 }
 
-/* grid items default to min-width auto, and the reel's max-content width
-   was blowing the whole mobile layout out to 1400 pixels. coño. */
+/* Grid items default to min-width auto, and the reel's max-content width was
+   forcing the mobile layout to 1400 pixels. */
 .rd-gap-layout > * {
   min-width: 0;
 }
@@ -1259,8 +1259,8 @@
   padding-bottom: var(--space-3);
 }
 
-/* no scroll here, deadass: every rung shrinks to share the row and the group
-   stays centered, whatever the step count ends up being */
+/* No scroll here: every rung shrinks to share the row and the group stays
+   centered, whatever the step count ends up being. */
 .rd-ledger-track {
   display: grid;
   grid-auto-flow: column;
@@ -1307,7 +1307,7 @@
   font-size: 0.84rem;
   font-weight: 800;
   line-height: 1.25;
-  /* a stupid long title should wrap inside its rung, never force a scroll */
+  /* A very long title should wrap inside its rung, never force a scroll. */
   overflow-wrap: anywhere;
 }
 

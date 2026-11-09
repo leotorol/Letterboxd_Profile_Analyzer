@@ -76,13 +76,10 @@ function patternNote(item, kind) {
 /**
  * A bespoke SVG area/line trend chart for films watched per month.
  *
- * Los muertos de esta puta función de mrd con lo facil q es y loq me ha costado
- * 
- * the math in this component is a fucking labyrinth. it builds an SVG
- * path by mapping each data point to x/y coordinates, then draws an area fill
- * underneath the line. the hover logic tracks pointer position and snaps to
- * the nearest data point index. pure presentational widget; keeps its own
- * hover state for the tooltip.
+ * It builds an SVG path by mapping each data point to x/y coordinates, then
+ * draws an area fill underneath the line. The hover logic tracks pointer
+ * position and snaps to the nearest data point index. Purely presentational;
+ * it keeps its own hover state for the tooltip.
  *
  * Args:
  *   series (Array<Object>): Chronological { year, month, label, count } points.

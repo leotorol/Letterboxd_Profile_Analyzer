@@ -16,7 +16,6 @@ export default class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // la puta madre se ha roto algo, grab error state
     return { hasError: true, error };
   }
 

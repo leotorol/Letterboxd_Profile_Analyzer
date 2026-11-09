@@ -57,7 +57,7 @@ export default function Heatmap({ heatmap, byDateMovies = new Map() }) {
    *   void
    */
   function handleEnter(cell, node) {
-    // joder no hover on empty days, that's just noise
+    // No hover on empty days, that is just noise.
     if (cell.blank || cell.count === 0) return;
     const { x, y } = cellPosition(node);
     setHover({ iso: cell.iso, count: cell.count, x, y });

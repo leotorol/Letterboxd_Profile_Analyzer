@@ -190,8 +190,8 @@ function intensity(count, max) {
 /**
  * Builds a GitHub-style heat grid for a single calendar year.
  *
- * the grid layout math here is a fucking headache. it lays out days in
- * week columns (Sun-Sat) starting from the Sunday on or before Jan 1 and ending
+ * The grid lays out days in week columns (Sun-Sat) starting from the Sunday on
+ * or before Jan 1 and ending
  * on the Saturday on or after Dec 31. days outside the target year and days
  * after today are rendered as blank cells so the current year reads as "so far".
  * a month label is placed on the column that holds the first of that month.
@@ -397,8 +397,8 @@ function buildByDateMovies(rows, enriched) {
  * diary.csv has one row per watch event (rewatches are separate entries). we
  * need both to get honest rewatch numbers. we group by name+year, never by uri,
  * because a diary uri points at the specific viewing page and changes on every
- * rewatch. the poster mapping is a bitch because we have to align the enriched
- * array (which matches watched.csv order) with the diary keys.
+ * rewatch. The poster mapping needs the enriched array (which matches
+ * watched.csv order) aligned with the diary keys.
  *
  * Args:
  *   watchedRows (Array<Object>): Watched rows (one per film) with name/year/date.
@@ -412,8 +412,8 @@ function buildByDateMovies(rows, enriched) {
  */
 function buildRewatches(watchedRows, diaryRows = [], enriched = null) {
   // name::year -> big poster URL, pulled from the enriched row that sits at the
-  // same index as the deduped watched row. Shit, the diary uri changes on every
-  // rewatch so that's the only stable way to map a title to its poster.
+  // same index as the deduped watched row. The diary URI changes on every
+  // rewatch, so the title fingerprint is the only stable key.
   const posterByKey = new Map();
   watchedRows.forEach((row, i) => {
     const key = `${row.name}::${row.year}`;

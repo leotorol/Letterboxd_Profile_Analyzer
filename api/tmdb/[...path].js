@@ -1,3 +1,5 @@
+import { isSameOrigin, rateLimit } from '../_lib/guard.js';
+
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
 const ALLOWED_PATH = /^\/(search\/(multi|movie|tv)|movie\/\d+|tv\/\d+|person\/\d+|discover\/movie|genre\/movie\/list|trending\/(movie|tv|all)\/(day|week))$/;
@@ -62,6 +64,20 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
     res.status(405).json({ error: 'method not allowed' });
+    return;
+  }
+
+  if (!isSameOrigin(req)) {
+    res.status(403).json({ error: 'forbidden' });
+    return;
+  }
+
+  // Generous enough for a full library import, firm enough to stop a runaway
+  // loop from burning the shared TMDB quota.
+  const limit = rateLimit(req, { namespace: 'tmdb', limit: 12000, windowMs: 60_000 });
+  if (!limit.allowed) {
+    res.setHeader('Retry-After', String(limit.retryAfter));
+    res.status(429).json({ error: 'too many requests' });
     return;
   }
 

@@ -133,22 +133,20 @@ function buildGrowthTimeline(watchlist, watched, today) {
     });
   }
 
-  // recent pace: last N months
-  const recentStart = monthIndex(today) - PACE_MONTHS;
+  // Recent pace: the last N calendar months, whether or not the user logged
+  // anything in them. Using the tail of the data would report an old rhythm as
+  // current when someone has not opened Letterboxd in a while.
+  const nowIdx = monthIndex(today);
   let recentAdded = 0;
   let recentWatched = 0;
-  let recentCount = 0;
-  for (const point of series) {
-    const idx = point.year * 12 + point.month;
-    if (idx > recentStart) {
-      recentAdded += point.added;
-      recentWatched += point.watched;
-      recentCount++;
-    }
+  for (let i = 1; i <= PACE_MONTHS; i++) {
+    const idx = nowIdx - i + 1;
+    recentAdded += addedByMonth.get(idx) || 0;
+    recentWatched += watchedByMonth.get(idx) || 0;
   }
 
-  const addedPerMonth = recentCount > 0 ? Math.round((recentAdded / recentCount) * 10) / 10 : 0;
-  const watchedPerMonth = recentCount > 0 ? Math.round((recentWatched / recentCount) * 10) / 10 : 0;
+  const addedPerMonth = Math.round((recentAdded / PACE_MONTHS) * 10) / 10;
+  const watchedPerMonth = Math.round((recentWatched / PACE_MONTHS) * 10) / 10;
 
   let verdict = 'none';
   if (addedPerMonth > 0 && watchedPerMonth > 0) {

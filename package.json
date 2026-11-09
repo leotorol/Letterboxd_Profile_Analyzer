@@ -1,12 +1,25 @@
 {
-  "name": "letterboxd-stats-app",
+  "name": "letterboxd-stats-analyser",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Turn a Letterboxd export into an interactive, private stats dashboard.",
+  "author": "leotorol",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leotorol/Letterboxd_Profile_Analyzer.git"
+  },
+  "homepage": "https://github.com/leotorol/Letterboxd_Profile_Analyzer#readme",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,6 +35,7 @@
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
     "oxlint": "^1.79.0",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vitest": "^5.1.0"
   }
 }

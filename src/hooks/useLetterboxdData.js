@@ -5,6 +5,10 @@ import { joinEnrichmentQueue } from '../services/enrichmentQueue';
 import { TMDB_POSTER_SMALL } from '../utils/tmdbImages';
 import { GRAVEYARD_LIMIT, selectOldestWatchlist } from '../utils/watchlist';
 
+// One import at a time. A double drop used to start two enrichment runs that
+// fought over the same state and the shared TMDB quota.
+let importInFlight = false;
+
 /**
  * Hook to orchestrate ZIP upload parsing, TMDB enrichment, and state progression.
  *
@@ -20,6 +24,7 @@ export function useLetterboxdData() {
     setEnrichedWatchlist,
     setEnrichmentReport,
     setTmdbReady,
+    setImportError,
   } = useData();
 
   /**
@@ -38,20 +43,25 @@ export function useLetterboxdData() {
    *   Error: If file extraction, missing CSV validation, or parsing fails.
    */
   async function processZip(file) {
-    const parsed = await parseLetterboxdZip(file);
-    setRawData(parsed);
+    if (importInFlight) return;
+    importInFlight = true;
+    setImportError('');
 
-    setAppState('loading');
-    setProgress({ processed: 0, total: 0, currentMovies: [], queue: null });
-
-    const queue = await joinEnrichmentQueue(parsed.watched.length, {
-      skip: hasCachedEnrichment(parsed.watched),
-    });
-    const queueInfo = queue.snapshot();
-    const tmdbAvailable = queueInfo.tmdbReady !== false;
-    setTmdbReady(tmdbAvailable);
-
+    let queue = null;
     try {
+      const parsed = await parseLetterboxdZip(file);
+      setRawData(parsed);
+
+      setAppState('loading');
+      setProgress({ processed: 0, total: 0, currentMovies: [], queue: null });
+
+      queue = await joinEnrichmentQueue(parsed.watched.length, {
+        skip: hasCachedEnrichment(parsed.watched),
+      });
+      const queueInfo = queue.snapshot();
+      const tmdbAvailable = queueInfo.tmdbReady !== false;
+      setTmdbReady(tmdbAvailable);
+
       let recentMovies = []; // keep a rolling window of found posters for the loading strip
       setProgress({ processed: 0, total: parsed.watched.length, currentMovies: [], queue: null });
 
@@ -126,11 +136,13 @@ export function useLetterboxdData() {
       setEnrichmentReport(mainReport);
       setAppState('ready');
     } catch (err) {
-      console.error('Failed during TMDB enrichment:', err);
+      console.error('Failed during import:', err);
+      setImportError(err?.message || 'Something went wrong while importing this ZIP.');
       setAppState('idle');
       throw err;
     } finally {
-      await queue.leave();
+      if (queue) await queue.leave();
+      importInFlight = false;
     }
   }
 

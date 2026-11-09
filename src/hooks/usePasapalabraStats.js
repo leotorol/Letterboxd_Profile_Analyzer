@@ -5,8 +5,8 @@ export const PASAPALABRA_LETTERS = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 const COUNT_FORMAT = new Intl.NumberFormat('en-US');
 
-// articles are a scam, strip the bastards so The Matrix lands under M where it
-// fucking belongs. spanish and french ones too, this is a cinephile app.
+// Leading articles are ignored so "The Matrix" lands under M, and the same
+// applies to Spanish and French titles.
 const ARTICLES = new Set([
   'a', 'an', 'the',
   'el', 'la', 'los', 'las', 'lo',

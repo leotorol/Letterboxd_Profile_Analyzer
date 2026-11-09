@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { isSameOrigin, rateLimit } from './_lib/guard.js';
 import { hasRedis, redisEval } from './_lib/redis.js';
 
 const ACTIVE_KEY = 'lbxd:queue:active';
@@ -143,6 +144,18 @@ export default async function handler(req, res) {
   if (req.method !== 'POST' && req.method !== 'GET') {
     res.setHeader('Allow', 'GET, POST');
     res.status(405).json({ error: 'method not allowed' });
+    return;
+  }
+
+  if (!isSameOrigin(req)) {
+    res.status(403).json({ error: 'forbidden' });
+    return;
+  }
+
+  const limit = rateLimit(req, { namespace: 'queue', limit: 240, windowMs: 60_000 });
+  if (!limit.allowed) {
+    res.setHeader('Retry-After', String(limit.retryAfter));
+    res.status(429).json({ error: 'too many requests' });
     return;
   }
 

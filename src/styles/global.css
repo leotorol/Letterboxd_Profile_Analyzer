@@ -237,6 +237,12 @@ button:active {
   }
 }
 
+/* A visible focus ring everywhere, including the custom chart controls */
+:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
 /* Skip navigation link */
 .skip-nav {
   position: absolute;

@@ -18,6 +18,7 @@ export function DataProvider({ children }) {
   const [enrichedWatchlist, setEnrichedWatchlist] = useState(null);
   const [enrichmentReport, setEnrichmentReport] = useState(null);
   const [tmdbReady, setTmdbReady] = useState(null);
+  const [importError, setImportError] = useState('');
 
   return (
     <DataContext.Provider value={{
@@ -28,6 +29,7 @@ export function DataProvider({ children }) {
       enrichedWatchlist, setEnrichedWatchlist,
       enrichmentReport, setEnrichmentReport,
       tmdbReady, setTmdbReady,
+      importError, setImportError,
     }}>
       {children}
     </DataContext.Provider>

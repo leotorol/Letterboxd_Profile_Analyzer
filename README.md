@@ -8,7 +8,15 @@ Turn your Letterboxd account history into a rich, scrollable stats dashboard. Dr
 
 Letterboxd lets you **export your entire account** as a ZIP file containing CSV files like `ratings.csv`, `watched.csv`, `reviews.csv`, and `watchlist.csv`. This app takes that export and turns it into something visual and fun.
 
-<img width="1202" height="821" alt="image" src="https://github.com/user-attachments/assets/38df4fed-34a9-4d64-b595-dc749e88324e" />
+<img width="1202" height="821" alt="Letterboxd Stats Analyser dashboard" src="https://github.com/user-attachments/assets/38df4fed-34a9-4d64-b595-dc749e88324e" />
+
+## Live demo
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/leotorol/Letterboxd_Profile_Analyzer)
+
+No account is required. Upload your own export or press **Try the demo** on the
+upload screen. After the first Vercel deploy, add `TMDB_API_KEY` in the project
+settings to enable the metadata sections.
 
 ## What this app does
 
@@ -25,7 +33,7 @@ Everything is parsed and computed in your browser. Account data never leaves you
 | 01 | Quick Facts | Watch time, film count, directors, average rating and watchlist size. |
 | 02 | Rhythm | GitHub style activity heatmap, streaks, weekday and month patterns, pace and comfort rewatches. |
 | 03 | Cinephile Profile | Taste spectrum, genre distribution, taste evolution, duration and year correlations, diversity and world map. |
-| 04 | Ratings | Your ratings against the Letterboxd consensus, contrarian level and highest rated decades. |
+| 04 | Ratings | Your ratings against the TMDB consensus, contrarian level and highest rated decades. |
 | 05 | Cast and Money | Most watched faces, favourite director and actor duo, studios and budget vs box office. |
 | 06 | Reviews | Word cloud, review length over time and your most substantial reviews. |
 | 07 | Watchlist | The graveyard of films waiting the longest, growth vs watches and average wait. |
@@ -57,10 +65,12 @@ The rail also holds the way back to the upload screen at its foot (desktop) or p
 - **Upstash Redis** — global enrichment queue
 - **topojson-client** + **world-atlas** — country geometry for the world map
 - **Oxlint** — linting
+- **Vitest** — unit tests
+- **GitHub Actions** — lint, test and build on every push
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org) (v18+ recommended, along with npm)
+- [Node.js](https://nodejs.org) 20 or newer, along with npm
 - A (free) [TMDB API key](https://www.themoviedb.org/settings/api) — needed for the TMDB powered sections (metadata enrichment, the all-time gap, popularity extremes and bookends ratings). Without it the app still works, but those stats fall back gracefully.
 
 ## Running locally
@@ -103,6 +113,20 @@ The rail also holds the way back to the upload screen at its foot (desktop) or p
 | `npm run build`   | Build the production bundle into `dist/`       |
 | `npm run preview` | Preview the production build locally           |
 | `npm run lint`    | Run Oxlint on the source                       |
+| `npm test`        | Run the Vitest suite once                      |
+| `npm run test:watch` | Run the tests in watch mode                 |
+
+## Tests
+
+The suite covers the CSV/ZIP parser, the coercion helpers, date maths, film
+deduplication and the watchlist selection. It runs in Node, no browser needed.
+
+```bash
+npm test
+```
+
+CI runs `npm run lint`, `npm test` and `npm run build` on every push and pull
+request through `.github/workflows/ci.yml`.
 
 ## Project structure
 
@@ -112,9 +136,13 @@ letterboxd stats/
 ├── vite.config.js             # Vite + React config + SEO file generation
 ├── vercel.json                # Vercel build, rewrites, headers and caching
 ├── package.json               # Scripts and dependencies
-├── .env                       # Local env vars (VITE_TMDB_API_KEY)
+├── LICENSE                    # MIT
+├── checklist.md               # Manual steps before publishing
+├── .env.example               # Documented local environment variables
+├── .github/workflows/ci.yml   # Lint, test and build on push
 ├── api/
 │   ├── queue.js               # Optional global enrichment queue
+│   ├── _lib/guard.js          # Same origin check and burst rate limiter
 │   ├── _lib/redis.js          # Minimal Upstash REST client
 │   └── tmdb/[...path].js      # Server side TMDB proxy with CDN cache
 ├── public/                    # Logo, OG image, manifest and demo ZIP
@@ -143,6 +171,7 @@ letterboxd stats/
 │   │   ├── enrichmentQueue.js # Client side shared queue controller
 │   │   └── tmdbApi.js         # TMDB search/enrichment, all-time catalogs, scored matching + cache
 │   ├── utils/
+│   │   ├── coerce.js          # Safe CSV and API value coercion
 │   │   ├── dateFormat.js      # Date formatting + shared month/day labels
 │   │   ├── films.js           # Film identity key and rewatch dedupe
 │   │   ├── geometry.js        # Polar to cartesian helpers for SVG charts
@@ -179,3 +208,11 @@ letterboxd stats/
 ## Data privacy
 
 Your Letterboxd export is parsed and enriched entirely in the browser. Raw movie metadata (title + year) is sent to TMDB through our serverless proxy to fetch extra details, but no personal account data is transmitted or stored anywhere. Enrichment results are cached in your browser's `localStorage` only. The section 08 all-time lists are public TMDB catalog data, cached separately for seven days. The proxy only forwards film titles and years, never your ratings, reviews or account details.
+
+## Attribution and legal
+
+This product uses the [TMDB API](https://www.themoviedb.org/) but is not endorsed or certified by TMDB. Film metadata and posters come from TMDB. Letterboxd Stats Analyser is an independent fan project and is not affiliated with Letterboxd.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

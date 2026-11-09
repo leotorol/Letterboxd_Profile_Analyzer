@@ -1241,9 +1241,9 @@ function ringToPath(ring) {
 }
 
 /**
- * Converts GeoJSON geometry to SVG path with anti-meridian unwrapping.
- * Prevents straight line artifacts across Japan / Asia while maintaining closed country polygons.
- * holy shit don't touch the unwrap logic, it's what keeps Japan from growing a tail to Hawaii
+ * Converts GeoJSON geometry to an SVG path with anti-meridian unwrapping.
+ * Prevents straight line artifacts across Japan and Asia while keeping closed
+ * country polygons.
  */
 function geometryToPath(geometry) {
   if (!geometry) return '';

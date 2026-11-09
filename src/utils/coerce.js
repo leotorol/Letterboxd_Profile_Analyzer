@@ -1,6 +1,6 @@
-// Shared coercion helpers so one weird CSV cell can't turn every stat into NaN.
-// Joder, Letterboxd exports are usually clean, but imports and hand edited
-// files are a whole different animal.
+// Shared coercion helpers so one weird CSV cell cannot turn every stat into NaN.
+// Letterboxd exports are usually clean, but reimports and hand edited files can
+// contain unexpected values.
 
 /**
  * Coerces any value to a finite number.

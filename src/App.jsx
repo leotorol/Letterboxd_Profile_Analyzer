@@ -31,6 +31,7 @@ export default function App() {
     setEnrichedWatchlist,
     setEnrichmentReport,
     setTmdbReady,
+    setImportError,
   } = useData();
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function App() {
     setEnrichedWatchlist(null);
     setEnrichmentReport(null);
     setTmdbReady(null);
+    setImportError('');
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
     window.scrollTo(0, 0);
   }

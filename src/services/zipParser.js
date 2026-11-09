@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import Papa from 'papaparse';
 import { toIsoDate, toName, toRating, toYear } from '../utils/coerce';
+import { filmKey } from '../utils/films';
 
 /**
  * Parses raw CSV text string using PapaParse under the hood.
@@ -44,7 +45,7 @@ function keepUniqueByFilm(rows) {
 
   for (const row of rows) {
     if (!row) continue;
-    const key = `${row.name}::${row.year ?? ''}`;
+    const key = filmKey(row.name, row.year);
     const existing = byFilm.get(key);
     if (!existing) {
       byFilm.set(key, row);
@@ -125,7 +126,6 @@ export async function parseLetterboxdZip(file) {
   try {
     zip = await JSZip.loadAsync(file);
   } catch {
-    // deadass invalid zip archive
     throw new Error('Invalid or corrupted ZIP file. Please upload a valid archive downloaded from Letterboxd.');
   }
 
@@ -145,7 +145,7 @@ export async function parseLetterboxdZip(file) {
     return parseCSV(text);
   }
 
-  // grab all the damn CSVs in parallel
+  // Read the CSVs in parallel
   const [ratings, watched, watchlist, profile, diary, reviews] = await Promise.all([
     extractCSV('ratings.csv'),
     extractCSV('watched.csv'),
@@ -185,7 +185,7 @@ export async function parseLetterboxdZip(file) {
     const year = toYear(r['Year']);
     const ratingVal = toRating(r['Rating']);
     if (uri) ratingsMap.set(uri, ratingVal);
-    if (name) ratingsMap.set(`${name}::${year ?? ''}`, ratingVal);
+    if (name) ratingsMap.set(filmKey(name, year), ratingVal);
   });
 
   // watched.csv is the main truth, fallback to ratings if watched is somehow empty
@@ -197,7 +197,7 @@ export async function parseLetterboxdZip(file) {
 
     const uri = typeof w['Letterboxd URI'] === 'string' ? w['Letterboxd URI'] : null;
     const year = toYear(w['Year']);
-    const nameYear = `${name}::${year ?? ''}`;
+    const nameYear = filmKey(name, year);
     let rating = uri ? ratingsMap.get(uri) : undefined;
     if (rating === undefined) {
       rating = ratingsMap.get(nameYear);

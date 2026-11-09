@@ -14,8 +14,7 @@ export const DataContext = createContext(null);
 export function useData() {
   const ctx = useContext(DataContext);
   if (!ctx) {
-    // deadass forgot to wrap the app in DataProvider
-    throw new Error('useData must be used inside a DataProvider or shit breaks');
+    throw new Error('useData must be used inside a DataProvider');
   }
   return ctx;
 }
