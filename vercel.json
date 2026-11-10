@@ -4,13 +4,19 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
-    "api/tmdb/[...path].js": {
+    "api/tmdb.js": {
       "maxDuration": 10
     },
     "api/queue.js": {
       "maxDuration": 10
     }
   },
+  "rewrites": [
+    {
+      "source": "/api/tmdb/:path*",
+      "destination": "/api/tmdb"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

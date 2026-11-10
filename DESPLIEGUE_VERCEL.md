@@ -35,7 +35,7 @@ y descartaba Vercel. Ese documento ya no aplica a este proyecto Vite + React.
    ```
 2. Crea una API key de TMDB para produccion en
    <https://www.themoviedb.org/settings/api>.
-   No uses la misma que tengas en el `.env` local si ese archivo se ha
+   No uses la misma que tengas en el `.env` local si ese arichvo se ha
    compartido alguna vez. Si tienes dudas, revoca la antigua.
 3. Sube el proyecto a GitHub si aun no lo has hecho.
 4. Entra en <https://vercel.com>, inicia sesion con GitHub e importa el
@@ -93,14 +93,14 @@ funcionando.
 2. Prueba el proxy de TMDB. En produccion el endpoint exige que la peticion
    venga de la propia app, asi que anade la cabecera de same origin:
    ```powershell
-   Invoke-RestMethod -Uri "https://TU-DOMINIO/api/tmdb/search/multi?query=Inception" `
+   Invoke-RestMethod -Uri "https://letterboxd-unwrapped.vercel.app/api/tmdb/search/multi?query=Inception" `
      -Headers @{ "Sec-Fetch-Site" = "same-origin" }
    ```
    Debe devolver JSON con resultados. Si devuelve 503, falta `TMDB_API_KEY`.
    Si devuelve 403, la cabecera no ha llegado.
 3. Prueba la cola:
    ```powershell
-   Invoke-RestMethod -Method Post -Uri "https://TU-DOMINIO/api/queue" `
+   Invoke-RestMethod -Method Post -Uri "https://letterboxd-unwrapped.vercel.app/api/queue" `
      -Headers @{ "Sec-Fetch-Site" = "same-origin" } `
      -ContentType "application/json" -Body '{"action":"probe"}'
    ```
@@ -114,9 +114,9 @@ funcionando.
 6. Comprueba la imagen social:
    - <https://www.opengraph.xyz/>
    - <https://cards-dev.twitter.com/validator>
-   La imagen debe ser `https://TU-DOMINIO/og-image.png`.
-7. Comprueba `https://TU-DOMINIO/robots.txt` y
-   `https://TU-DOMINIO/sitemap.xml`.
+   La imagen debe ser `https://letterboxd-unwrapped.vercel.app/og-image.png`.
+7. Comprueba `https://letterboxd-unwrapped.vercel.app/robots.txt` y
+   `https://letterboxd-unwrapped.vercel.app/sitemap.xml`.
 8. Ejecuta Lighthouse en Chrome DevTools sobre la pantalla de subida. Revisa
    sobre todo rendimiento, accesibilidad y SEO.
 
@@ -126,7 +126,7 @@ funcionando.
 2. Anade la propiedad de tu dominio. La forma mas facil es el registro DNS de
    tipo TXT si usas un dominio propio. Si usas `tu-proyecto.vercel.app`, usa la
    verificacion por etiqueta HTML o por DNS.
-3. En Sitemaps, envia `https://TU-DOMINIO/sitemap.xml`.
+3. En Sitemaps, envia `https://letterboxd-unwrapped.vercel.app/sitemap.xml`.
 4. Usa Inspeccion de URL para pedir la indexacion de la home.
 5. Repite el envio del sitemap en Bing Webmaster Tools:
    <https://www.bing.com/webmasters>

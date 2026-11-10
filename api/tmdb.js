@@ -1,4 +1,4 @@
-import { isSameOrigin, rateLimit } from '../_lib/guard.js';
+import { isSameOrigin, rateLimit } from './_lib/guard.js';
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
@@ -81,8 +81,15 @@ export default async function handler(req, res) {
     return;
   }
 
+  // vercel.json rewrites /api/tmdb/:path* here. Named params arrive as a
+  // query string, and req.url keeps the original pathname, so read both.
   const rawPath = req.query?.path;
-  const segments = Array.isArray(rawPath) ? rawPath : [rawPath].filter(Boolean);
+  let segments = Array.isArray(rawPath) ? rawPath : [rawPath].filter(Boolean);
+  if (segments.length === 0) {
+    const url = new URL(req.url || '/', 'http://localhost');
+    const match = url.pathname.match(/^\/api\/tmdb\/?(.*)$/);
+    segments = (match?.[1] || '').split('/').filter(Boolean);
+  }
   const path = `/${segments.join('/')}`;
 
   if (!ALLOWED_PATH.test(path) || path.includes('..')) {
