@@ -16,11 +16,8 @@ Letterboxd lets you **export your entire account** as a ZIP file containing CSV 
 
 **Try it live: <https://letterboxd-unwrapped.vercel.app/>**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/leotorol/Letterboxd_Profile_Analyzer)
-
 No account is required. Upload your own export or press **Try the demo** on the
-upload screen. After the first Vercel deploy, add `TMDB_API_KEY` in the project
-settings to enable the metadata sections.
+upload screen.
 
 ## What this app does
 
