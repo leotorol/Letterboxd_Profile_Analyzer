@@ -1,62 +1,56 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#090912" />
-    <meta name="color-scheme" content="dark" />
 
-    <title>Letterboxd Stats Analyser | Your Letterboxd, Unwrapped</title>
-    <meta
-      name="description"
-      content="Turn your Letterboxd export into a cinematic stats dashboard, like a Letterboxd Wrapped. See watch time, ratings, genres, actors and watchlist, parsed privately in your browser."
-    />
-    <meta
-      name="keywords"
-      content="letterboxd stats, letterboxd wrapped, letterboxd analyzer, letterboxd export, letterboxd csv, film stats, movie stats, watchlist stats, letterboxd profile"
-    />
-    <meta name="author" content="leotorol" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <link rel="canonical" href="__SITE_URL__/" />
-    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090912" />
+  <meta name="color-scheme" content="dark" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Letterboxd Stats Analyser" />
-    <meta property="og:url" content="__SITE_URL__/" />
-    <meta property="og:title" content="Letterboxd Stats Analyser | Your Letterboxd, Unwrapped" />
-    <meta
-      property="og:description"
-      content="Upload your Letterboxd export and get a beautiful, interactive breakdown of your film life. Watch time, ratings, genres, actors, watchlist and more, all in your browser."
-    />
-    <meta property="og:image" content="__SITE_URL__/og-image.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Letterboxd Stats Analyser: Your Letterboxd, Unwrapped, on a dark cinematic starfield" />
-    <meta property="og:locale" content="en_US" />
+  <title>Letterboxd Stats Analyser | Your Letterboxd, Unwrapped</title>
+  <meta name="description"
+    content="Turn your Letterboxd export into a cinematic stats dashboard, like a Letterboxd Wrapped. See watch time, ratings, genres, actors and watchlist, parsed privately in your browser." />
+  <meta name="keywords"
+    content="letterboxd stats, letterboxd wrapped, letterboxd analyzer, letterboxd export, letterboxd csv, film stats, movie stats, watchlist stats, letterboxd profile" />
+  <meta name="author" content="leotorol" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="__SITE_URL__/" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Letterboxd Stats Analyser | Your Letterboxd, Unwrapped" />
-    <meta
-      name="twitter:description"
-      content="Upload your Letterboxd export and get a beautiful, interactive breakdown of your film life. Watch time, ratings, genres, actors, watchlist and more."
-    />
-    <meta name="twitter:image" content="__SITE_URL__/og-image.png" />
-    <meta name="twitter:image:alt" content="Letterboxd Stats Analyser: Your Letterboxd, Unwrapped, on a dark cinematic starfield" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Letterboxd Stats Analyser" />
+  <meta property="og:url" content="__SITE_URL__/" />
+  <meta property="og:title" content="Letterboxd Stats Analyser | Your Letterboxd, Unwrapped" />
+  <meta property="og:description"
+    content="Upload your Letterboxd export and get an interactive breakdown of your film life. Watch time, ratings, genres, actors, watchlist and more, all in your browser." />
+  <meta property="og:image" content="__SITE_URL__/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"
+    content="Letterboxd Stats Analyser: Your Letterboxd, Unwrapped, on a dark cinematic starfield" />
+  <meta property="og:locale" content="en_US" />
 
-    <link rel="icon" type="image/png" href="/letterboxd-unwrapped-mini-icon.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preconnect" href="https://image.tmdb.org" crossorigin />
-    <link rel="dns-prefetch" href="https://image.tmdb.org" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Letterboxd Stats Analyser | Your Letterboxd, Unwrapped" />
+  <meta name="twitter:description"
+    content="Upload your Letterboxd export and get a beautiful, interactive breakdown of your film life. Watch time, ratings, genres, actors, watchlist and more." />
+  <meta name="twitter:image" content="__SITE_URL__/og-image.png" />
+  <meta name="twitter:image:alt"
+    content="Letterboxd Stats Analyser: Your Letterboxd, Unwrapped, on a dark cinematic starfield" />
 
-    <script type="application/ld+json">
+  <link rel="icon" type="image/png" href="/letterboxd-unwrapped-mini-icon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="preconnect" href="https://image.tmdb.org" crossorigin />
+  <link rel="dns-prefetch" href="https://image.tmdb.org" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
@@ -90,7 +84,7 @@
       }
     </script>
 
-    <script type="application/ld+json">
+  <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -130,26 +124,30 @@
         ]
       }
     </script>
-  </head>
-  <body>
-    <div class="stars-layer-2"></div>
-    <div class="stars-layer-3"></div>
-    <div id="root">
-      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px; background: #090912; color: #ffffff; font-family: Segoe UI, Arial, sans-serif; text-align: center;">
-        <h1 style="margin: 0; font-size: clamp(2rem, 6vw, 3.4rem); letter-spacing: -0.03em;">Letterboxd Stats Analyser</h1>
-        <p style="max-width: 620px; margin: 0; font-size: 1.1rem; line-height: 1.6; color: #9e9ea8;">
-          Turn your Letterboxd export into a cinematic stats dashboard. Upload your ZIP to see
-          watch time, ratings, genres, favourite actors, watchlist insights and an interactive A to Z game.
-        </p>
-        <p style="margin: 0; font-size: 0.9rem; color: #00e87a;">Loading the app...</p>
-      </div>
+</head>
+
+<body>
+  <div class="stars-layer-2"></div>
+  <div class="stars-layer-3"></div>
+  <div id="root">
+    <div
+      style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px; background: #090912; color: #ffffff; font-family: Segoe UI, Arial, sans-serif; text-align: center;">
+      <h1 style="margin: 0; font-size: clamp(2rem, 6vw, 3.4rem); letter-spacing: -0.03em;">Letterboxd Stats Analyser
+      </h1>
+      <p style="max-width: 620px; margin: 0; font-size: 1.1rem; line-height: 1.6; color: #9e9ea8;">
+        Turn your Letterboxd export into a cinematic stats dashboard. Upload your ZIP to see
+        watch time, ratings, genres, favourite actors, watchlist insights and an interactive A to Z game.
+      </p>
+      <p style="margin: 0; font-size: 0.9rem; color: #00e87a;">Loading the app...</p>
     </div>
-    <noscript>
-      <div style="padding: 40px; color: #ffffff; font-family: sans-serif; text-align: center;">
-        Letterboxd Stats Analyser needs JavaScript to parse your export locally in the browser.
-        Please enable JavaScript and reload the page.
-      </div>
-    </noscript>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  </div>
+  <noscript>
+    <div style="padding: 40px; color: #ffffff; font-family: sans-serif; text-align: center;">
+      Letterboxd Stats Analyser needs JavaScript to parse your export locally in the browser.
+      Please enable JavaScript and reload the page.
+    </div>
+  </noscript>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
