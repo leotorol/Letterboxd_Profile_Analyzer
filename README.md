@@ -1,5 +1,7 @@
 # Letterboxd Stats
 
+**Live: <https://letterboxd-unwrapped.vercel.app/>**
+
 Turn your Letterboxd account history into a rich, scrollable stats dashboard. Drop in your exported ZIP and get an interactive, visual breakdown of everything you've ever watched.
 
 ## What is Letterboxd?
@@ -11,6 +13,8 @@ Letterboxd lets you **export your entire account** as a ZIP file containing CSV 
 <img width="1202" height="821" alt="Letterboxd Stats Analyser dashboard" src="https://github.com/user-attachments/assets/38df4fed-34a9-4d64-b595-dc749e88324e" />
 
 ## Live demo
+
+**Try it live: <https://letterboxd-unwrapped.vercel.app/>**
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/leotorol/Letterboxd_Profile_Analyzer)
 
