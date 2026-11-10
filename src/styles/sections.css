@@ -452,7 +452,7 @@
 
 @media (max-width: 480px) {
   .lb-chapter {
-    padding: var(--space-5) var(--space-3) var(--space-7);
+    padding: var(--space-5) var(--space-4) var(--space-8);
   }
 
   .lb-head {

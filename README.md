@@ -43,8 +43,6 @@ Everything is parsed and computed in your browser. Account data never leaves you
 
 TMDB's free rate limit is generous but not unlimited, so enrichment requests are batched, results are cached in `localStorage` and the loading screen shows live progress. The all-time lists used by section 08 are cached separately for seven days.
 
-Section 10 (exporting the report as an image or PDF, plus vertical share cards) is still planned.
-
 ## Chapter system
 
 The scroll is built as nine chapters, each with its own editorial format, joined by a fixed chapter rail (a vertical spine on desktop, a swipeable strip on mobile). Three shared pieces keep them coherent without making them identical:

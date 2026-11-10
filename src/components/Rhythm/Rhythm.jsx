@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { useData } from '../../context/DataContext';
 import { useRhythmStats, buildYearGrid } from '../../hooks/useRhythmStats';
 import { useCountUp } from '../../hooks/useCountUp';
+import { useDismissTapHover } from '../../hooks/useDismissTapHover';
 import { formatIsoDate, FULL_DAYS, FULL_MONTHS } from '../../utils/dateFormat';
 import { CalendarIcon, ClockIcon, CompassIcon, TrendIcon } from '../icons/Icons';
 import ChapterHeading from '../shared/ChapterHeading';
@@ -91,6 +92,8 @@ function TrendChart({ series }) {
   const [hover, setHover] = useState(-1);
   const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 720, height: 250 });
+
+  useDismissTapHover(containerRef, hover >= 0, () => setHover(-1));
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -183,8 +186,12 @@ function TrendChart({ series }) {
         preserveAspectRatio="none"
         role="img"
         aria-label="Films watched per month over time"
-        onMouseMove={onMove}
-        onMouseLeave={() => setHover(-1)}
+        onPointerDown={onMove}
+        onPointerMove={onMove}
+        onPointerLeave={(e) => {
+          // touch taps keep the reading on screen, mouse hover still clears
+          if (e.pointerType === 'mouse') setHover(-1);
+        }}
       >
         {gridLines.map((gy) => (
           <line key={gy} className="ry-evo-grid" x1={padL} y1={gy} x2={W - chart.padR} y2={gy} />
@@ -244,11 +251,20 @@ function TrendChart({ series }) {
  */
 function MonthBarChart({ data, max, favorite }) {
   const [hover, setHover] = useState(null);
+  const wrapRef = useRef(null);
+
+  useDismissTapHover(wrapRef, hover !== null, () => setHover(null));
 
   if (!data || data.length === 0) return null;
 
   return (
-    <div className="ry-month-bars" onMouseLeave={() => setHover(null)}>
+    <div
+      className="ry-month-bars"
+      ref={wrapRef}
+      onPointerLeave={(e) => {
+        if (e.pointerType === 'mouse') setHover(null);
+      }}
+    >
       {data.map((m, i) => {
         const full = FULL_MONTHS[m.label] || m.label;
         const isPeak = favorite && m.label === favorite.label;
@@ -257,7 +273,8 @@ function MonthBarChart({ data, max, favorite }) {
             key={m.label}
             className={`ry-month-bar${isPeak ? ' is-peak' : ''}`}
             style={{ height: `${(m.count / max) * 100}%` }}
-            onMouseEnter={() => setHover(i)}
+            onPointerEnter={() => setHover(i)}
+            onPointerDown={() => setHover(i)}
             aria-label={`${full}: ${m.count} films total`}
           >
             {hover === i && (

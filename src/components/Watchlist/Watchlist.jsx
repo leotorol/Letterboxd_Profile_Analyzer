@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useWatchlistStats, formatAge } from '../../hooks/useWatchlistStats';
+import { useDismissTapHover } from '../../hooks/useDismissTapHover';
 import { formatIsoDate } from '../../utils/dateFormat';
 import ChapterHeading from '../shared/ChapterHeading';
 import PanelHead from '../shared/PanelHead';
@@ -82,6 +83,9 @@ const VERDICT_COPY = {
  */
 function GrowthChart({ series }) {
   const [hover, setHover] = useState(null);
+  const wrapRef = useRef(null);
+
+  useDismissTapHover(wrapRef, hover != null, () => setHover(null));
 
   const chart = useMemo(() => {
     if (series.length < 2) return null;
@@ -137,7 +141,7 @@ function GrowthChart({ series }) {
   const slotW = chart.plotW / n;
 
   return (
-    <div className="wl-growth">
+    <div className="wl-growth" ref={wrapRef}>
       <svg
         className="wl-growth-svg"
         viewBox={`0 0 ${CHART_W} ${CHART_H}`}
@@ -179,7 +183,10 @@ function GrowthChart({ series }) {
             width={slotW}
             height={baseline - PAD_T}
             onPointerEnter={() => setHover(i)}
-            onPointerLeave={() => setHover(null)}
+            onPointerDown={() => setHover(i)}
+            onPointerLeave={(e) => {
+              if (e.pointerType === 'mouse') setHover(null);
+            }}
           />
         ))}
 

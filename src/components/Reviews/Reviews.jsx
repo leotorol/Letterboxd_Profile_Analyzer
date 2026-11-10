@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useReviewStats } from '../../hooks/useReviewStats';
+import { useDismissTapHover } from '../../hooks/useDismissTapHover';
 import { TMDB_POSTER_SMALL, TMDB_POSTER_MEDIUM } from '../../utils/tmdbImages';
 import ChapterHeading from '../shared/ChapterHeading';
 import PanelHead from '../shared/PanelHead';
@@ -163,6 +164,11 @@ function WordCloud({ words }) {
   const [hoverIdx, setHoverIdx] = useState(null);
   const [pinnedIdx, setPinnedIdx] = useState(null);
 
+  useDismissTapHover(wrapRef, pinnedIdx !== null, () => {
+    setHoverIdx(null);
+    setPinnedIdx(null);
+  });
+
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return undefined;
@@ -310,6 +316,9 @@ const BARS_PAD_B = 56;
  */
 function LengthBars({ series, verdict }) {
   const [hover, setHover] = useState(null);
+  const wrapRef = useRef(null);
+
+  useDismissTapHover(wrapRef, hover != null, () => setHover(null));
 
   const chart = useMemo(() => {
     if (series.length === 0) return null;
@@ -353,7 +362,7 @@ function LengthBars({ series, verdict }) {
   const verdictInfo = verdictMap[verdict.direction] || verdictMap.none;
 
   return (
-    <div className="rv-bars">
+    <div className="rv-bars" ref={wrapRef}>
       <svg
         className="rv-bars-svg"
         viewBox={`0 0 ${BARS_W} ${BARS_H}`}
@@ -378,7 +387,10 @@ function LengthBars({ series, verdict }) {
               key={row.year}
               className={`rv-bars-group${isActive ? ' is-active' : ''}`}
               onPointerEnter={() => setHover(i)}
-              onPointerLeave={() => setHover(null)}
+              onPointerDown={() => setHover(i)}
+              onPointerLeave={(e) => {
+                if (e.pointerType === 'mouse') setHover(null);
+              }}
               onFocus={() => setHover(i)}
               onBlur={() => setHover(null)}
               tabIndex={0}

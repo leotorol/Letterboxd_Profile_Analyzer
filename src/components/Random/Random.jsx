@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useRandomStats } from '../../hooks/useRandomStats';
+import { useDismissTapHover } from '../../hooks/useDismissTapHover';
 import useSectionMotion from '../../hooks/useSectionMotion';
 import { formatIsoDate } from '../../utils/dateFormat';
 import { tipPosition } from '../../utils/positionTip';
@@ -252,6 +253,8 @@ function CoverageStrip({ gap }) {
     setHover(null);
   }, []);
 
+  useDismissTapHover(wrapRef, Boolean(hover), clearHover);
+
   useEffect(() => () => {
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
   }, []);
@@ -347,8 +350,12 @@ function CoverageStrip({ gap }) {
         className="rd-filmstrip"
         role="img"
         aria-label={`You have seen ${gap.seenCount} of the ${gap.windowSize} most rated films of all time on TMDB`}
-        onPointerLeave={clearHover}
-        onPointerCancel={clearHover}
+        onPointerLeave={(e) => {
+          if (e.pointerType === 'mouse') clearHover();
+        }}
+        onPointerCancel={(e) => {
+          if (e.pointerType === 'mouse') clearHover();
+        }}
       >
         <div className="rd-filmstrip-cells">{cellNodes}</div>
       </div>
@@ -613,6 +620,8 @@ function DotField({ dots, ariaLabel, subFor, className = '', children }) {
     setHover(null);
   }, []);
 
+  useDismissTapHover(plotRef, Boolean(hover), clearHover);
+
   useEffect(() => () => {
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
   }, []);
@@ -626,8 +635,12 @@ function DotField({ dots, ariaLabel, subFor, className = '', children }) {
         ref={plotRef}
         onPointerMove={trackPointer}
         onPointerDown={showAtPointer}
-        onPointerLeave={clearHover}
-        onPointerCancel={clearHover}
+        onPointerLeave={(e) => {
+          if (e.pointerType === 'mouse') clearHover();
+        }}
+        onPointerCancel={(e) => {
+          if (e.pointerType === 'mouse') clearHover();
+        }}
       >
         {children}
         <DotScatter dots={dots} />

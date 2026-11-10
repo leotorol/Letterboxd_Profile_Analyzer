@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useDismissTapHover } from '../../hooks/useDismissTapHover';
 import { formatIsoDate } from '../../utils/dateFormat';
 import { tipPosition } from '../../utils/positionTip';
 import './Heatmap.css';
@@ -25,6 +26,8 @@ export default function Heatmap({ heatmap, byDateMovies = new Map() }) {
   const [hover, setHover] = useState(null);
   // the big film list stays put until you click another cell or leave it
   const [pinned, setPinned] = useState(null);
+
+  useDismissTapHover(wrapRef, Boolean(pinned), () => setPinned(null));
 
   if (!heatmap) return null;
 

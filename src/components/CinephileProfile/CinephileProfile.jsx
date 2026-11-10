@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { feature } from 'topojson-client';
 import { useData } from '../../context/DataContext';
 import { useCinephileStats } from '../../hooks/useCinephileStats';
+import { useDismissTapHover } from '../../hooks/useDismissTapHover';
 import { polarToCartesian } from '../../utils/geometry';
 import { ratingColor } from '../../utils/ratingColor';
 import { asArray } from '../../utils/coerce';
@@ -184,11 +185,14 @@ const LensIcon = () => (
  */
 function CinephileSpectrum({ axes }) {
   const [hoverKey, setHoverKey] = useState(null);
+  const wrapRef = useRef(null);
+
+  useDismissTapHover(wrapRef, hoverKey !== null, () => setHoverKey(null));
 
   if (!axes.length) return null;
 
   return (
-    <div className="cp-spectrum">
+    <div className="cp-spectrum" ref={wrapRef}>
       {axes.map((axis) => {
         const leftPct = axis.available ? axis.value * 100 : 50;
         const rightPct = 100 - leftPct;
@@ -226,7 +230,10 @@ function CinephileSpectrum({ axes }) {
                       aria-label={`Details for ${axis.key}`}
                       aria-expanded={hoverKey === axis.key}
                       onPointerEnter={() => setHoverKey(axis.key)}
-                      onPointerLeave={() => setHoverKey(null)}
+                      onPointerDown={() => setHoverKey(axis.key)}
+                      onPointerLeave={(e) => {
+                        if (e.pointerType === 'mouse') setHoverKey(null);
+                      }}
                       onFocus={() => setHoverKey(axis.key)}
                       onBlur={() => setHoverKey(null)}
                       onKeyDown={(e) => {
@@ -279,10 +286,16 @@ const GENRE_ARC_PALETTE = [
 function GenreDiversityCard({ genre }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const [pinnedIdx, setPinnedIdx] = useState(null);
+  const wrapRef = useRef(null);
 
   // what the tooltip centre label shows: pin (tap) wins over hover
   const activeIdx = hoveredIdx ?? pinnedIdx;
   const toggleIdx = (idx) => setPinnedIdx((prev) => (prev === idx ? null : idx));
+
+  useDismissTapHover(wrapRef, pinnedIdx !== null, () => {
+    setHoveredIdx(null);
+    setPinnedIdx(null);
+  });
 
   // Edge case: no genre data at all
   if (!genre.list.length || genre.total === 0) {
@@ -351,7 +364,7 @@ function GenreDiversityCard({ genre }) {
   const topDominancePct = safePct(genre.topGenre?.count || 0, genre.total);
 
   return (
-    <div className="cp-gfp-wrap">
+    <div className="cp-gfp-wrap" ref={wrapRef}>
       <div className="cp-gfp-donut-area">
         <svg
           className="cp-gfp-svg"
@@ -464,6 +477,11 @@ function GenreDotplot({ genre }) {
   const [hover, setHover] = useState(null);
   const [pinned, setPinned] = useState(null);
 
+  useDismissTapHover(containerRef, Boolean(hover || pinned), () => {
+    setHover(null);
+    setPinned(null);
+  });
+
   if (!genre.list.length) {
     return (
       <p className="cp-chart-empty">
@@ -479,12 +497,13 @@ function GenreDotplot({ genre }) {
   const makeTip = (film, genreName, node) => ({
     type: 'film', film, genre: genreName, ...tipPosition(containerRef.current, node, 120),
   });
-  // tap the same dot twice and the pinned tip dies
-  const activate = (film, genreName, node) => (
-    pinned?.film?.name === film.name && pinned?.genre === genreName
-      ? setPinned(null)
-      : setPinned(makeTip(film, genreName, node))
-  );
+  // tap the same dot twice and the pinned tip dies. hover is dropped too so a
+  // touch tap cannot leave a ghost tip behind after unpinning.
+  const activate = (film, genreName, node) => {
+    const same = pinned?.film?.name === film.name && pinned?.genre === genreName;
+    setHover(null);
+    setPinned(same ? null : makeTip(film, genreName, node));
+  };
   const rowKeyDown = (e) => {
     if (!['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
     e.preventDefault();
@@ -548,10 +567,6 @@ function GenreDotplot({ genre }) {
                           setHover(makeTip(film, row.genre, e.currentTarget));
                         }}
                         onFocus={(e) => setHover(makeTip(film, row.genre, e.currentTarget))}
-                        onPointerDown={(e) => {
-                          e.stopPropagation();
-                          activate(film, row.genre, e.currentTarget);
-                        }}
                         onClick={(e) => activate(film, row.genre, e.currentTarget)}
                       />
                     );
@@ -762,6 +777,11 @@ function TickDensityChart({ data, xLabel, accent }) {
   const [pinned, setPinned] = useState(null);
   const containerRef = useRef(null);
   const kIdxRef = useRef(-1);
+
+  useDismissTapHover(containerRef, Boolean(hover || pinned), () => {
+    setHover(null);
+    setPinned(null);
+  });
 
   const W = 560;
   const H = 200;
@@ -1356,6 +1376,11 @@ function WorldMapChart({ worldMap }) {
   const viewRef = useRef(view);
   const dragRef = useRef(null);
   const suppressClickRef = useRef(false);
+
+  useDismissTapHover(containerRef, Boolean(hover || pinned), () => {
+    setHover(null);
+    setPinned(null);
+  });
 
   // keep the latest view reachable from drag handlers without stale closures
   useEffect(() => {

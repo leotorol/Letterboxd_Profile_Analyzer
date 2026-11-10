@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useCastStats } from '../../hooks/useCastStats';
+import { useDismissTapHover } from '../../hooks/useDismissTapHover';
 import { ratingColor } from '../../utils/ratingColor';
 import { TMDB_POSTER_SMALL, TMDB_PROFILE_SMALL } from '../../utils/tmdbImages';
 import { tipPosition } from '../../utils/positionTip';
@@ -406,6 +407,8 @@ function BudgetQuadrant({ budget }) {
   const keyIdxRef = useRef(-1);
   const [hover, setHover] = useState(null);
   const [pinned, setPinned] = useState(null);
+
+  useDismissTapHover(plotRef, Boolean(pinned), () => setPinned(null));
 
   const chart = useMemo(() => {
     if (!points.length) return null;
