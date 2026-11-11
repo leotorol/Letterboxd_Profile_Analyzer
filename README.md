@@ -16,7 +16,7 @@ Letterboxd lets you **export your entire account** as a ZIP file containing CSV 
 
 **Try it live: <https://letterboxd-unwrapped.vercel.app/>**
 
-No account is required. Upload your own export or press **Try the demo** on the
+No account is required. Upload your own export or press **Use mock data** on the
 upload screen.
 
 ## What this app does

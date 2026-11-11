@@ -194,8 +194,11 @@ function CinephileSpectrum({ axes }) {
   return (
     <div className="cp-spectrum" ref={wrapRef}>
       {axes.map((axis) => {
-        const leftPct = axis.available ? axis.value * 100 : 50;
-        const rightPct = 100 - leftPct;
+        // value is the share toward the right pole, so the left pole takes the rest
+        const rightSharePct = axis.available ? axis.value * 100 : 50;
+        const leftSharePct = 100 - rightSharePct;
+        // the diamond marks where the two shares meet, so it sits on the split
+        const markerPct = leftSharePct;
         return (
           <div key={axis.key} className="cp-spectrum-row">
             <div className="cp-spectrum-meta">
@@ -212,19 +215,19 @@ function CinephileSpectrum({ axes }) {
                 role="meter"
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-valuenow={axis.available ? Math.round(leftPct) : undefined}
+                aria-valuenow={axis.available ? Math.round(rightSharePct) : undefined}
                 aria-valuetext={axis.available ? axis.pctLabel : 'no data'}
                 aria-label={axis.key}
               >
                 <div className="cp-spectrum-dual">
-                  <div className="cp-spectrum-fill-left" style={{ transform: `scaleX(${(leftPct / 100).toFixed(4)})` }} />
-                  <div className="cp-spectrum-fill-right" style={{ transform: `scaleX(${(rightPct / 100).toFixed(4)})` }} />
+                  <div className="cp-spectrum-fill-left" style={{ transform: `scaleX(${(leftSharePct / 100).toFixed(4)})` }} />
+                  <div className="cp-spectrum-fill-right" style={{ transform: `scaleX(${(rightSharePct / 100).toFixed(4)})` }} />
                 </div>
                 {axis.available && (
                   <>
                     <div
                       className={`cp-spectrum-marker ${hoverKey === axis.key ? 'is-active' : ''}`}
-                      style={{ left: `${axis.value * 100}%` }}
+                      style={{ left: `${markerPct}%` }}
                       role="button"
                       tabIndex={0}
                       aria-label={`Details for ${axis.key}`}
@@ -246,7 +249,7 @@ function CinephileSpectrum({ axes }) {
                     {hoverKey === axis.key && axis.explanation && (
                       <div
                         className="cp-dna-tip"
-                        style={{ left: `${axis.value * 100}%` }}
+                        style={{ left: `${markerPct}%` }}
                       >
                         {axis.explanation}
                       </div>
@@ -1886,7 +1889,8 @@ export default function CinephileProfile() {
             icon={<DnaIcon />}
             accent="var(--color-accent)"
             label="Your Cinephile DNA"
-            note="hover the markers"
+            note="hover the markers for info"
+            noteUnderline
           />
           <CinephileSpectrum axes={stats.spectrum} />
         </section>

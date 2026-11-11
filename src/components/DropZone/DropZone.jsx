@@ -141,7 +141,7 @@ export default function DropZone() {
         aria-busy={loadingMock}
       >
         {loadingMock ? <span className="dropzone-mock-spinner" aria-hidden="true" /> : <SparkIcon />}
-        {loadingMock ? 'Loading demo' : 'Try the demo'}
+        {loadingMock ? 'Loading mock data' : 'Use mock data'}
       </button>
 
       {/* Header — Letterboxd Stats Analyser */}

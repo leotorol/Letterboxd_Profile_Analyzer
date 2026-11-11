@@ -69,16 +69,10 @@ function buildSpectrum(rows) {
   let modernCount = 0;
   let medianYr = null;
   if (years.length) {
-    // a spread over a huge library can blow the call stack, so walk the years
-    let minYear = Infinity;
-    let maxYear = -Infinity;
-    for (const year of years) {
-      if (year < minYear) minYear = year;
-      if (year > maxYear) maxYear = year;
-    }
     medianYr = Math.round(median(years));
-    modern = minYear === maxYear ? 0.5 : (medianYr - minYear) / (maxYear - minYear);
-    modernCount = rows.filter((m) => Number.isFinite(m.year) && m.year >= 2000).length;
+    modernCount = years.filter((year) => year >= 2000).length;
+    // same definition as the tooltip: share of films released in 2000 or later
+    modern = modernCount / years.length;
   }
 
   const intlCount = withLang.length
@@ -109,7 +103,7 @@ function buildSpectrum(rows) {
       mainstream,
       mainstream != null ? `${Math.round(mainstream * 100)}% mainstream` : null,
       withVotes.length
-        ? `Out of ${withVotes.length.toLocaleString()} films, ${mainstreamCount.toLocaleString()} (${Math.round(mainstream * 100)}%) have more than your average TMDB vote count.`
+        ? `Out of ${withVotes.length.toLocaleString()} films, ${mainstreamCount.toLocaleString()} (${Math.round(mainstream * 100)}%) are at or above your average TMDB vote count.`
         : 'Not enough TMDB vote data.'
     ),
     makeAxis(
